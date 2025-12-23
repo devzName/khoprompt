@@ -1,0 +1,136 @@
+{
+  "header": {
+    "title": "Prompt Library",
+    "subtitle": "AI Prompt Collection",
+    "search": "Search prompts, authors, tags...",
+    "createPrompt": "Create Prompt",
+    "myPrompts": "My Prompts",
+    "logout": "Logout"
+  },
+  "login": {
+    "welcome": "Welcome back",
+    "subtitle": "Sign in to your account",
+    "emailPlaceholder": "Your email",
+    "passwordPlaceholder": "Password",
+    "signIn": "Sign In",
+    "or": "Or",
+    "googleLogin": "Sign in with Google",
+    "loggingIn": "Signing in...",
+    "footer": "Sign in to experience all features of Prompt Library",
+    "success": "Login successful!",
+    "error": "Login failed. Please try again!",
+    "fillAllFields": "Please fill in all fields"
+  },
+  "sidebar": {
+    "backToHome": "Back to home",
+    "overview": "Overview",
+    "myPrompts": "My Prompts",
+    "promptKits": "Prompt Kits",
+    "orders": "My Orders",
+    "paymentHistory": "Payment History",
+    "revenue": "Revenue",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "myPrompts": {
+    "breadcrumb": "Dashboard",
+    "title": "My Prompts",
+    "search": "Search prompts...",
+    "all": "All",
+    "public": "Public",
+    "private": "Private",
+    "createNew": "Create New",
+    "empty": "You don't have any prompts yet.",
+    "createFirst": "Create your first Prompt"
+  },
+  "hero": {
+    "title": "Discover & Share AI Prompts",
+    "subtitle": "Explore curated prompts for all needs – from programming, content creation to marketing."
+  },
+  "featured": {
+    "title": "Featured Prompts",
+    "by": "by",
+    "quickView": "Quick View"
+  },
+  "latest": {
+    "title": "Latest Prompts",
+    "quickView": "Quick View",
+    "pagination": "of"
+  },
+  "categories": {
+    "title": "Prompt Categories",
+    "subtitle": "Explore prompts by professional field",
+    "all": "All"
+  },
+  "footer": {
+    "description": "High-quality AI prompt library for ChatGPT, Claude, Gemini and other AI tools. Optimize your work with professional prompts.",
+    "copyright": "© 2025 Prompt Library. All rights reserved.",
+    "popularCategories": "Popular Categories",
+    "viewAll": "View All",
+    "support": "Support",
+    "guide": "User Guide",
+    "contact": "Contact",
+    "reportBug": "Report Bug",
+    "terms": "Terms of Service",
+    "builtWith": "Built with ❤️ AI Champions"
+  },
+  "categoryPage": {
+    "home": "Home",
+    "prompts": "Prompts",
+    "results": "Results",
+    "noResults": "No prompts found",
+    "noResultsDesc": "currently has no prompts.",
+    "categoryDescriptions": {
+      "Development": "Prompts for coding, debugging and code optimization",
+      "Design": "Prompts for UI/UX design and creative work",
+      "Marketing": "Prompts for marketing, SEO and content creation",
+      "Business Analysis": "Prompts for business analysis and research",
+      "Project Management": "Prompts for project management and planning",
+      "Testing": "Prompts for testing and quality assurance",
+      "Data Analysis": "Prompts for data analysis and insights",
+      "default": "Professional prompts for various purposes"
+    }
+  },
+  "promptDetail": {
+    "home": "Home",
+    "notFound": "Prompt not found",
+    "backHome": "Back to home",
+    "copyPrompt": "Copy Prompt",
+    "copied": "Copied!",
+    "share": "Share",
+    "promptContent": "Prompt Content",
+    "instructions": "Instructions",
+    "category": "Category",
+    "categoryDesc": "This prompt belongs to category",
+    "relatedPrompts": "Related Prompts",
+    "defaultInstructions": {
+      "0": "Copy the prompt content above using the \"Copy Prompt\" button",
+      "1": "Open ChatGPT, Claude or any AI tool you want to use",
+      "2": "Paste the prompt and replace the placeholder [brackets] with your specific information",
+      "3": "Press Enter to get results from AI"
+    }
+  },
+  "tags": {
+    "title": "Explore by Tags",
+    "subtitle": "Find prompts based on your favorite tags",
+    "learning": "Learning",
+    "education": "Education",
+    "office": "Office",
+    "professional": "Professional",
+    "landscape": "Landscape",
+    "art": "Art",
+    "creative": "Creative",
+    "writing": "Writing",
+    "shortStory": "Short Story"
+  },
+  "drawer": {
+    "categoryTags": "Category & Tags",
+    "detailDescription": "Detailed Description",
+    "promptContent": "Prompt Content",
+    "copy": "Copy",
+    "author": "Author",
+    "helpful": "Helpful",
+    "notHelpful": "Not Helpful",
+    "viewDetail": "View Details"
+  }
+}

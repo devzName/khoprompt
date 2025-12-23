@@ -11,11 +11,14 @@ import {
   AppstoreOutlined,
   FolderOutlined
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const Categories = () => {
+  const { t } = useTranslation();
+  
   const categories = [
     {
-      title: 'Tất cả',
+      title: t('categories.all'),
       icon: <AppstoreOutlined />,
       count: 190
     },
@@ -78,11 +81,11 @@ const Categories = () => {
           <div className="flex items-center gap-3 mb-3">
             <FolderOutlined className="text-2xl text-blue-600" />
             <h2 className="text-3xl font-bold text-gray-900">
-              Danh mục Prompts
+              {t('categories.title')}
             </h2>
           </div>
           <p className="text-gray-600">
-            Khám phá prompts theo từng lĩnh vực chuyên môn
+            {t('categories.subtitle')}
           </p>
         </div>
 

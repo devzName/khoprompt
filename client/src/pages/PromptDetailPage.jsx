@@ -6,65 +6,49 @@ import {
   ShareAltOutlined, 
   EyeOutlined, 
   LikeOutlined, 
-  CalendarOutlined,
-  UserOutlined
+  CalendarOutlined
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
 import { mockPrompts } from '../data/mockPrompts';
+import { ROUTES } from '../constants/routes';
 
 const PromptDetailPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
 
-  // Find prompt from mockPrompts based on ID
   const prompt = mockPrompts.find(p => p.id === parseInt(id));
 
-  // If prompt not found, show 404 or redirect
   if (!prompt) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-          <p className="text-gray-600 mb-4">Prompt không tồn tại</p>
-          <Link to="/" className="text-blue-600 hover:text-blue-800">
-            Về trang chủ
+          <p className="text-gray-600 mb-4">{t('promptDetail.notFound')}</p>
+          <Link to={ROUTES.HOME} className="text-blue-600 hover:text-blue-800">
+            {t('promptDetail.backHome')}
           </Link>
         </div>
       </div>
     );
   }
 
-  // Generate default instructions if not provided
-  const defaultInstructions = [
-    'Copy nội dung prompt ở trên bằng nút "Copy Prompt"',
-    'Mở ChatGPT, Claude hoặc AI tool bạn muốn sử dụng',
-    'Paste prompt và thay thế các placeholder [brackets] với thông tin cụ thể của bạn',
-    'Nhấn Enter để nhận kết quả từ AI'
-  ];
-
-  // Use prompt instructions or default ones
-  const instructions = prompt.instructions || defaultInstructions;
-
-  // Generate author avatar from first letter of author name
-  const authorAvatar = prompt.author ? prompt.author.charAt(0).toUpperCase() : 'A';
-
-  // Format created date (use a default if not provided)
-  const createdAt = prompt.createdAt || '01/01/2024';
-
-  // Category descriptions
-  const categoryDescriptions = {
-    'Development': 'Prompt giúp code, debug và tối ưu code',
-    'Design': 'Prompt hỗ trợ thiết kế UI/UX và creative work',
-    'Marketing': 'Prompt cho marketing, SEO và content creation',
-    'Business Analysis': 'Prompt phân tích business và research',
-    'Project Management': 'Prompt quản lý dự án và planning',
-    'Testing': 'Prompt cho testing và quality assurance',
-    'Data Analysis': 'Prompt phân tích dữ liệu và insights'
+  const getDefaultInstructions = () => {
+    return [
+      t('promptDetail.defaultInstructions.0'),
+      t('promptDetail.defaultInstructions.1'),
+      t('promptDetail.defaultInstructions.2'),
+      t('promptDetail.defaultInstructions.3')
+    ];
   };
 
-  const categoryDescription = categoryDescriptions[prompt.category] || 'Prompt chuyên nghiệp cho nhiều mục đích khác nhau';
+  const instructions = prompt.instructions || getDefaultInstructions();
+  const authorAvatar = prompt.author ? prompt.author.charAt(0).toUpperCase() : 'A';
+  const createdAt = prompt.createdAt || '01/01/2024';
+  const categoryDescription = t(`categoryPage.categoryDescriptions.${prompt.category}`) || t('categoryPage.categoryDescriptions.default');
 
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(prompt.content);
@@ -74,10 +58,10 @@ const PromptDetailPage = () => {
 
   const breadcrumbItems = [
     {
-      title: <Link to="/">Trang chủ</Link>
+      title: <Link to={ROUTES.HOME}>{t('promptDetail.home')}</Link>
     },
     {
-      title: <Link to={`/category/${prompt.category.toLowerCase()}`}>{prompt.category}</Link>
+      title: <Link to={ROUTES.CATEGORY_PATH(prompt.category.toLowerCase())}>{prompt.category}</Link>
     },
     {
       title: prompt.title
@@ -89,14 +73,9 @@ const PromptDetailPage = () => {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Main Content - Full Width */}
         <div className="w-full">
-          {/* Breadcrumb */}
-          <Breadcrumb 
-            items={breadcrumbItems}
-          />
+          <Breadcrumb items={breadcrumbItems} />
 
-          {/* Prompt Header */}
           <div className="mt-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
             <div className="flex items-start gap-4 mb-4">
               <Avatar size={48} className="bg-blue-500 text-white font-semibold">
@@ -106,7 +85,6 @@ const PromptDetailPage = () => {
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{prompt.title}</h1>
                 <p className="text-gray-600 mb-3">{prompt.description}</p>
                 
-                {/* Stats */}
                 <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
                   <div className="flex items-center gap-1">
                     <EyeOutlined />
@@ -122,7 +100,6 @@ const PromptDetailPage = () => {
                   </div>
                 </div>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-2">
                   {prompt.tags && prompt.tags.map((tag, index) => (
                     <Tag key={index} color="blue">
@@ -133,7 +110,6 @@ const PromptDetailPage = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3">
               <Button 
                 type="primary" 
@@ -141,28 +117,26 @@ const PromptDetailPage = () => {
                 onClick={handleCopyPrompt}
                 className="flex-1"
               >
-                {copied ? 'Đã copy!' : 'Copy Prompt'}
+                {copied ? t('promptDetail.copied') : t('promptDetail.copyPrompt')}
               </Button>
               <Button 
                 icon={<ShareAltOutlined />}
                 className="px-6"
               >
-                Chia sẻ
+                {t('promptDetail.share')}
               </Button>
             </div>
           </div>
 
-          {/* Prompt Content */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Nội dung Prompt</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('promptDetail.promptContent')}</h2>
             <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-800 whitespace-pre-wrap">
               {prompt.content}
             </div>
           </div>
 
-          {/* Instructions */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Hướng dẫn sử dụng</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('promptDetail.instructions')}</h2>
             <ol className="space-y-2">
               {instructions.map((instruction, index) => (
                 <li key={index} className="flex gap-3">
@@ -173,19 +147,17 @@ const PromptDetailPage = () => {
             </ol>
           </div>
 
-          {/* Category */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Danh mục</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('promptDetail.category')}</h2>
             <p className="text-gray-700">
-              Prompt này thuộc danh mục <strong>{prompt.category}</strong> - {categoryDescription}
+              {t('promptDetail.categoryDesc')} <strong>{prompt.category}</strong> - {categoryDescription}
             </p>
           </div>
         </div>
 
-        {/* Related Prompts Section */}
         <div className="mt-16">
           <LatestPrompts 
-            title="Prompts cùng danh mục" 
+            title={t('promptDetail.relatedPrompts')} 
             prompts={mockPrompts}
             currentPrompt={prompt}
             filterByCategory={true}

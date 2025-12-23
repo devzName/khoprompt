@@ -11,3 +11,4 @@ server/.mypy_cache
 server/logs/
 .DS_Store
 .idea/
+client/.env

@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
@@ -8,6 +9,7 @@ import EmptyState from '../components/EmptyState';
 import { mockPrompts } from '../data/mockPrompts';
 
 const CategoryPage = () => {
+  const { t } = useTranslation();
   const { category } = useParams();
   const categoryName = decodeURIComponent(category);
   
@@ -15,17 +17,7 @@ const CategoryPage = () => {
     prompt.category.toLowerCase() === categoryName.toLowerCase()
   );
 
-  const categoryDescriptions = {
-    'Development': 'Prompt giúp code, debug và tối ưu code',
-    'Design': 'Prompt hỗ trợ thiết kế UI/UX và creative work',
-    'Marketing': 'Prompt cho marketing, SEO và content creation',
-    'Business Analysis': 'Prompt phân tích business và research',
-    'Project Management': 'Prompt quản lý dự án và planning',
-    'Testing': 'Prompt cho testing và quality assurance',
-    'Data Analysis': 'Prompt phân tích dữ liệu và insights'
-  };
-
-  const categoryDescription = categoryDescriptions[categoryName] || 'Prompt chuyên nghiệp cho nhiều mục đích khác nhau';
+  const categoryDescription = t(`categoryPage.categoryDescriptions.${categoryName}`) || t('categoryPage.categoryDescriptions.default');
   const totalItems = categoryPrompts.length;
 
   return (
@@ -35,8 +27,8 @@ const CategoryPage = () => {
       <PageHero 
         title={categoryName}
         description={categoryDescription}
-        breadcrumb={<><span>Trang chủ</span> / <span className="capitalize">{categoryName}</span></>}
-        stats={`${totalItems} Prompts`}
+        breadcrumb={<><span>{t('categoryPage.home')}</span> / <span className="capitalize">{categoryName}</span></>}
+        stats={`${totalItems} ${t('categoryPage.prompts')}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -46,12 +38,12 @@ const CategoryPage = () => {
           <div className="lg:col-span-3">
             {totalItems === 0 ? (
               <EmptyState 
-                title="Không tìm thấy prompt nào"
-                description={`Danh mục "${categoryName}" hiện chưa có prompt nào.`}
+                title={t('categoryPage.noResults')}
+                description={`${t('categoryPage.categoryDescriptions.default')} "${categoryName}" ${t('categoryPage.noResultsDesc')}`}
               />
             ) : (
               <LatestPrompts 
-                title="Kết quả"
+                title={t('categoryPage.results')}
                 prompts={categoryPrompts}
                 pageSize={9}
                 columns={3}

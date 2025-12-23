@@ -1,8 +1,11 @@
 import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined } from '@ant-design/icons';
 import { Drawer, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../constants/routes';
 
 const PromptDrawer = ({ open, onClose, prompt }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleCopy = () => {
@@ -12,9 +15,8 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
   };
 
   const handleViewDetail = () => {
-    // Navigate to detail page
-    navigate(`/prompt/${prompt.id}`);
-    onClose(); // Close drawer when navigating
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
+    onClose();
   };
 
   return (
@@ -23,19 +25,17 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
       placement="right"
       onClose={onClose}
       open={open}
-      width={600}
+      size="large"
       className="prompt-drawer"
     >
       {prompt && (
         <div className="space-y-6">
-          {/* Header Info */}
           <div className="text-gray-600">
             {prompt.fullDescription}
           </div>
 
-          {/* Categories and Tags */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Danh mục & Tags</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('drawer.categoryTags')}</h3>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md">
                 {prompt.category}
@@ -48,7 +48,6 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="flex items-center gap-6 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <EyeOutlined />
@@ -64,15 +63,13 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             </div>
           </div>
 
-          {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Mô tả chi tiết</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('drawer.detailDescription')}</h3>
             <p className="text-gray-600">{prompt.fullDescription}</p>
           </div>
 
-          {/* Prompt Content */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Nội dung Prompt</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('drawer.promptContent')}</h3>
             <div className="bg-gray-50 rounded-lg p-4 relative">
               <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
                 {prompt.content}
@@ -83,31 +80,29 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
                 size="small"
                 onClick={handleCopy}
               >
-                Copy
+                {t('drawer.copy')}
               </Button>
             </div>
           </div>
 
-          {/* Author */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Tác giả</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('drawer.author')}</h3>
             <p className="text-gray-600">{prompt.author}</p>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3 pt-4 border-t">
             <Button 
               type="primary" 
               icon={<LikeOutlined />}
               className="flex-1"
             >
-              Hữu ích
+              {t('drawer.helpful')}
             </Button>
             <Button 
               icon={<DislikeOutlined />}
               className="flex-1"
             >
-              Không hữu ích
+              {t('drawer.notHelpful')}
             </Button>
           </div>
           
@@ -118,7 +113,7 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             size="large"
             onClick={handleViewDetail}
           >
-            Xem chi tiết
+            {t('drawer.viewDetail')}
           </Button>
         </div>
       )}
