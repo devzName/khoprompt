@@ -1,0 +1,92 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { StarOutlined, EyeOutlined } from '@ant-design/icons';
+import PromptDrawer from './PromptDrawer';
+import { mockPrompts } from '../data/mockPrompts';
+
+const FeaturedPrompts = () => {
+  const navigate = useNavigate();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(null);
+
+  const featuredPrompts = mockPrompts.filter(prompt => prompt.featured === true);
+
+  if (featuredPrompts.length === 0) {
+    return null;
+  }
+
+  const handleQuickView = (e, prompt) => {
+    e.stopPropagation();
+    setSelectedPrompt(prompt);
+    setDrawerOpen(true);
+  };
+
+  const handleCardClick = (prompt) => {
+    navigate(`/prompt/${prompt.id}`);
+  };
+
+  return (
+    <>
+      <section className="py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-8">
+            <StarOutlined className="text-2xl text-yellow-500" />
+            <h2 className="text-3xl font-bold text-gray-900">
+              Prompts Nổi Bật ({featuredPrompts.length})
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredPrompts.map((prompt) => (
+              <div 
+                key={prompt.id} 
+                className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col cursor-pointer"
+                onClick={() => handleCardClick(prompt)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                    {prompt.category}
+                  </span>
+                  <div className="flex items-center gap-1 text-yellow-500">
+                    <StarOutlined className="text-sm" />
+                    <span className="text-sm font-medium text-gray-700">{prompt.rating}</span>
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{prompt.title}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {prompt.tags.map((tag, index) => (
+                    <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                
+                <div className="flex items-center justify-between text-sm mt-auto">
+                  <span className="text-gray-500">bởi {prompt.author}</span>
+                  <button 
+                    onClick={(e) => handleQuickView(e, prompt)}
+                    className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"
+                  >
+                    <EyeOutlined className="text-xs" />
+                    Xem nhanh
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <PromptDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        prompt={selectedPrompt}
+      />
+    </>
+  );
+};
+
+export default FeaturedPrompts;
