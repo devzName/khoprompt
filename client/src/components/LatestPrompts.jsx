@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FireOutlined, StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { Pagination } from 'antd';
+import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
+import { ROUTES } from '../constants/routes';
 
 const LatestPrompts = ({ 
-  title = "Prompts Mới Nhất", 
+  title = null, 
   prompts = [],
   currentPrompt = null, 
   filterByCategory = false,
@@ -14,6 +16,7 @@ const LatestPrompts = ({
   pageSize = 8,
   columns = 4
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -67,7 +70,7 @@ const LatestPrompts = ({
   };
 
   const handleCardClick = (prompt) => {
-    navigate(`/prompt/${prompt.id}`);
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
   };
 
   return (
@@ -78,7 +81,7 @@ const LatestPrompts = ({
             <div className="flex items-center gap-3">
               <FireOutlined className="text-2xl text-orange-500" />
               <h2 className="text-3xl font-bold text-gray-900">
-                {title} ({totalItems})
+                {title || t('latest.title')} ({totalItems})
               </h2>
             </div>
           </div>
@@ -125,7 +128,7 @@ const LatestPrompts = ({
                     className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium"
                   >
                     <EyeOutlined className="text-xs" />
-                    Xem nhanh
+                    {t('latest.quickView')}
                   </button>
                 </div>
               </div>
@@ -142,7 +145,7 @@ const LatestPrompts = ({
                 showSizeChanger={false}
                 showQuickJumper={false}
                 showTotal={(total, range) => 
-                  `${range[0]}-${range[1]} của ${total} prompts`
+                  `${range[0]}-${range[1]} ${t('latest.pagination')} ${total} prompts`
                 }
                 className="text-sm"
               />

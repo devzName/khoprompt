@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
 import { mockPrompts } from '../data/mockPrompts';
+import { ROUTES } from '../constants/routes';
 
 const FeaturedPrompts = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -22,7 +25,7 @@ const FeaturedPrompts = () => {
   };
 
   const handleCardClick = (prompt) => {
-    navigate(`/prompt/${prompt.id}`);
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
   };
 
   return (
@@ -32,7 +35,7 @@ const FeaturedPrompts = () => {
           <div className="flex items-center gap-3 mb-8">
             <StarOutlined className="text-2xl text-yellow-500" />
             <h2 className="text-3xl font-bold text-gray-900">
-              Prompts Nổi Bật ({featuredPrompts.length})
+              {t('featured.title')} ({featuredPrompts.length})
             </h2>
           </div>
           
@@ -65,13 +68,13 @@ const FeaturedPrompts = () => {
                 </div>
                 
                 <div className="flex items-center justify-between text-sm mt-auto">
-                  <span className="text-gray-500">bởi {prompt.author}</span>
+                  <span className="text-gray-500">{t('featured.by')} {prompt.author}</span>
                   <button 
                     onClick={(e) => handleQuickView(e, prompt)}
                     className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"
                   >
                     <EyeOutlined className="text-xs" />
-                    Xem nhanh
+                    {t('featured.quickView')}
                   </button>
                 </div>
               </div>

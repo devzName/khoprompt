@@ -1,12 +1,15 @@
 import { TagOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const TagsSection = () => {
+  const { t } = useTranslation();
+  
   const tags = [
     'Claude', 'GPT-4', 'Code', 'ChatGPT', 'SEO', 'React',
     'Laravel', 'Marketing', 'Programming', 'Gemini', 'Development', 'Content',
-    'PHP', 'Social Media', 'Học tập', 'Giáo dục', 'Email', 'Văn phòng',
-    'Chuyên nghiệp', 'Debug', 'Midjourney', 'Phong cảnh', 'Nghệ thuật', 'Facebook',
-    'Sáng tạo', 'Viết lách', 'Truyện ngắn', 'Blog', 'Content Marketing', 'Email Marketing',
+    'PHP', 'Social Media', t('tags.learning'), t('tags.education'), 'Email', t('tags.office'),
+    t('tags.professional'), 'Debug', 'Midjourney', t('tags.landscape'), t('tags.art'), 'Facebook',
+    t('tags.creative'), t('tags.writing'), t('tags.shortStory'), 'Blog', 'Content Marketing', 'Email Marketing',
     'Conversion', 'AIDA'
   ];
 
@@ -17,11 +20,11 @@ const TagsSection = () => {
           <div className="flex items-center gap-3 mb-3">
             <TagOutlined className="text-2xl text-blue-600" />
             <h2 className="text-3xl font-bold text-gray-900">
-              Khám phá theo Tags
+              {t('tags.title')}
             </h2>
           </div>
           <p className="text-gray-600">
-            Tìm prompts bằng cách dựa vào các tag yêu thích của bạn
+            {t('tags.subtitle')}
           </p>
         </div>
 

@@ -1,0 +1,136 @@
+{
+  "header": {
+    "title": "Prompt Library",
+    "subtitle": "AI Prompt Collection",
+    "search": "Tìm kiếm prompt, tác giả, tag...",
+    "createPrompt": "Tạo Prompt",
+    "myPrompts": "Prompts của tôi",
+    "logout": "Đăng xuất"
+  },
+  "login": {
+    "welcome": "Chào mừng bạn trở lại",
+    "subtitle": "Đăng nhập vào tài khoản của bạn",
+    "emailPlaceholder": "Email của bạn",
+    "passwordPlaceholder": "Mật khẩu",
+    "signIn": "Đăng nhập",
+    "or": "Hoặc",
+    "googleLogin": "Đăng nhập với Google",
+    "loggingIn": "Đang đăng nhập...",
+    "footer": "Đăng nhập để trải nghiệm đầy đủ tính năng của Prompt Library",
+    "success": "Đăng nhập thành công!",
+    "error": "Đăng nhập thất bại. Vui lòng thử lại!",
+    "fillAllFields": "Vui lòng điền đầy đủ thông tin"
+  },
+  "sidebar": {
+    "backToHome": "Quay về trang chủ",
+    "overview": "Tổng quan",
+    "myPrompts": "Prompts của tôi",
+    "promptKits": "Prompt Kits",
+    "orders": "Đơn hàng đã mua",
+    "paymentHistory": "Lịch sử nạp tiền",
+    "revenue": "Doanh thu",
+    "profile": "Thông tin cá nhân",
+    "logout": "Đăng xuất"
+  },
+  "myPrompts": {
+    "breadcrumb": "Dashboard",
+    "title": "Prompts của tôi",
+    "search": "Tìm kiếm prompts...",
+    "all": "Tất cả",
+    "public": "Công khai",
+    "private": "Riêng tư",
+    "createNew": "Tạo mới",
+    "empty": "Bạn chưa có prompt nào.",
+    "createFirst": "Tạo Prompt đầu tiên"
+  },
+  "hero": {
+    "title": "Khám phá & Chia sẻ AI Prompts",
+    "subtitle": "Khám phá kho prompt được tuyển chọn cho mọi nhu cầu – từ lập trình, sáng tạo nội dung đến marketing."
+  },
+  "featured": {
+    "title": "Prompts Nổi Bật",
+    "by": "bởi",
+    "quickView": "Xem nhanh"
+  },
+  "latest": {
+    "title": "Prompts Mới Nhất",
+    "quickView": "Xem nhanh",
+    "pagination": "của"
+  },
+  "categories": {
+    "title": "Danh mục Prompts",
+    "subtitle": "Khám phá prompts theo từng lĩnh vực chuyên môn",
+    "all": "Tất cả"
+  },
+  "footer": {
+    "description": "Thư viện prompt AI chất lượng cao cho ChatGPT, Claude, Gemini và các AI tools khác. Tối ưu hóa công việc với prompt chuyên nghiệp.",
+    "copyright": "© 2025 Prompt Library. All rights reserved.",
+    "popularCategories": "Danh mục phổ biến",
+    "viewAll": "Xem tất cả",
+    "support": "Hỗ trợ",
+    "guide": "Hướng dẫn sử dụng",
+    "contact": "Liên hệ",
+    "reportBug": "Báo lỗi",
+    "terms": "Điều khoản sử dụng",
+    "builtWith": "Được xây dựng với ❤️ AI Champions"
+  },
+  "categoryPage": {
+    "home": "Trang chủ",
+    "prompts": "Prompts",
+    "results": "Kết quả",
+    "noResults": "Không tìm thấy prompt nào",
+    "noResultsDesc": "hiện chưa có prompt nào.",
+    "categoryDescriptions": {
+      "Development": "Prompt giúp code, debug và tối ưu code",
+      "Design": "Prompt hỗ trợ thiết kế UI/UX và creative work",
+      "Marketing": "Prompt cho marketing, SEO và content creation",
+      "Business Analysis": "Prompt phân tích business và research",
+      "Project Management": "Prompt quản lý dự án và planning",
+      "Testing": "Prompt cho testing và quality assurance",
+      "Data Analysis": "Prompt phân tích dữ liệu và insights",
+      "default": "Prompt chuyên nghiệp cho nhiều mục đích khác nhau"
+    }
+  },
+  "promptDetail": {
+    "home": "Trang chủ",
+    "notFound": "Prompt không tồn tại",
+    "backHome": "Về trang chủ",
+    "copyPrompt": "Copy Prompt",
+    "copied": "Đã copy!",
+    "share": "Chia sẻ",
+    "promptContent": "Nội dung Prompt",
+    "instructions": "Hướng dẫn sử dụng",
+    "category": "Danh mục",
+    "categoryDesc": "Prompt này thuộc danh mục",
+    "relatedPrompts": "Prompts cùng danh mục",
+    "defaultInstructions": {
+      "0": "Nhấn Copy nội dung prompt ở trên bằng nút \"Copy Prompt\"",
+      "1": "Mở ChatGPT, Claude hoặc AI tool bạn muốn sử dụng",
+      "2": "Paste prompt và thay thế các placeholder [brackets] với thông tin cụ thể của bạn",
+      "3": "Nhấn Enter để nhận kết quả từ AI"
+    }
+  },
+  "tags": {
+    "title": "Khám phá theo Tags",
+    "subtitle": "Tìm prompts bằng cách dựa vào các tag yêu thích của bạn",
+    "learning": "Học tập",
+    "education": "Giáo dục",
+    "office": "Văn phòng",
+    "professional": "Chuyên nghiệp",
+    "landscape": "Phong cảnh",
+    "art": "Nghệ thuật",
+    "creative": "Sáng tạo",
+    "writing": "Viết lách",
+    "shortStory": "Truyện ngắn"
+  },
+  "drawer": {
+    "categoryTags": "Danh mục & Tags",
+    "detailDescription": "Mô tả chi tiết",
+    "promptContent": "Nội dung Prompt",
+    "copy": "Copy",
+    "author": "Tác giả",
+    "helpful": "Hữu ích",
+    "notHelpful": "Không hữu ích",
+    "viewDetail": "Xem chi tiết"
+  }
+}
