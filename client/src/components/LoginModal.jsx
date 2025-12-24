@@ -1,12 +1,12 @@
 import { Modal, message, Input, Button, Divider } from 'antd';
-import { GoogleOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,9 +75,8 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
   const handleGoogleSuccess = async (idToken) => {
     try {
-      setLoading(true);
+      setGoogleLoading(true);
 
-      // 1. Authenticate with backend using Google ID Token
       const response = await fetch('/api/v1/auth/login/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,13 +89,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
       const { access_token, refresh_token } = await response.json();
 
-      // 2. Store tokens
       localStorage.setItem('access_token', access_token);
       if (refresh_token) {
         localStorage.setItem('refresh_token', refresh_token);
       }
 
-      // 3. Get user info from backend
       const meResponse = await fetch('/api/v1/auth/me', {
         headers: {
           'Authorization': `Bearer ${access_token}`
@@ -109,7 +106,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
       const userInfo = await meResponse.json();
 
-      // For UI compatibility, ensure picture is present
       const user = {
         ...userInfo,
         name: userInfo.full_name || userInfo.email.split('@')[0],
@@ -125,7 +121,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       console.error('Google login error:', error);
       message.error(t('login.error'));
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -135,22 +131,22 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       open={open}
       onCancel={onClose}
       footer={null}
-      width={480}
+      width="90%"
+      style={{ maxWidth: 480 }}
       centered
       className="login-modal"
     >
-      <div className="py-6 px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="py-4 px-2 sm:py-6 sm:px-4">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             {t('login.welcome')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             {t('login.subtitle')}
           </p>
         </div>
 
-        {/* Email/Password Form */}
-        <form onSubmit={handleFormLogin} className="space-y-4 mb-6">
+        <form onSubmit={handleFormLogin} className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
           <Input
             size="large"
             placeholder={t('login.emailPlaceholder')}
@@ -178,26 +174,39 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
           </Button>
         </form>
 
-        <Divider className="text-gray-400 text-sm">{t('login.or')}</Divider>
+        <Divider className="text-gray-400 text-xs sm:text-sm">{t('login.or')}</Divider>
 
-        {/* Google Login Button */}
-        <div className="w-full flex justify-center">
-          <GoogleLogin
-            onSuccess={credentialResponse => {
-              handleGoogleSuccess(credentialResponse.credential);
-            }}
-            onError={() => {
-              console.error('Login Failed');
-              message.error(t('login.error'));
-            }}
-            useOneTap
-            width="400"
-            theme="outline"
-            shape="pill"
-          />
+        <div className="w-full flex justify-center mb-4 sm:mb-6">
+          <div className="w-full max-w-sm">
+            {googleLoading ? (
+              <Button
+                size="large"
+                loading={true}
+                className="w-full rounded-xl border-gray-300 font-medium"
+              >
+                {t('login.loggingIn')}
+              </Button>
+            ) : (
+              <GoogleLogin
+                onSuccess={credentialResponse => {
+                  handleGoogleSuccess(credentialResponse.credential);
+                }}
+                onError={() => {
+                  console.error('Login Failed');
+                  message.error(t('login.error'));
+                }}
+                useOneTap={false}
+                width="100%"
+                theme="outline"
+                shape="pill"
+                size="large"
+                text="signin_with"
+              />
+            )}
+          </div>
         </div>
 
-        <div className="text-center mt-6 text-xs text-gray-500">
+        <div className="text-center text-xs text-gray-500 px-2">
           {t('login.footer')}
         </div>
       </div>
