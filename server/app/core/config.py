@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     redis_port: int = Field(default=6379, validation_alias="REDIS_PORT")
     redis_url: str | None = Field(default=None, validation_alias="REDIS_URL")
     algorithm: str = Field(default="HS256", validation_alias="ALGORITHM")
+    google_client_id: str | None = Field(default=None, validation_alias="GOOGLE_CLIENT_ID")
 
     database_url: str = Field(
         default="postgresql+asyncpg://app:app@localhost:5432/app",
