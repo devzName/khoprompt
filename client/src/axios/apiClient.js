@@ -32,7 +32,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
-      window.location.href = '/';
+      // window.location.href = '/';
     }
     
     const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
