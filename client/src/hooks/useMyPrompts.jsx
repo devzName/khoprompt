@@ -17,6 +17,7 @@ export const useMyPrompts = () => {
   const [prompts, setPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [predefinedTags, setPredefinedTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -30,6 +31,7 @@ export const useMyPrompts = () => {
   const fetchTags = useCallback(async () => {
     try {
       const data = await promptService.getTags();
+      setAvailableTags(data);
       setPredefinedTags(data.map(tag => tag.name));
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -87,13 +89,26 @@ export const useMyPrompts = () => {
 
       const categoryObj = categories.find(c => c.value === values.category);
 
+      const tagIds = [];
+      const tagNames = [];
+
+      (values.tags || []).forEach(val => {
+        const found = availableTags.find(t => t.name === val);
+        if (found) {
+          tagIds.push(found.id);
+        }
+        // Always send tag names for display/fallback
+        tagNames.push(val);
+      });
+
       const payload = {
         title: values.title,
         description: values.description,
         content: values.content,
         category_id: values.category,
         category: categoryObj ? categoryObj.label : 'General',
-        tags: values.tags || [],
+        tags: tagNames,
+        tag_ids: tagIds,
         full_description: values.notes || ""
       };
 

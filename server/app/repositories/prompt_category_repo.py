@@ -32,6 +32,28 @@ class PromptCategoryRepository:
         return [dict(row._asdict()) for row in result.all()]
 
     @staticmethod
+    async def get_top_categories(session: AsyncSession, limit: int = 5) -> list[dict]:
+        from app.models.prompt import Prompt
+        from app.schemas.prompt import PromptState
+        from sqlalchemy import desc
+        
+        stmt = (
+            select(
+                PromptCategory.id,
+                PromptCategory.name,
+                PromptCategory.slug,
+                PromptCategory.description,
+                func.count(Prompt.id).label("prompt_count")
+            )
+            .outerjoin(Prompt, (Prompt.category_id == PromptCategory.id) & (Prompt.state == PromptState.APPROVED.value) & (Prompt.is_deleted.is_(False)))
+            .group_by(PromptCategory.id)
+            .order_by(desc("prompt_count"))
+            .limit(limit)
+        )
+        result = await session.execute(stmt)
+        return [dict(row._asdict()) for row in result.all()]
+
+    @staticmethod
     async def get_by_id(session: AsyncSession, category_id: int) -> PromptCategory | None:
         result = await session.execute(
             select(PromptCategory).where(PromptCategory.id == category_id)

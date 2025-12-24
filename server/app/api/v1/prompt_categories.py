@@ -25,6 +25,14 @@ async def get_categories_stats(session: DbSession) -> list[PromptCategoryStats]:
     return await PromptCategoryRepository.get_categories_with_counts(session)
 
 
+@router.get("/top", response_model=list[PromptCategoryStats])
+async def get_top_categories(
+    session: DbSession, limit: int = 5
+) -> list[PromptCategoryStats]:
+    """Get top categories ordered by number of approved prompts."""
+    return await PromptCategoryRepository.get_top_categories(session, limit)
+
+
 @router.post("/", response_model=PromptCategoryOut, status_code=status.HTTP_201_CREATED)
 async def create_category(
     data: PromptCategoryCreate,
