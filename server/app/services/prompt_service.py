@@ -12,6 +12,7 @@ from sqlalchemy import select, desc
 
 from app.models.prompt import Prompt
 from app.repositories.prompt_repo import PromptRepository
+from app.repositories.prompt_tag_repo import PromptTagRepository
 from app.schemas.prompt import PromptCreate, PromptOut, PromptSeed, PromptState, PromptUpdate
 from app.schemas.user import UserOut, UserRole
 from app.services.mock_prompts_loader import (
@@ -113,6 +114,7 @@ class PromptService:
         *,
         q: str | None,
         category: str | None,
+        category_id: int | None = None,
         tag: str | None,
         featured: bool | None,
         state: PromptState | None,
@@ -126,6 +128,7 @@ class PromptService:
             session,
             q=q,
             category=category,
+            category_id=category_id,
             tag=tag,
             featured=featured,
             state=state_filter,
@@ -137,6 +140,7 @@ class PromptService:
             session,
             q=q,
             category=category,
+            category_id=category_id,
             tag=tag,
             featured=featured,
             state=state_filter,
@@ -155,12 +159,22 @@ class PromptService:
     @staticmethod
     async def create_prompt(session: AsyncSession, data: PromptCreate, current_user) -> PromptOut:
         try:
+            payload = data.model_dump()
+            tag_ids = payload.pop("tag_ids", [])
+            
             prompt = await PromptRepository.create(
                 session,
                 data,
                 owner_id=current_user.id,
                 state=PromptState.DRAFT.value,
             )
+            
+            if tag_ids:
+                for tid in tag_ids:
+                    tag = await PromptTagRepository.get_by_id(session, tid)
+                    if tag:
+                        prompt.tag_refs.append(tag)
+            
             await session.commit()
             await session.refresh(prompt)
             session.add(
@@ -186,7 +200,19 @@ class PromptService:
             raise PromptNotFoundError("Prompt not found")
         PromptService._assert_can_edit(prompt, current_user)
         prev_state = prompt.state
+        update_data = data.model_dump(exclude_unset=True)
+        tag_ids = update_data.pop("tag_ids", None)
+        
         prompt = await PromptRepository.update_by_id(session, prompt_id, data)
+        
+        if tag_ids is not None:
+            # Replace tags
+            prompt.tag_refs = []
+            for tid in tag_ids:
+                tag = await PromptTagRepository.get_by_id(session, tid)
+                if tag:
+                    prompt.tag_refs.append(tag)
+        
         await session.commit()
         await session.refresh(prompt)
         session.add(

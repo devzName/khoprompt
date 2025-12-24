@@ -33,7 +33,9 @@ class PromptRepository:
                 )
             )
 
-        if category:
+        if category_id:
+            stmt = stmt.where(Prompt.category_id == category_id)
+        elif category:
             stmt = stmt.where(Prompt.category == category)
 
         if tag:
@@ -57,6 +59,7 @@ class PromptRepository:
         *,
         q: str | None,
         category: str | None,
+        category_id: int | None = None,
         tag: str | None,
         featured: bool | None,
         state: str | None,
@@ -69,6 +72,7 @@ class PromptRepository:
             stmt,
             q=q,
             category=category,
+            category_id=category_id,
             tag=tag,
             featured=featured,
             state=state,
@@ -83,6 +87,7 @@ class PromptRepository:
         *,
         q: str | None,
         category: str | None,
+        category_id: int | None = None,
         tag: str | None,
         featured: bool | None,
         state: str | None,
@@ -93,6 +98,7 @@ class PromptRepository:
             stmt.select_from(Prompt),
             q=q,
             category=category,
+            category_id=category_id,
             tag=tag,
             featured=featured,
             state=state,
