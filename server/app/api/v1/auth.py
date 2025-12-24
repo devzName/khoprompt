@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import DbSession, get_current_user, get_optional_current_user
-from app.schemas.user import Token, UserCreate, UserLogin, UserOut
+from app.schemas.user import Token, UserCreate, UserLogin, UserOut, GoogleLogin
 from app.services.auth_service import AuthError, AuthService
 
 router = APIRouter()
@@ -50,6 +50,17 @@ async def login(
     credentials = UserLogin(email=form_data.username, password=form_data.password)
     try:
         return await AuthService.authenticate(session, credentials)
+    except AuthError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e)) from e
+
+
+@router.post("/login/google", response_model=Token)
+async def login_google(
+    data: GoogleLogin,
+    session: DbSession,
+) -> Token:
+    try:
+        return await AuthService.authenticate_google(session, data)
     except AuthError as e:
         raise HTTPException(status_code=e.status_code, detail=str(e)) from e
 

@@ -44,3 +44,7 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str | None = None
+
+
+class GoogleLogin(BaseModel):
+    id_token: str
