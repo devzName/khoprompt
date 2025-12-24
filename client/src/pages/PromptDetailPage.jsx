@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button, Avatar, Tag, Breadcrumb } from 'antd';
 import { 
@@ -22,6 +22,10 @@ const PromptDetailPage = () => {
   const [isHelpful, setIsHelpful] = useState(null);
 
   const prompt = mockPrompts.find(p => p.id === parseInt(id));
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (!prompt) {
     return (
