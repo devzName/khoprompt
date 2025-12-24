@@ -3,6 +3,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { authService } from '../services/authService';
 
 const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const { t } = useTranslation();
@@ -21,37 +22,14 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     try {
       setFormLoading(true);
 
-      const response = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          username: email,
-          password: password,
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      const { access_token, refresh_token } = await response.json();
+      const { access_token, refresh_token } = await authService.login(email, password);
 
       localStorage.setItem('access_token', access_token);
       if (refresh_token) {
         localStorage.setItem('refresh_token', refresh_token);
       }
 
-      const meResponse = await fetch('/api/v1/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${access_token}`
-        }
-      });
-
-      if (!meResponse.ok) {
-        throw new Error('Failed to fetch user info');
-      }
-
-      const userInfo = await meResponse.json();
+      const userInfo = await authService.getCurrentUser();
       const user = {
         ...userInfo,
         name: userInfo.full_name || userInfo.email.split('@')[0],
@@ -77,34 +55,14 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     try {
       setGoogleLoading(true);
 
-      const response = await fetch('/api/v1/auth/login/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: idToken })
-      });
-
-      if (!response.ok) {
-        throw new Error('Backend authentication failed');
-      }
-
-      const { access_token, refresh_token } = await response.json();
+      const { access_token, refresh_token } = await authService.loginWithGoogle(idToken);
 
       localStorage.setItem('access_token', access_token);
       if (refresh_token) {
         localStorage.setItem('refresh_token', refresh_token);
       }
 
-      const meResponse = await fetch('/api/v1/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${access_token}`
-        }
-      });
-
-      if (!meResponse.ok) {
-        throw new Error('Failed to fetch user info');
-      }
-
-      const userInfo = await meResponse.json();
+      const userInfo = await authService.getCurrentUser();
 
       const user = {
         ...userInfo,

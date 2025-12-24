@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { message } from 'antd';
-import { FileTextOutlined, AuditOutlined } from '@ant-design/icons';
+import { AuditOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
+import { API_ENDPOINTS } from '../constants/api';
+import apiClient from '../axios/apiClient';
 
 export const useReviewPrompts = () => {
     const { user, logout } = useAuth();
@@ -15,15 +17,10 @@ export const useReviewPrompts = () => {
     const fetchSubmittedPrompts = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`/api/v1/prompts?state=SUBMITTED&limit=100`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BASE, {
+                params: { state: 'SUBMITTED', limit: 100 }
             });
-            if (!response.ok) throw new Error('Failed to fetch prompts');
-            const data = await response.json();
-            setPrompts(data);
+            setPrompts(response.data);
         } catch (error) {
             console.error('Error fetching prompts for review:', error);
             message.error(t('reviewPrompts.errorFetching'));
@@ -40,14 +37,7 @@ export const useReviewPrompts = () => {
 
     const handleApprove = async (id) => {
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`/api/v1/prompts/${id}/approve`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) throw new Error('Failed to approve prompt');
+            await apiClient.post(API_ENDPOINTS.PROMPTS.APPROVE(id));
             message.success(t('reviewPrompts.approveSuccess'));
             setPrompts(prompts.filter(p => p.id !== id));
         } catch (error) {
@@ -58,14 +48,7 @@ export const useReviewPrompts = () => {
 
     const handleReject = async (id) => {
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`/api/v1/prompts/${id}/reject`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) throw new Error('Failed to reject prompt');
+            await apiClient.post(API_ENDPOINTS.PROMPTS.REJECT(id));
             message.success(t('reviewPrompts.rejectSuccess'));
             setPrompts(prompts.filter(p => p.id !== id));
         } catch (error) {

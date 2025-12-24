@@ -3,6 +3,7 @@ import { Form, message } from 'antd';
 import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
+import { promptService } from '../services/promptService';
 
 export const useMyPrompts = () => {
   const { user, logout } = useAuth();
@@ -18,11 +19,8 @@ export const useMyPrompts = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await fetch('/api/v1/prompt-categories');
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
-      }
+      const data = await promptService.getCategories();
+      setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -30,11 +28,8 @@ export const useMyPrompts = () => {
 
   const fetchTags = useCallback(async () => {
     try {
-      const response = await fetch('/api/v1/prompt-tags');
-      if (response.ok) {
-        const data = await response.json();
-        setPredefinedTags(data.map(tag => tag.name));
-      }
+      const data = await promptService.getTags();
+      setPredefinedTags(data.map(tag => tag.name));
     } catch (error) {
       console.error('Error fetching tags:', error);
     }
@@ -44,16 +39,8 @@ export const useMyPrompts = () => {
     if (!user) return;
     try {
       setLoading(true);
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('/api/v1/prompts?limit=100', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPrompts(data);
-      }
+      const data = await promptService.getPrompts({ limit: 100 });
+      setPrompts(data);
     } catch (error) {
       console.error('Error fetching prompts:', error);
       message.error(t('myPrompts.errorFetching'));
@@ -80,9 +67,7 @@ export const useMyPrompts = () => {
   const handleSubmitPrompt = async (values) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('access_token');
 
-      // Find category name for compatibility
       const categoryObj = categories.find(c => c.value === values.category);
 
       const payload = {
@@ -95,19 +80,7 @@ export const useMyPrompts = () => {
         full_description: values.notes || ""
       };
 
-      const response = await fetch('/api/v1/prompts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create prompt');
-      }
+      await promptService.createPrompt(payload);
 
       message.success(t('myPrompts.createPrompt.success'));
       form.resetFields();
@@ -115,7 +88,7 @@ export const useMyPrompts = () => {
       fetchMyPrompts();
     } catch (error) {
       console.error('Error creating prompt:', error);
-      message.error(error.message || t('myPrompts.createPrompt.error'));
+      message.error(error.response?.data?.detail || t('myPrompts.createPrompt.error'));
     } finally {
       setLoading(false);
     }
@@ -124,18 +97,7 @@ export const useMyPrompts = () => {
   const handleSubmitForReview = async (id) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(`/api/v1/prompts/${id}/submit`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit prompt');
-      }
-
+      await promptService.submitPrompt(id);
       message.success(t('myPrompts.submitSuccess'));
       fetchMyPrompts();
     } catch (error) {

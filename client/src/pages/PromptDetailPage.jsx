@@ -12,9 +12,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import LatestPrompts from '../components/LatestPrompts';
 import { ROUTES } from '../constants/routes';
+import { API_ENDPOINTS } from '../constants/api';
 import dayjs from 'dayjs';
+import apiClient from '../axios/apiClient';
 
 const PromptDetailPage = () => {
   const { t } = useTranslation();
@@ -28,20 +29,10 @@ const PromptDetailPage = () => {
     const fetchPromptDetail = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('access_token');
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        const response = await fetch(`/api/v1/prompts/${id}`, { headers });
-        if (!response.ok) {
-          throw new Error('Prompt not found');
-        }
-        const data = await response.json();
-        setPrompt(data);
+        const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BY_ID(id));
+        setPrompt(response.data);
 
-        // Register view
-        fetch(`/api/v1/prompts/${id}/view`, { method: 'POST' }).catch(() => { });
+        apiClient.post(API_ENDPOINTS.PROMPTS.VIEW(id)).catch(() => { });
       } catch (error) {
         console.error('Error fetching prompt:', error);
         message.error(t('promptDetail.notFound'));
@@ -71,16 +62,11 @@ const PromptDetailPage = () => {
         message.warning(t('login.required'));
         return;
       }
-      const response = await fetch(`/api/v1/prompts/${id}/vote?value=${value}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      await apiClient.post(API_ENDPOINTS.PROMPTS.VOTE(id), null, {
+        params: { value }
       });
-      if (response.ok) {
-        setIsHelpful(value === 1);
-        message.success(t('common.success'));
-      }
+      setIsHelpful(value === 1);
+      message.success(t('common.success'));
     } catch (error) {
       message.error(t('common.error'));
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
 import { useAuth } from './useAuth';
+import { notificationService } from '../services/notificationService';
 
 export const useNotifications = () => {
     const { user } = useAuth();
@@ -12,14 +13,8 @@ export const useNotifications = () => {
         if (!user) return;
         try {
             setLoading(true);
-            const token = localStorage.getItem('access_token');
-            const response = await fetch('/api/v1/notifications?limit=10', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setNotifications(data);
-            }
+            const data = await notificationService.getNotifications(10);
+            setNotifications(data);
         } catch (error) {
             console.error('Error fetching notifications:', error);
         } finally {
@@ -30,14 +25,8 @@ export const useNotifications = () => {
     const fetchUnreadCount = useCallback(async () => {
         if (!user) return;
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch('/api/v1/notifications/unread-count', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setUnreadCount(data.count);
-            }
+            const data = await notificationService.getUnreadCount();
+            setUnreadCount(data.count);
         } catch (error) {
             console.error('Error fetching unread count:', error);
         }
@@ -45,15 +34,9 @@ export const useNotifications = () => {
 
     const markAsRead = async (id) => {
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`/api/v1/notifications/${id}/read`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-                setUnreadCount(prev => Math.max(0, prev - 1));
-            }
+            await notificationService.markAsRead(id);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
@@ -61,16 +44,10 @@ export const useNotifications = () => {
 
     const markAllRead = async () => {
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch('/api/v1/notifications/read-all', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-                setUnreadCount(0);
-                message.success('All notifications marked as read');
-            }
+            await notificationService.markAllAsRead();
+            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            setUnreadCount(0);
+            message.success('All notifications marked as read');
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
         }
@@ -81,7 +58,6 @@ export const useNotifications = () => {
             fetchNotifications();
             fetchUnreadCount();
 
-            // Poll for new notifications every 1 minute
             const interval = setInterval(() => {
                 fetchUnreadCount();
             }, 60000);
