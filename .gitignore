@@ -1,3 +1,14 @@
 node_modules
 client/package-lock.json
+**/__pycache__/
+*.pyc
+server/.env
+server/.env.*
+server/.venv
+server/.pytest_cache
+server/.ruff_cache
+server/.mypy_cache
+server/logs/
+.DS_Store
+.idea/
 client/.env
