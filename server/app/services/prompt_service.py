@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from uuid import UUID
 
 from app.models.prompt_log import PromptLog
@@ -233,6 +233,29 @@ class PromptService:
         except IntegrityError as e:
             await session.rollback()
             raise PromptCreateError("Could not create prompt") from e
+        
+        # Cache Strategy: Write-Through
+        try:
+            redis = get_redis()
+            prompt_out = PromptOut.model_validate(prompt)
+            prompt_json = prompt_out.model_dump_json()
+            
+            # 1. Provide object cache (TTL 1h)
+            await redis.setex(f"prompt:{prompt.id}", 3600, prompt_json)
+            
+            # 2. Add to 1h feed
+            ts = prompt.created_at.timestamp()
+            await redis.zadd("feed:latest:1h", {str(prompt.id): ts})
+            
+            # 3. Trim old entries (> 1h ago)
+            cutoff = datetime.now(timezone.utc).timestamp() - 3600
+            await redis.zremrangebyscore("feed:latest:1h", 0, cutoff)
+            
+        except Exception:
+            # Redis failure should not rollback transaction
+            pass
+
+        return PromptOut.model_validate(prompt)
 
     @staticmethod
     async def update_prompt(
@@ -426,7 +449,7 @@ class PromptService:
                 content=rec.content,
                 state=PromptState.APPROVED,
             )
-            await PromptRepository.create(session, data, id_override=data.id, state=data.state.value)
+            await PromptRepository.create(session, data, id_override=rec.id, state=data.state.value)
             created += 1
 
         await session.commit()
@@ -451,15 +474,73 @@ class PromptService:
             return 0
 
     @staticmethod
-    async def top_recent_prompts(session: AsyncSession, limit: int = 10) -> list[PromptOut]:
+    async def get_latest_prompts_feed(session: AsyncSession, limit: int = 15) -> list[PromptOut]:
+        """
+        Get latest prompts created in the last hour.
+        Strategy: Redis Feed -> Redis Cache -> DB Fallback
+        """
+        redis = get_redis()
+        now = datetime.now(timezone.utc).timestamp()
+        
+        # 1. Try fetching from Redis Feed
+        try:
+            # Get IDs from ZSET, newest first
+            prompt_ids = await redis.zrevrangebyscore("feed:latest:1h", "+inf", "-inf", start=0, num=limit)
+            
+            if prompt_ids:
+                # 2. MGET objects
+                keys = [f"prompt:{pid}" for pid in prompt_ids]
+                cached_data = await redis.mget(keys)
+                
+                prompts = []
+                missing_ids = []
+                
+                for pid, data in zip(prompt_ids, cached_data):
+                    if data:
+                        try:
+                            prompts.append(PromptOut.model_validate_json(data))
+                        except Exception:
+                            missing_ids.append(pid)
+                    else:
+                        missing_ids.append(pid)
+                
+                # If we have all data, return immediately
+                if len(missing_ids) == 0:
+                    return prompts
+                    
+                # If partial miss, we could fallback to DB for missing items,
+                # but simplest consistent approach if feed is possibly stale/corrupt
+                # is to check DB next.
+        except Exception:
+            pass
+
+        # 3. Fallback: DB Source of Truth
+        # If cache miss or Redis error, query DB
         one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
-        result = await session.execute(
+        stmt = (
             select(Prompt)
             .where(Prompt.created_at >= one_hour_ago)
             .order_by(desc(Prompt.created_at))
             .limit(limit)
         )
+        result = await session.execute(stmt)
         prompts = result.scalars().all()
+        
+        # 4. Read Repair (Async/Non-blocking ideally, but simple inline here)
+        if prompts:
+            try:
+                # Pipeline restore
+                pipe = redis.pipeline()
+                for p in prompts:
+                    p_out = PromptOut.model_validate(p)
+                    # Restore object
+                    pipe.setex(f"prompt:{p.id}", 3600, p_out.model_dump_json())
+                    # Restore feed entry
+                    pipe.zadd("feed:latest:1h", {str(p.id): p.created_at.timestamp()})
+                await pipe.execute()
+            except Exception:
+                pass
+                
         return [PromptOut.model_validate(p) for p in prompts]
 
     @staticmethod

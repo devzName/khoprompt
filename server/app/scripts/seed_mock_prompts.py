@@ -1,6 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+import os
+import sys
+from pathlib import Path
+
+# Add server root to sys.path to allow imports from app.*
+current_dir = Path(__file__).resolve().parent
+server_root = current_dir.parent.parent
+sys.path.append(str(server_root))
+
+from dotenv import load_dotenv
+# Load .env from server root before importing database config
+load_dotenv(server_root / ".env")
 
 from app.core.database import AsyncSessionLocal
 from app.services.prompt_service import PromptSeedError, PromptService

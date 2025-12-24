@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     VIEW: (id) => `/prompts/${id}/view`,
     LIKE: (id) => `/prompts/${id}/like`,
     DISLIKE: (id) => `/prompts/${id}/dislike`,
+    FEED_LATEST: '/prompts/feed/latest',
   },
 
   CATEGORIES: '/prompt-categories',

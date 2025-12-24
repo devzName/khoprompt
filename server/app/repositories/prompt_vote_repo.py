@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func, Float
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,6 +36,8 @@ class PromptVoteRepository:
             delta_like += 1
         if new_value == -1:
             delta_dislike += 1
+            
+        # 1. Update like/dislike counts
         await session.execute(
             update(Prompt)
             .where(Prompt.id == prompt_id)
@@ -43,6 +45,27 @@ class PromptVoteRepository:
                 likes=Prompt.likes + delta_like,
                 dislikes=Prompt.dislikes + delta_dislike,
             )
+        )
+        
+        # 2. Recalculate Rating based on new ratio
+        # Since we just executed the update but haven't committed, we can fetch the updated values or calculate them?
+        # Better: run a direct update query that calculates rating from (likes / (likes + dislikes)) * 5
+        # Note: Avoid division by zero.
+        
+        # Using SQL expression for rating calculation
+        # CAST(likes AS FLOAT) / NULLIF(likes + dislikes, 0) * 5
+        
+        rating_expr = (
+            func.coalesce(
+                (func.cast(Prompt.likes, Float) / func.nullif(Prompt.likes + Prompt.dislikes, 0)) * 5.0, 
+                0.0
+            ) 
+        )
+        
+        await session.execute(
+            update(Prompt)
+            .where(Prompt.id == prompt_id)
+            .values(rating=rating_expr)
         )
 
     @staticmethod

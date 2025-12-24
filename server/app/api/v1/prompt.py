@@ -77,6 +77,15 @@ async def recent_prompts(session: DbSession, limit: int = Query(default=10, ge=1
     return await PromptService.top_recent_prompts(session, limit)
 
 
+@router.get("/feed/latest", response_model=list[PromptOut])
+async def feed_latest(session: DbSession, limit: int = Query(default=15, ge=1, le=50)) -> list[PromptOut]:
+    """
+    Get real-time feed of latest prompts (last 1 hour).
+    Served from Redis cache with DB fallback.
+    """
+    return await PromptService.get_latest_prompts_feed(session, limit)
+
+
 @router.get("/stats/created_last_hour")
 async def stats_created_last_hour() -> dict[str, int]:
     count = await PromptService.get_created_last_hour()

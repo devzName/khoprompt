@@ -3,16 +3,45 @@ import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
-import { mockPrompts } from '../data/mockPrompts';
+
 import { ROUTES } from '../constants/routes';
 
-const FeaturedPrompts = () => {
+const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
 
-  const featuredPrompts = mockPrompts.filter(prompt => prompt.featured === true);
+  const featuredPrompts = prompts;
+
+  if (loading) {
+    return (
+      <section className="py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-8 animate-pulse">
+            <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+            <div className="space-y-2">
+              <div className="h-8 bg-gray-200 rounded w-48"></div>
+              <div className="h-4 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-2xl border border-gray-200 p-6 h-64 animate-pulse">
+                <div className="flex justify-between mb-4">
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-4 bg-gray-200 rounded w-12"></div>
+                </div>
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (featuredPrompts.length === 0) {
     return null;
