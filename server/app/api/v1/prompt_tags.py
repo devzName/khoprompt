@@ -46,7 +46,7 @@ async def update_tag(
     
     return await PromptTagRepository.update(session, tag, data)
 
-@router.delete("/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{tag_id}", status_code=status.HTTP_200_OK)
 async def delete_tag(
     tag_id: int,
     session: DbSession,

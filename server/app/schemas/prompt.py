@@ -1,4 +1,3 @@
-```python
 from __future__ import annotations
 
 from enum import StrEnum
@@ -77,4 +76,3 @@ class PromptOut(PromptBase):
 
 class PromptSeed(PromptCreate):
     state: PromptState = PromptState.APPROVED
-```

@@ -110,13 +110,13 @@ async def update_prompt(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e)) from e
 
 
-@router.delete("/{prompt_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{prompt_id}", status_code=status.HTTP_200_OK)
 async def delete_prompt(
     prompt_id: int, session: DbSession, current_user=Depends(get_current_user)
 ) -> Response:
     try:
         await PromptService.delete_prompt(session, prompt_id, current_user)
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_200_OK)
     except PromptNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except PromptPermissionError as e:

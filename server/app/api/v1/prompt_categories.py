@@ -56,7 +56,7 @@ async def update_category(
     return await PromptCategoryRepository.update(session, category, data)
 
 
-@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{category_id}", status_code=status.HTTP_200_OK)
 async def delete_category(
     category_id: int,
     session: DbSession,

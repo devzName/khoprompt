@@ -4,9 +4,11 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from typing import Annotated
 from app.api.deps import DbSession, get_current_user
 from app.core.redis_client import get_redis
 from app.models.role import Role
+from app.models.user import User
 from app.repositories.role_repo import RoleRepository
 from app.schemas.role import RoleOut
 
@@ -20,10 +22,14 @@ async def list_roles(session: DbSession) -> list[RoleOut]:
 
 
 @router.post("", response_model=RoleOut, status_code=status.HTTP_201_CREATED)
-async def create_role(name: str, description: str | None = None, session: DbSession = Depends(get_current_user)):
+async def create_role(
+    name: str,
+    session: DbSession,
+    current_user: Annotated[User, Depends(get_current_user)],
+    description: str | None = None,
+):
     # only admin
-    current = await get_current_user(session=session)  # type: ignore[arg-type]
-    if not any(r.name == "admin" for r in current.roles):
+    if not any(r.name == "admin" for r in current_user.roles):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
 
     exists = await RoleRepository.get_by_name(session, name)
@@ -41,9 +47,13 @@ async def create_role(name: str, description: str | None = None, session: DbSess
 
 
 @router.put("/{role_id}", response_model=RoleOut)
-async def update_role(role_id: str, description: str | None = None, session: DbSession = Depends(get_current_user)) -> RoleOut:
-    current = await get_current_user(session=session)  # type: ignore[arg-type]
-    if not any(r.name == "admin" for r in current.roles):
+async def update_role(
+    role_id: str,
+    session: DbSession,
+    current_user: Annotated[User, Depends(get_current_user)],
+    description: str | None = None,
+) -> RoleOut:
+    if not any(r.name == "admin" for r in current_user.roles):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
 
     result = await session.execute(Role.__table__.select().where(Role.id == role_id, Role.is_deleted.is_(False)))
