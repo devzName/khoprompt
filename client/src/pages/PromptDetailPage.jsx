@@ -233,7 +233,7 @@ const PromptDetailPage = () => {
                 onClick={handleCopyPrompt}
                 className="flex-1 sm:flex-none h-12 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
               >
-                {copied ? t('promptDetail.copied') : t('promptDetail.copy')}
+                {copied ? t('promptDetail.copied') : t('promptDetail.copyPrompt')}
               </Button>
 
               {/* Only show vote buttons if not own prompt */}
