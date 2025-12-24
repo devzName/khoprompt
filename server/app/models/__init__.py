@@ -1,4 +1,6 @@
 from app.models.prompt import Prompt
+from app.models.prompt_category import PromptCategory
+from app.models.prompt_tag import PromptTag
 from app.models.user import User
 from app.models.role import Role
 from app.models.permission import Permission

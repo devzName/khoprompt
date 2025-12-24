@@ -4,6 +4,8 @@ from datetime import timedelta, datetime, timezone
 
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from app.core.config import get_settings
 from app.core.security import (
@@ -14,7 +16,7 @@ from app.core.security import (
     verify_password,
 )
 from app.repositories.user_repo import UserRepository
-from app.schemas.user import Token, UserCreate, UserLogin, UserOut
+from app.schemas.user import Token, UserCreate, UserLogin, UserOut, GoogleLogin
 from app.services.role_service import RoleService
 from app.models.token_version import TokenVersion
 from app.repositories.refresh_token_repo import RefreshTokenRepository
@@ -105,3 +107,58 @@ class AuthService:
         if not user or not user.is_active:
             raise AuthError("User not found", status.HTTP_404_NOT_FOUND)
         return UserOut.model_validate(user)
+
+    @staticmethod
+    async def authenticate_google(session: AsyncSession, data: GoogleLogin) -> Token:
+        settings = get_settings()
+        if not settings.google_client_id:
+            raise AuthError("Google Login is not configured", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            # Verify the token
+            idinfo = id_token.verify_oauth2_token(
+                data.id_token, requests.Request(), settings.google_client_id
+            )
+
+            # ID token is valid. Get the user's Google ID and email.
+            email = idinfo["email"]
+            name = idinfo.get("name")
+            # picture = idinfo.get('picture')
+
+            user = await UserRepository.get_by_email(session, email)
+            if not user:
+                # Create a new user if they don't exist
+                # For social logins, we don't have a password. 
+                # Our User model now allows hashed_password to be null.
+                user_create = UserCreate(
+                    email=email,
+                    full_name=name,
+                    password="SOCIAL_LOGIN_NO_PASSWORD", # Not used but required by schema
+                    roles=[UserRole.USER]
+                )
+                user = await UserRepository.create(session, user_create, None)
+                await session.flush()
+
+            if not user.is_active:
+                raise AuthError("User account is disabled", status.HTTP_401_UNAUTHORIZED)
+
+            access_token = create_access_token(
+                str(user.id), expires_delta=timedelta(minutes=settings.access_token_expire_minutes)
+            )
+            refresh_token, jti = create_refresh_token(
+                str(user.id), expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes)
+            )
+            await RefreshTokenRepository.create(
+                session,
+                user_id=user.id,
+                jti=jti,
+                expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.refresh_token_expire_minutes),
+            )
+            await session.commit()
+            return Token(access_token=access_token, refresh_token=refresh_token)
+
+        except ValueError as e:
+            # Invalid token
+            raise AuthError(f"Invalid Google token: {str(e)}", status.HTTP_401_UNAUTHORIZED) from e
+        except Exception as e:
+            raise AuthError(f"Google authentication failed: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR) from e
