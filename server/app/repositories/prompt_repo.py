@@ -17,6 +17,7 @@ class PromptRepository:
         *,
         q: str | None,
         category: str | None,
+        category_id: int | None,
         tag: str | None,
         featured: bool | None,
         state: str | None,
@@ -124,6 +125,7 @@ class PromptRepository:
         state: str | None = None,
     ) -> Prompt:
         payload = data.model_dump()
+        payload.pop("tag_ids", None) # tag_ids is not a column
         if owner_id is not None:
             payload["owner_id"] = owner_id
         if state is not None:
@@ -139,7 +141,7 @@ class PromptRepository:
     async def update_by_id(
         session: AsyncSession, prompt_id: int, data: PromptUpdate
     ) -> Prompt | None:
-        values = {k: v for k, v in data.model_dump(exclude_unset=True).items()}
+        values = {k: v for k, v in data.model_dump(exclude_unset=True).items() if k != "tag_ids"}
         if not values:
             return await PromptRepository.get_by_id(session, prompt_id)
         await session.execute(update(Prompt).where(Prompt.id == prompt_id).values(**values))

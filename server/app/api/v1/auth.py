@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.api.deps import DbSession, get_current_user, get_optional_current_user
+from app.api.deps import DbSession, get_current_user, get_optional_current_user, oauth2_scheme
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut, GoogleLogin
 from app.services.auth_service import AuthError, AuthService
 
@@ -76,3 +77,26 @@ async def refresh_token(refresh_token: str, session: DbSession) -> Token:
 @router.get("/me", response_model=UserOut)
 async def read_me(current_user=Depends(get_current_user)) -> UserOut:
     return UserOut.model_validate(current_user)
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    session: DbSession,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    refresh_token: Annotated[str | None, Body(embed=True)] = None,
+) -> None:
+    try:
+        await AuthService.logout(session, token, refresh_token)
+    except AuthError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e)) from e
+
+
+@router.post("/logout-all", status_code=status.HTTP_200_OK)
+async def logout_all(
+    session: DbSession,
+    current_user: User = Depends(get_current_user),
+) -> None:
+    try:
+        await AuthService.logout_all_devices(session, current_user.id)
+    except AuthError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e)) from e

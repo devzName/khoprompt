@@ -11,6 +11,8 @@ from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.repositories.user_repo import UserRepository
 from app.schemas.user import TokenPayload, UserOut
+from app.repositories.access_token_repo import AccessTokenRepository
+from app.repositories.token_version_repo import TokenVersionRepository
 from app.core.audit import set_current_actor
 from app.models.user import User
 
@@ -31,8 +33,21 @@ async def get_current_user(
             detail="Could not validate credentials",
         ) from e
 
+    jti = payload.jti
+    if not jti:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token: missing jti")
+    
+    token_rec = await AccessTokenRepository.get_by_jti(session, jti)
+    if not token_rec or token_rec.revoked:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has been revoked or not found")
+
     if not payload.sub:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+
+    # Check token version
+    current_version = await TokenVersionRepository.get_current_version(session, UUID(payload.sub))
+    if payload.v < current_version:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token version is outdated")
 
     try:
         user_id = UUID(payload.sub)
@@ -56,7 +71,23 @@ async def get_optional_current_user(
     except Exception:
         return None
 
+    jti = payload.jti
+    if not jti:
+        return None
+    
+    token_rec = await AccessTokenRepository.get_by_jti(session, jti)
+    if not token_rec or token_rec.revoked:
+        return None
+
     if not payload.sub:
+        return None
+
+    # Check token version
+    try:
+        current_version = await TokenVersionRepository.get_current_version(session, UUID(payload.sub))
+        if payload.v < current_version:
+            return None
+    except Exception:
         return None
 
     try:

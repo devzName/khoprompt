@@ -76,7 +76,7 @@ async def seed_from_mock(session: DbSession, source_path: str | None = None) -> 
 
 @router.get("/{prompt_id}", response_model=PromptOut)
 async def get_prompt(
-    prompt_id: int, session: DbSession, current_user=Depends(get_current_user)
+    prompt_id: int, session: DbSession, current_user=Depends(get_optional_current_user)
 ) -> PromptOut:
     try:
         return await PromptService.get_prompt(session, prompt_id, current_user)

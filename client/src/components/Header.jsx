@@ -6,6 +6,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
 import LoginModal from './LoginModal';
+import NotificationBell from './shared/NotificationBell';
 import { ROUTES } from '../constants/routes';
 
 const Header = () => {
@@ -27,7 +28,7 @@ const Header = () => {
     setUser(null);
   };
 
-  const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, handleLogout, true);
+  const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, handleLogout, true, user);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -68,7 +69,7 @@ const Header = () => {
                       <span className="hidden sm:inline ml-1">{currentLanguageLabel}</span>
                     </Button>
                   </Dropdown>
-                  
+
                   <Button
                     type="primary"
                     size="large"
@@ -82,19 +83,22 @@ const Header = () => {
               )}
 
               {user && (
-                <Dropdown
-                  menu={{ items: userMenuItems }}
-                  placement="bottomRight"
-                  arrow={{ pointAtCenter: true }}
-                >
-                  <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
-                    <Avatar size={36} src={user.picture} className="border-2 border-gray-200" />
-                    <div className="hidden sm:block text-left">
-                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
+                <>
+                  <NotificationBell />
+                  <Dropdown
+                    menu={{ items: userMenuItems }}
+                    placement="bottomRight"
+                    arrow={{ pointAtCenter: true }}
+                  >
+                    <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
+                      <Avatar size={36} src={user.picture} className="border-2 border-gray-200" />
+                      <div className="hidden sm:block text-left">
+                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
+                      </div>
                     </div>
-                  </div>
-                </Dropdown>
+                  </Dropdown>
+                </>
               )}
             </div>
           </div>
@@ -113,8 +117,8 @@ const Header = () => {
         </div>
       </div>
 
-      <LoginModal 
-        open={isLoginModalOpen} 
+      <LoginModal
+        open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={setUser}
       />

@@ -32,6 +32,7 @@ class UserRepository:
             email=data.email,
             hashed_password=hashed_password,
             full_name=data.full_name,
+            picture=data.picture,
             is_active=True,
         )
         roles = await RoleRepository.get_default_roles(session, data.roles)

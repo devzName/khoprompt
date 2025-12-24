@@ -1,10 +1,18 @@
 {
+  "common": {
+    "view": "View",
+    "edit": "Edit",
+    "submit": "Submit",
+    "error": "Error",
+    "success": "Success"
+  },
   "header": {
     "title": "Prompt Library",
     "subtitle": "AI Prompt Collection",
     "search": "Search prompts, authors, tags...",
     "createPrompt": "Create Prompt",
     "myPrompts": "My Prompts",
+    "reviewPrompts": "Review Prompts",
     "logout": "Logout"
   },
   "login": {
@@ -32,6 +40,7 @@
     "profile": "Profile",
     "logout": "Logout",
     "language": "Language",
+    "reviewPrompts": "Review Prompts",
     "vietnamese": "Tiếng Việt",
     "english": "English"
   },
@@ -45,6 +54,15 @@
     "createNew": "Create New",
     "empty": "You don't have any prompts yet.",
     "createFirst": "Create your first Prompt",
+    "submitSuccess": "Prompt submitted successfully!",
+    "submitError": "Error submitting prompt",
+    "status": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "ARCHIVED": "Archived"
+    },
     "createPrompt": {
       "title": "Create new prompt",
       "description": "Create and share useful prompts with everyone in the community",
@@ -165,5 +183,26 @@
     "helpful": "Helpful",
     "notHelpful": "Not Helpful",
     "viewDetail": "View Details"
+  },
+  "reviewPrompts": {
+    "errorFetching": "Error fetching pending prompts",
+    "approveSuccess": "Prompt approved successfully!",
+    "approveError": "Error approving prompt",
+    "rejectSuccess": "Prompt rejected successfully!",
+    "rejectError": "Error rejecting prompt",
+    "noPendingTitle": "No prompts pending review",
+    "noPendingDesc": "All prompts have been processed. Check back later!",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No new notifications",
+    "markAllRead": "Mark all as read",
+    "unreadCount": "{{count}} unread notifications",
+    "types": {
+      "promptApproved": "Prompt Approved",
+      "promptRejected": "Prompt Rejected"
+    }
   }
 }

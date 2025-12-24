@@ -15,13 +15,14 @@ class UserRole(StrEnum):
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str | None = None
+    picture: str | None = None
     roles: list[UserRole] = Field(default_factory=lambda: [UserRole.USER])
 
     @field_validator("roles", mode="before")
     @classmethod
     def extract_role_names(cls, v):
         if isinstance(v, list):
-            return [getattr(r, "name", r) for r in v]
+            return [getattr(r, "value", getattr(r, "name", r)) for r in v]
         return v
 
 
@@ -50,6 +51,8 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str | None = None
+    jti: str | None = None
+    v: int = 0
 
 
 class GoogleLogin(BaseModel):

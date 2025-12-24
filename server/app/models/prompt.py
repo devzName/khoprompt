@@ -23,7 +23,6 @@ class Prompt(AuditMixin, Base):
         Integer, ForeignKey("prompt_categories.id", ondelete="SET NULL"), nullable=True, index=True
     )
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     tags: Mapped[list[str]] = mapped_column(ARRAY(String(50)), nullable=True, default=list)
 
     rating: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
@@ -40,8 +39,10 @@ class Prompt(AuditMixin, Base):
 
     state: Mapped[str] = mapped_column(String(20), nullable=False, server_default="DRAFT", index=True)
     owner_id: Mapped[UUID | None] = mapped_column(
-        PGUUID(as_uuid=True), nullable=True, index=True, server_default=text("NULL")
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
+
+    owner_ref: Mapped["User"] = relationship("User", lazy="selectin")
 
     category_ref: Mapped["PromptCategory"] = relationship(
         "PromptCategory", back_populates="prompts", lazy="selectin"

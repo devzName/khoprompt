@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Form, message } from 'antd';
 import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -12,27 +12,66 @@ export const useMyPrompts = () => {
   const [activeTab, setActiveTab] = useState('list');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [prompts, setPrompts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [predefinedTags, setPredefinedTags] = useState([]);
 
-  const predefinedTags = [
-    'Viết lách', 'Marketing', 'Giáo dục', 'Kinh doanh', 'Sáng tạo', 'Phân tích', 'Lập trình',
-    'Thiết kế', 'Nghiên cứu', 'Tư vấn', 'Dịch thuật', 'Tóm tắt', 'Brainstorming', 'SEO',
-    'Social Media', 'Email', 'Presentation', 'Copywriting', 'Content', 'Strategy', 'Planning',
-    'Review', 'Feedback', 'Training', 'Coaching', 'Consulting', 'Analysis', 'Report'
-  ];
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await fetch('/api/v1/prompt-categories');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  }, []);
 
-  const categories = [
-    { label: t('categoryPage.categoryDescriptions.Development'), value: 'development' },
-    { label: t('categoryPage.categoryDescriptions.Marketing'), value: 'marketing' },
-    { label: t('categoryPage.categoryDescriptions.Design'), value: 'design' },
-    { label: t('categoryPage.categoryDescriptions.Business Analysis'), value: 'business' },
-    { label: t('categoryPage.categoryDescriptions.Project Management'), value: 'project' },
-    { label: t('categoryPage.categoryDescriptions.Data Analysis'), value: 'data' },
-  ];
+  const fetchTags = useCallback(async () => {
+    try {
+      const response = await fetch('/api/v1/prompt-tags');
+      if (response.ok) {
+        const data = await response.json();
+        setPredefinedTags(data.map(tag => tag.name));
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  }, []);
 
-  const menuItems = [
-    { key: 'my-prompts', icon: <FileTextOutlined />, label: t('sidebar.myPrompts'), action: () => setActiveTab('list') },
-    { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => setActiveTab('create') },
-  ];
+  const fetchMyPrompts = useCallback(async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('/api/v1/prompts?limit=100', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPrompts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching prompts:', error);
+      message.error(t('myPrompts.errorFetching'));
+    } finally {
+      setLoading(false);
+    }
+  }, [user, t]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchTags();
+  }, [fetchCategories, fetchTags]);
+
+  useEffect(() => {
+    if (user && activeTab === 'list') {
+      fetchMyPrompts();
+    }
+  }, [user, activeTab, fetchMyPrompts]);
 
   const handleCreatePrompt = () => {
     setActiveTab('create');
@@ -41,14 +80,67 @@ export const useMyPrompts = () => {
   const handleSubmitPrompt = async (values) => {
     try {
       setLoading(true);
-      console.log('Creating prompt:', values);
-      
+      const token = localStorage.getItem('access_token');
+
+      // Find category name for compatibility
+      const categoryObj = categories.find(c => c.value === values.category);
+
+      const payload = {
+        title: values.title,
+        description: values.description,
+        content: values.content,
+        category_id: values.category,
+        category: categoryObj ? categoryObj.label : 'General',
+        tags: values.tags || [],
+        full_description: values.notes || ""
+      };
+
+      const response = await fetch('/api/v1/prompts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create prompt');
+      }
+
       message.success(t('myPrompts.createPrompt.success'));
       form.resetFields();
       setActiveTab('list');
+      fetchMyPrompts();
     } catch (error) {
       console.error('Error creating prompt:', error);
-      message.error(t('myPrompts.createPrompt.error'));
+      message.error(error.message || t('myPrompts.createPrompt.error'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitForReview = async (id) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(`/api/v1/prompts/${id}/submit`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit prompt');
+      }
+
+      message.success(t('myPrompts.submitSuccess'));
+      fetchMyPrompts();
+    } catch (error) {
+      console.error('Error submitting prompt:', error);
+      message.error(t('myPrompts.submitError'));
     } finally {
       setLoading(false);
     }
@@ -62,6 +154,11 @@ export const useMyPrompts = () => {
     setSearchValue(e.target.value);
   };
 
+  const menuItems = [
+    { key: 'my-prompts', icon: <FileTextOutlined />, label: t('sidebar.myPrompts'), action: () => setActiveTab('list') },
+    { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => setActiveTab('create') },
+  ];
+
   return {
     // State
     user,
@@ -70,15 +167,17 @@ export const useMyPrompts = () => {
     activeTab,
     form,
     loading,
+    prompts,
     predefinedTags,
     categories,
     menuItems,
-    
+
     // Actions
     setMobileMenuOpen,
     setActiveTab,
     handleCreatePrompt,
     handleSubmitPrompt,
+    handleSubmitForReview,
     handleLogout,
     handleSearchChange,
   };

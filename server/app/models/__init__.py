@@ -11,3 +11,4 @@ from app.models.token_version import TokenVersion
 from app.models.refresh_token import RefreshToken
 from app.models.prompt_log import PromptLog
 from app.models.prompt_vote import PromptVote
+from app.models.notification import Notification

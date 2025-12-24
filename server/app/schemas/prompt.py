@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated
+from typing import Annotated, Any
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
@@ -72,6 +72,19 @@ class PromptOut(PromptBase):
         default=None, serialization_alias="categoryInfo", validation_alias=AliasChoices("category_ref", "category_info")
     )
     tags_info: list[PromptTagOut] = Field(default_factory=list, serialization_alias="tagsInfo", validation_alias=AliasChoices("tag_refs", "tags_info"))
+
+    @staticmethod
+    def _get_author(obj: Any) -> str:
+        if obj.owner_ref and obj.owner_ref.full_name:
+            return obj.owner_ref.full_name
+        return obj.author or "Unknown"
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        data = super().model_validate(obj, **kwargs)
+        if hasattr(obj, "owner_ref") and obj.owner_ref and obj.owner_ref.full_name:
+            data.author = obj.owner_ref.full_name
+        return data
 
 
 class PromptSeed(PromptCreate):
