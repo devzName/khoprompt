@@ -16,7 +16,8 @@ const PromptsList = ({
   onMenuClick,
   prompts = [],
   loading = false,
-  onSubmitPrompt
+  onSubmitPrompt,
+  onEditPrompt
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ const PromptsList = ({
                         />
                       </Tooltip>,
                       <Tooltip title={t('common.edit')} key="edit">
-                        <Button type="text" icon={<EditOutlined />} disabled={item.state === 'SUBMITTED' || item.state === 'APPROVED'} />
+                        <Button type="text" icon={<EditOutlined />} disabled={item.state === 'SUBMITTED' || item.state === 'APPROVED'} onClick={() => onEditPrompt && onEditPrompt(item)} />
                       </Tooltip>,
                       item.state === 'DRAFT' && (
                         <Tooltip title={t('common.submit')} key="submit">

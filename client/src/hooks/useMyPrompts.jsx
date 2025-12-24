@@ -13,6 +13,7 @@ export const useMyPrompts = () => {
   const [activeTab, setActiveTab] = useState('list');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [predefinedTags, setPredefinedTags] = useState([]);
@@ -62,7 +63,22 @@ export const useMyPrompts = () => {
   }, [user, activeTab, fetchMyPrompts]);
 
   const handleCreatePrompt = () => {
+    setEditingPrompt(null);
+    form.resetFields();
     setActiveTab('create');
+  };
+
+  const handleEditPrompt = (prompt) => {
+    setEditingPrompt(prompt);
+    form.setFieldsValue({
+      title: prompt.title,
+      description: prompt.description,
+      content: prompt.content,
+      category: prompt.categoryId || prompt.category_id,
+      tags: prompt.tags || [],
+      notes: prompt.full_description
+    });
+    setActiveTab('create'); // Re-use create tab UI for editing
   };
 
   const handleSubmitPrompt = async (values) => {
@@ -81,14 +97,20 @@ export const useMyPrompts = () => {
         full_description: values.notes || ""
       };
 
-      await promptService.createPrompt(payload);
+      if (editingPrompt) {
+        await promptService.updatePrompt(editingPrompt.id, payload);
+        message.success(t('myPrompts.editPrompt.success', 'Prompt updated successfully'));
+      } else {
+        await promptService.createPrompt(payload);
+        message.success(t('myPrompts.createPrompt.success'));
+      }
 
-      message.success(t('myPrompts.createPrompt.success'));
       form.resetFields();
+      setEditingPrompt(null);
       setActiveTab('list');
       fetchMyPrompts();
     } catch (error) {
-      console.error('Error creating prompt:', error);
+      console.error('Error saving prompt:', error);
       message.error(error.response?.data?.detail || t('myPrompts.createPrompt.error'));
     } finally {
       setLoading(false);
@@ -143,5 +165,7 @@ export const useMyPrompts = () => {
     handleSubmitForReview,
     handleLogout,
     handleSearchChange,
+    handleEditPrompt,
+    editingPrompt,
   };
 };

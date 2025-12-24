@@ -17,6 +17,11 @@ export const promptService = {
     return response.data;
   },
 
+  updatePrompt: async (id, promptData) => {
+    const response = await apiClient.patch(API_ENDPOINTS.PROMPTS.BY_ID(id), promptData);
+    return response.data;
+  },
+
   submitPrompt: async (id) => {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.SUBMIT(id));
     return response.data;

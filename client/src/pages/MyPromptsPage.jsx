@@ -23,6 +23,8 @@ const MyPromptsPage = () => {
     handleSubmitForReview,
     handleLogout,
     handleSearchChange,
+    handleEditPrompt,
+    editingPrompt,
   } = useMyPrompts();
 
   return (
@@ -61,6 +63,7 @@ const MyPromptsPage = () => {
             prompts={prompts}
             loading={loading}
             onSubmitPrompt={handleSubmitForReview}
+            onEditPrompt={handleEditPrompt}
           />
         ) : (
           <CreatePromptForm
@@ -71,6 +74,7 @@ const MyPromptsPage = () => {
             onSubmit={handleSubmitPrompt}
             onCancel={() => setActiveTab('list')}
             onMenuClick={() => setMobileMenuOpen(true)}
+            isEditing={!!editingPrompt}
           />
         )}
       </div>

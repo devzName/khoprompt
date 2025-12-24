@@ -201,6 +201,13 @@ class PromptService:
 
     @staticmethod
     async def create_prompt(session: AsyncSession, data: PromptCreate, current_user) -> PromptOut:
+        # Validate Category
+        if data.category_id:
+            from app.repositories.prompt_category_repo import PromptCategoryRepository
+            cat = await PromptCategoryRepository.get_by_id(session, data.category_id)
+            if not cat:
+                raise PromptCreateError(f"Category with ID {data.category_id} not found")
+
         try:
             payload = data.model_dump()
             tag_ids = payload.pop("tag_ids", [])
@@ -232,7 +239,30 @@ class PromptService:
             return PromptOut.model_validate(prompt)
         except IntegrityError as e:
             await session.rollback()
-            raise PromptCreateError("Could not create prompt") from e
+            import logging
+            from app.core.config import get_settings
+            logger = logging.getLogger(__name__)
+            
+            error_msg = f"IntegrityError creating prompt: {e}"
+            if get_settings().detailed_error_logs:
+                logger.exception(error_msg)
+            else:
+                logger.error(error_msg)
+                
+            raise PromptCreateError(f"Could not create prompt: {e.orig}") from e
+        except Exception as e:
+            await session.rollback()
+            import logging
+            from app.core.config import get_settings
+            logger = logging.getLogger(__name__)
+            
+            error_msg = f"Unexpected error creating prompt: {str(e)}"
+            if get_settings().detailed_error_logs:
+                logger.exception(error_msg)
+            else:
+                logger.error(error_msg)
+                
+            raise PromptCreateError(f"Unexpected error creating prompt: {str(e)}") from e
         
         # Cache Strategy: Write-Through
         try:

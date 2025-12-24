@@ -4,6 +4,7 @@ import PromptDetailPage from './pages/PromptDetailPage';
 import CategoryPage from './pages/CategoryPage';
 import MyPromptsPage from './pages/MyPromptsPage';
 import ReviewPromptsPage from './pages/ReviewPromptsPage';
+import ManagePromptsPage from './pages/ManagePromptsPage';
 import { ROUTES } from './constants/routes';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path={ROUTES.PROMPT_DETAIL} element={<PromptDetailPage />} />
         <Route path={ROUTES.MY_PROMPTS} element={<MyPromptsPage />} />
         <Route path={ROUTES.REVIEW_PROMPTS} element={<ReviewPromptsPage />} />
+        <Route path={ROUTES.MANAGE_PROMPTS} element={<ManagePromptsPage />} />
       </Routes>
     </Router>
   );

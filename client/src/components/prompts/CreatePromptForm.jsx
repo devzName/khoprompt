@@ -7,23 +7,24 @@ import CategorizationSection from './CategorizationSection';
 import NotesSection from './NotesSection';
 import FormActions from './FormActions';
 
-const CreatePromptForm = ({ 
-  form, 
-  loading, 
-  categories, 
-  predefinedTags, 
-  onSubmit, 
-  onCancel, 
-  onMenuClick 
+const CreatePromptForm = ({
+  form,
+  loading,
+  categories,
+  predefinedTags,
+  onSubmit,
+  onCancel,
+  onMenuClick,
+  isEditing = false
 }) => {
   const { t } = useTranslation();
 
   return (
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
-        title={t('myPrompts.createPrompt.title')}
-        description={t('myPrompts.createPrompt.description')}
-        breadcrumb={t('myPrompts.createPrompt.title')}
+        title={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
+        description={isEditing ? t('myPrompts.editPrompt.description', 'Update your prompt details') : t('myPrompts.createPrompt.description')}
+        breadcrumb={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
         onMenuClick={onMenuClick}
       />
 

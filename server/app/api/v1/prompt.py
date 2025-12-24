@@ -121,7 +121,8 @@ async def create_prompt(
         resp = await PromptService.create_prompt(session, data, current_user)
         await PromptService.increment_created_counter()
         return resp
-    except PromptCreateError as e:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
