@@ -15,6 +15,7 @@ from app.repositories.prompt_repo import PromptRepository
 from app.repositories.prompt_tag_repo import PromptTagRepository
 from app.schemas.prompt import PromptCreate, PromptOut, PromptSeed, PromptState, PromptUpdate
 from app.schemas.user import UserOut, UserRole
+from app.services.notification_service import NotificationService
 from app.services.mock_prompts_loader import (
     MockPromptsParseError,
     default_mock_prompts_path,
@@ -63,7 +64,11 @@ class PromptService:
         return PromptService._is_admin(user) or PromptService._is_supervisor(user)
 
     @staticmethod
-    def _assert_can_view(prompt, user: UserOut) -> None:
+    def _assert_can_view(prompt, user: UserOut | None) -> None:
+        if prompt.state == PromptState.APPROVED.value:
+            return
+        if not user:
+            raise PromptPermissionError("Authentication required for non-approved prompts")
         if PromptService._is_reviewer(user):
             return
         if prompt.owner_id == user.id:
@@ -288,6 +293,11 @@ class PromptService:
                 new_state=prompt.state,
             )
         )
+        if prompt.owner_id:
+            await NotificationService.notify_prompt_approved(
+                session, prompt.owner_id, prompt.title, prompt.id
+            )
+            await session.commit()
         return PromptOut.model_validate(prompt)
 
     @staticmethod
@@ -309,6 +319,11 @@ class PromptService:
                 new_state=prompt.state,
             )
         )
+        if prompt.owner_id:
+            await NotificationService.notify_prompt_rejected(
+                session, prompt.owner_id, prompt.title
+            )
+            await session.commit()
         return PromptOut.model_validate(prompt)
 
     @staticmethod

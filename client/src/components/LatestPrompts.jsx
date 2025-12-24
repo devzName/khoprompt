@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
 import { ROUTES } from '../constants/routes';
 
-const LatestPrompts = ({ 
-  title = null, 
+const LatestPrompts = ({
+  title = null,
   prompts = [],
-  currentPrompt = null, 
+  currentPrompt = null,
   filterByCategory = false,
   maxItems = null,
   showPagination = true,
@@ -23,18 +23,18 @@ const LatestPrompts = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   let filteredPrompts = prompts || [];
-  
+
   if (currentPrompt && filterByCategory) {
-    filteredPrompts = filteredPrompts.filter(prompt => 
+    filteredPrompts = filteredPrompts.filter(prompt =>
       prompt.category === currentPrompt.category && prompt.id !== currentPrompt.id
     );
   } else if (currentPrompt) {
     filteredPrompts = filteredPrompts.filter(prompt => prompt.id !== currentPrompt.id);
   }
-  
+
   const totalItems = filteredPrompts.length;
   let paginatedPrompts = filteredPrompts;
-  
+
   if (showPagination && !maxItems) {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -57,16 +57,15 @@ const LatestPrompts = ({
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    document.querySelector('.latest-prompts-section')?.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'start' 
+    document.querySelector('.latest-prompts-section')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
   };
 
   const handleQuickView = (e, prompt) => {
     e.stopPropagation();
-    setSelectedPrompt(prompt);
-    setDrawerOpen(true);
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
   };
 
   const handleCardClick = (prompt) => {
@@ -91,8 +90,8 @@ const LatestPrompts = ({
 
           <div className={getGridClasses()}>
             {paginatedPrompts.map((prompt) => (
-              <div 
-                key={prompt.id} 
+              <div
+                key={prompt.id}
                 className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 flex flex-col cursor-pointer"
                 onClick={() => handleCardClick(prompt)}
               >
@@ -104,10 +103,10 @@ const LatestPrompts = ({
                     <StarOutlined className="text-yellow-500 text-sm" />
                   )}
                 </div>
-                
+
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">{prompt.title}</h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
-                
+
                 <div className="flex flex-wrap gap-1 mb-3">
                   {prompt.tags.slice(0, 2).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
@@ -120,13 +119,13 @@ const LatestPrompts = ({
                     </span>
                   )}
                 </div>
-                
+
                 <div className="flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-1 text-gray-500">
                     <StarOutlined className="text-yellow-500" />
                     <span>{prompt.rating}</span>
                   </div>
-                  <button 
+                  <button
                     onClick={(e) => handleQuickView(e, prompt)}
                     className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium"
                   >
@@ -147,7 +146,7 @@ const LatestPrompts = ({
                 onChange={handlePageChange}
                 showSizeChanger={false}
                 showQuickJumper={false}
-                showTotal={(total, range) => 
+                showTotal={(total, range) =>
                   `${range[0]}-${range[1]} ${t('latest.pagination')} ${total} prompts`
                 }
                 className="text-sm"

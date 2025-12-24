@@ -33,17 +33,28 @@ def get_password_hash(password: str) -> str:
     return bcrypt.hashpw(_sha256_bytes(password), bcrypt.gensalt()).decode()
 
 
-def create_access_token(subject: str | int, expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    subject: str | int, version: int = 0, expires_delta: timedelta | None = None
+) -> tuple[str, str]:
     expire = datetime.now(tz=timezone.utc) + (
         expires_delta
         if expires_delta
         else timedelta(minutes=settings.access_token_expire_minutes)
     )
-    to_encode: dict[str, Any] = {"sub": str(subject), "exp": expire, "token_type": "access"}
-    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    jti = str(uuid4())
+    to_encode: dict[str, Any] = {
+        "sub": str(subject),
+        "exp": expire,
+        "token_type": "access",
+        "jti": jti,
+        "v": version,
+    }
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm), jti
 
 
-def create_refresh_token(subject: str | int, expires_delta: timedelta | None = None) -> tuple[str, str]:
+def create_refresh_token(
+    subject: str | int, version: int = 0, expires_delta: timedelta | None = None
+) -> tuple[str, str]:
     expire = datetime.now(tz=timezone.utc) + (
         expires_delta
         if expires_delta
@@ -55,6 +66,7 @@ def create_refresh_token(subject: str | int, expires_delta: timedelta | None = N
         "exp": expire,
         "token_type": "refresh",
         "jti": jti,
+        "v": version,
     }
     token = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return token, jti

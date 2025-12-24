@@ -6,6 +6,7 @@ export const ROUTES = {
   PROMPT_DETAIL: '/prompt/:id',
   PROMPT_DETAIL_PATH: (id) => `/prompt/${id}`,
   MY_PROMPTS: '/my-prompts',
+  REVIEW_PROMPTS: '/review-prompts',
 };
 
 export default ROUTES;

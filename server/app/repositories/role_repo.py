@@ -10,6 +10,7 @@ from app.schemas.user import UserRole
 from app.core.cache import cache
 from app.core.cache_pg import pg_redis_get, pg_redis_set
 from app.core.redis_client import get_redis
+import json
 
 
 class RoleRepository:
@@ -19,20 +20,18 @@ class RoleRepository:
         try:
             redis_role = await redis_client.get(f"role:{name}")
             if redis_role:
-                from json import loads
-
-                data = loads(redis_role)
+                data = json.loads(redis_role)
                 role = Role(**data)
-                return session.merge(role, load=False)
+                return await session.merge(role, load=False)
         except Exception:
             redis_role = await pg_redis_get(session, f"role:{name}")
             if isinstance(redis_role, dict):
                 role = Role(**redis_role)
-                return session.merge(role, load=False)
+                return await session.merge(role, load=False)
 
         cached_role = cache.get(f"role:{name}")
         if cached_role:
-            return session.merge(cached_role, load=False)
+            return await session.merge(cached_role, load=False)
         result = await session.execute(select(Role).where(Role.name == name))
         role = result.scalar_one_or_none()
         if role:

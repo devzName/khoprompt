@@ -10,7 +10,7 @@ import { ROUTES } from '../constants/routes';
 const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClose = null }) => {
   const navigate = useNavigate();
   const { t, getLanguageMenuItems } = useLanguage();
-  const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, onLogout);
+  const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, onLogout, false, user);
 
   const handleMenuClick = (item) => {
     if (item.action) {
@@ -27,9 +27,10 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
   };
 
   const getActiveClass = (itemKey) => {
-    const isActive = (itemKey === 'my-prompts' && activeTab === 'list') || 
-                    (itemKey === 'create-prompt' && activeTab === 'create');
-    return isActive 
+    const isActive = (itemKey === 'my-prompts' && activeTab === 'list') ||
+      (itemKey === 'create-prompt' && activeTab === 'create') ||
+      (itemKey === 'review-list' && activeTab === 'review-list');
+    return isActive
       ? 'bg-blue-50 text-blue-600 font-medium'
       : 'text-gray-700 hover:bg-gray-50';
   };

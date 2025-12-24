@@ -12,6 +12,7 @@ const MyPromptsPage = () => {
     activeTab,
     form,
     loading,
+    prompts,
     predefinedTags,
     categories,
     menuItems,
@@ -19,6 +20,7 @@ const MyPromptsPage = () => {
     setActiveTab,
     handleCreatePrompt,
     handleSubmitPrompt,
+    handleSubmitForReview,
     handleLogout,
     handleSearchChange,
   } = useMyPrompts();
@@ -39,8 +41,8 @@ const MyPromptsPage = () => {
         styles={{ body: { padding: 0 } }}
         closeIcon={null}
       >
-        <Sidebar 
-          user={user} 
+        <Sidebar
+          user={user}
           onLogout={handleLogout}
           onClose={() => setMobileMenuOpen(false)}
           menuItems={menuItems}
@@ -48,7 +50,7 @@ const MyPromptsPage = () => {
           isMobile={true}
         />
       </Drawer>
-      
+
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {activeTab === 'list' ? (
           <PromptsList
@@ -56,6 +58,9 @@ const MyPromptsPage = () => {
             onSearchChange={handleSearchChange}
             onCreatePrompt={handleCreatePrompt}
             onMenuClick={() => setMobileMenuOpen(true)}
+            prompts={prompts}
+            loading={loading}
+            onSubmitPrompt={handleSubmitForReview}
           />
         ) : (
           <CreatePromptForm

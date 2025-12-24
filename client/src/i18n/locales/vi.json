@@ -1,10 +1,18 @@
 {
+  "common": {
+    "view": "Xem",
+    "edit": "Sửa",
+    "submit": "Duyệt",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
   "header": {
     "title": "Prompt Library",
     "subtitle": "AI Prompt Collection",
     "search": "Tìm kiếm prompt, tác giả, tag...",
     "createPrompt": "Tạo Prompt",
     "myPrompts": "Prompts của tôi",
+    "reviewPrompts": "Duyệt Prompt",
     "logout": "Đăng xuất"
   },
   "login": {
@@ -32,6 +40,7 @@
     "profile": "Thông tin cá nhân",
     "logout": "Đăng xuất",
     "language": "Ngôn ngữ",
+    "reviewPrompts": "Duyệt Prompt",
     "vietnamese": "Tiếng Việt",
     "english": "English"
   },
@@ -45,6 +54,15 @@
     "createNew": "Tạo mới",
     "empty": "Bạn chưa có prompt nào.",
     "createFirst": "Tạo Prompt đầu tiên",
+    "status": {
+      "DRAFT": "Nháp",
+      "SUBMITTED": "Chờ duyệt",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Từ chối",
+      "ARCHIVED": "Lưu trữ"
+    },
+    "submitSuccess": "Đăng ký thành công!",
+    "submitError": "Đăng ký thất bại",
     "createPrompt": {
       "title": "Tạo prompt mới",
       "description": "Tạo một prompt mới để sử dụng trong công việc của bạn",
@@ -165,5 +183,26 @@
     "helpful": "Hữu ích",
     "notHelpful": "Không hữu ích",
     "viewDetail": "Xem chi tiết"
+  },
+  "reviewPrompts": {
+    "errorFetching": "Lỗi khi tải danh sách prompt chờ duyệt",
+    "approveSuccess": "Đã duyệt prompt thành công!",
+    "approveError": "Lỗi khi duyệt prompt",
+    "rejectSuccess": "Đã từ chối prompt thành công!",
+    "rejectError": "Lỗi khi từ chối prompt",
+    "noPendingTitle": "Không có prompt nào chờ duyệt",
+    "noPendingDesc": "Tất cả các prompt đã được xử lý. Hãy quay lại sau nhé!",
+    "approve": "Duyệt",
+    "reject": "Từ chối"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "empty": "Không có thông báo mới",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "unreadCount": "{{count}} thông báo chưa đọc",
+    "types": {
+      "promptApproved": "Prompt đã được duyệt",
+      "promptRejected": "Prompt bị từ chối"
+    }
   }
 }
