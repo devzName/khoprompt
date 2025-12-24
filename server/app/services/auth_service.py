@@ -16,7 +16,7 @@ from app.core.security import (
     verify_password,
 )
 from app.repositories.user_repo import UserRepository
-from app.schemas.user import Token, UserCreate, UserLogin, UserOut, GoogleLogin
+from app.schemas.user import Token, UserCreate, UserLogin, UserOut, GoogleLogin, UserRole
 from app.services.role_service import RoleService
 from app.models.token_version import TokenVersion
 from app.repositories.refresh_token_repo import RefreshTokenRepository
@@ -116,6 +116,10 @@ class AuthService:
 
         try:
             # Verify the token
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info("Verifying Google ID Token...")
+            
             idinfo = id_token.verify_oauth2_token(
                 data.id_token, requests.Request(), settings.google_client_id
             )
@@ -127,6 +131,7 @@ class AuthService:
 
             user = await UserRepository.get_by_email(session, email)
             if not user:
+                logger.info(f"Creating new user for Google login: {email}")
                 # Create a new user if they don't exist
                 # For social logins, we don't have a password. 
                 # Our User model now allows hashed_password to be null.
@@ -159,6 +164,8 @@ class AuthService:
 
         except ValueError as e:
             # Invalid token
+            logger.error(f"Invalid Google token: {str(e)}")
             raise AuthError(f"Invalid Google token: {str(e)}", status.HTTP_401_UNAUTHORIZED) from e
         except Exception as e:
+            logger.exception("Google authentication unexpected error")
             raise AuthError(f"Google authentication failed: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR) from e

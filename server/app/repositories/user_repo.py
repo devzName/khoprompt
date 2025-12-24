@@ -27,7 +27,7 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def create(session: AsyncSession, data: UserCreate, hashed_password: str) -> User:
+    async def create(session: AsyncSession, data: UserCreate, hashed_password: str | None) -> User:
         user = User(
             email=data.email,
             hashed_password=hashed_password,

@@ -1,6 +1,6 @@
 import { Modal, message, Input, Button, Divider } from 'antd';
 import { GoogleOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -20,28 +20,49 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
     try {
       setFormLoading(true);
-      
-      // TODO: Implement actual login API call
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
-      
-      // Mock successful login for demo
-      const mockUser = {
-        name: email.split('@')[0],
-        email: email,
-        picture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-        id: Date.now(),
+
+      const response = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          username: email,
+          password: password,
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const { access_token, refresh_token } = await response.json();
+
+      localStorage.setItem('access_token', access_token);
+      if (refresh_token) {
+        localStorage.setItem('refresh_token', refresh_token);
+      }
+
+      const meResponse = await fetch('/api/v1/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      });
+
+      if (!meResponse.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+
+      const userInfo = await meResponse.json();
+      const user = {
+        ...userInfo,
+        name: userInfo.full_name || userInfo.email.split('@')[0],
+        picture: userInfo.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
       };
-      
-      localStorage.setItem('user', JSON.stringify(mockUser));
+
+      localStorage.setItem('user', JSON.stringify(user));
       message.success(t('login.success'));
-      onLoginSuccess(mockUser);
+      onLoginSuccess(user);
       onClose();
-      
-      // Reset form
+
       setEmail('');
       setPassword('');
     } catch (error) {
@@ -52,45 +73,62 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     }
   };
 
-  const login = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        setLoading(true);
-        
-        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: {
-            Authorization: `Bearer ${tokenResponse.access_token}`,
-          },
-        });
-        
-        const userInfo = await userInfoResponse.json();
-        
-        const user = {
-          name: userInfo.name,
-          email: userInfo.email,
-          picture: userInfo.picture,
-          googleId: userInfo.sub,
-        };
-        
-        localStorage.setItem('access_token', tokenResponse.access_token);
-        localStorage.setItem('user', JSON.stringify(user));
-        
-        message.success(t('login.success'));
-        onLoginSuccess(user);
-        onClose();
-      } catch (error) {
-        console.error('Login error:', error);
-        message.error(t('login.error'));
-      } finally {
-        setLoading(false);
+  const handleGoogleSuccess = async (idToken) => {
+    try {
+      setLoading(true);
+
+      // 1. Authenticate with backend using Google ID Token
+      const response = await fetch('/api/v1/auth/login/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: idToken })
+      });
+
+      if (!response.ok) {
+        throw new Error('Backend authentication failed');
       }
-    },
-    onError: (error) => {
-      console.error('Login Failed:', error);
+
+      const { access_token, refresh_token } = await response.json();
+
+      // 2. Store tokens
+      localStorage.setItem('access_token', access_token);
+      if (refresh_token) {
+        localStorage.setItem('refresh_token', refresh_token);
+      }
+
+      // 3. Get user info from backend
+      const meResponse = await fetch('/api/v1/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      });
+
+      if (!meResponse.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+
+      const userInfo = await meResponse.json();
+
+      // For UI compatibility, ensure picture is present
+      const user = {
+        ...userInfo,
+        name: userInfo.full_name || userInfo.email.split('@')[0],
+        picture: userInfo.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
+      };
+
+      localStorage.setItem('user', JSON.stringify(user));
+
+      message.success(t('login.success'));
+      onLoginSuccess(user);
+      onClose();
+    } catch (error) {
+      console.error('Google login error:', error);
       message.error(t('login.error'));
-    },
-    prompt: 'select_account',
-  });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <Modal
@@ -143,14 +181,21 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
         <Divider className="text-gray-400 text-sm">{t('login.or')}</Divider>
 
         {/* Google Login Button */}
-        <button
-          onClick={() => login()}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-gray-700 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <GoogleOutlined className="text-xl text-red-500" />
-          <span>{loading ? t('login.loggingIn') : t('login.googleLogin')}</span>
-        </button>
+        <div className="w-full flex justify-center">
+          <GoogleLogin
+            onSuccess={credentialResponse => {
+              handleGoogleSuccess(credentialResponse.credential);
+            }}
+            onError={() => {
+              console.error('Login Failed');
+              message.error(t('login.error'));
+            }}
+            useOneTap
+            width="400"
+            theme="outline"
+            shape="pill"
+          />
+        </div>
 
         <div className="text-center mt-6 text-xs text-gray-500">
           {t('login.footer')}
