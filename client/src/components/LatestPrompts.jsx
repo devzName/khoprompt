@@ -80,9 +80,12 @@ const LatestPrompts = ({
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <FireOutlined className="text-2xl text-orange-500" />
-              <h2 className="text-3xl font-bold text-gray-900">
-                {title || t('latest.title')} ({totalItems})
-              </h2>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {title || t('latest.title')} ({totalItems})
+                </h2>
+                <p className="text-gray-600 mt-1">{t('latest.subtitle')}</p>
+              </div>
             </div>
           </div>
 

@@ -30,7 +30,10 @@
     "paymentHistory": "Lịch sử nạp tiền",
     "revenue": "Doanh thu",
     "profile": "Thông tin cá nhân",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "language": "Ngôn ngữ",
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -41,7 +44,35 @@
     "private": "Riêng tư",
     "createNew": "Tạo mới",
     "empty": "Bạn chưa có prompt nào.",
-    "createFirst": "Tạo Prompt đầu tiên"
+    "createFirst": "Tạo Prompt đầu tiên",
+    "createPrompt": {
+      "title": "Tạo prompt mới",
+      "description": "Tạo một prompt mới để sử dụng trong công việc của bạn",
+      "basicInfo": "Thông tin cơ bản",
+      "titleLabel": "Tiêu đề prompt",
+      "titlePlaceholder": "Nhập tiêu đề cho prompt của bạn",
+      "titleRequired": "Vui lòng nhập tiêu đề prompt",
+      "descriptionLabel": "Mô tả ngắn",
+      "descriptionPlaceholder": "Mô tả ngắn gọn về prompt này",
+      "descriptionRequired": "Vui lòng nhập mô tả ngắn",
+      "content": "Nội dung",
+      "contentLabel": "Nội dung prompt",
+      "contentPlaceholder": "Nhập nội dung chi tiết của prompt...",
+      "contentRequired": "Vui lòng nhập nội dung prompt",
+      "categorization": "Phân loại",
+      "categoryLabel": "Danh mục",
+      "categoryPlaceholder": "Chọn danh mục",
+      "categoryRequired": "Vui lòng chọn danh mục",
+      "tagsLabel": "Tags",
+      "tagsPlaceholder": "Chọn hoặc thêm tags",
+      "notes": "Ghi chú",
+      "notesLabel": "Ghi chú thêm",
+      "notesPlaceholder": "Thêm ghi chú hoặc hướng dẫn sử dụng (tùy chọn)",
+      "cancel": "Hủy",
+      "create": "Tạo prompt",
+      "success": "Tạo prompt thành công!",
+      "error": "Có lỗi xảy ra khi tạo prompt"
+    }
   },
   "hero": {
     "title": "Khám phá & Chia sẻ AI Prompts",
@@ -49,11 +80,13 @@
   },
   "featured": {
     "title": "Prompts Nổi Bật",
+    "subtitle": "Top {{count}} prompt hữu ích nhất được cộng đồng đánh giá cao",
     "by": "bởi",
     "quickView": "Xem nhanh"
   },
   "latest": {
     "title": "Prompts Mới Nhất",
+    "subtitle": "Khám phá những prompt được duyệt gần đây",
     "quickView": "Xem nhanh",
     "pagination": "của"
   },

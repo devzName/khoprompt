@@ -30,7 +30,10 @@
     "paymentHistory": "Payment History",
     "revenue": "Revenue",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "language": "Language",
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -41,7 +44,35 @@
     "private": "Private",
     "createNew": "Create New",
     "empty": "You don't have any prompts yet.",
-    "createFirst": "Create your first Prompt"
+    "createFirst": "Create your first Prompt",
+    "createPrompt": {
+      "title": "Create new prompt",
+      "description": "Create a new prompt to use in your work",
+      "basicInfo": "Basic Information",
+      "titleLabel": "Prompt title",
+      "titlePlaceholder": "Enter title for your prompt",
+      "titleRequired": "Please enter prompt title",
+      "descriptionLabel": "Short description",
+      "descriptionPlaceholder": "Brief description of this prompt",
+      "descriptionRequired": "Please enter short description",
+      "content": "Content",
+      "contentLabel": "Prompt content",
+      "contentPlaceholder": "Enter detailed prompt content...",
+      "contentRequired": "Please enter prompt content",
+      "categorization": "Categorization",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Select category",
+      "categoryRequired": "Please select category",
+      "tagsLabel": "Tags",
+      "tagsPlaceholder": "Select or add tags",
+      "notes": "Notes",
+      "notesLabel": "Additional notes",
+      "notesPlaceholder": "Add notes or usage instructions (optional)",
+      "cancel": "Cancel",
+      "create": "Create prompt",
+      "success": "Prompt created successfully!",
+      "error": "An error occurred while creating prompt"
+    }
   },
   "hero": {
     "title": "Discover & Share AI Prompts",
@@ -49,11 +80,13 @@
   },
   "featured": {
     "title": "Featured Prompts",
+    "subtitle": "Top {{count}} most useful prompts highly rated by the community",
     "by": "by",
     "quickView": "Quick View"
   },
   "latest": {
     "title": "Latest Prompts",
+    "subtitle": "Discover recently approved prompts",
     "quickView": "Quick View",
     "pagination": "of"
   },
