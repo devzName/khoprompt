@@ -16,7 +16,7 @@ const HomePage = () => {
       <FeaturedPrompts />
       <LatestPrompts 
         prompts={mockPrompts} 
-        maxItems={8}
+        maxItems={16}
         columns={4}
       />
       <TagsSection />

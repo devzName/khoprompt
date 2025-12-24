@@ -3,9 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { Button, Avatar, Tag, Breadcrumb } from 'antd';
 import { 
   CopyOutlined, 
-  ShareAltOutlined, 
   EyeOutlined, 
   LikeOutlined, 
+  DislikeOutlined,
   CalendarOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ const PromptDetailPage = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
+  const [isHelpful, setIsHelpful] = useState(null);
 
   const prompt = mockPrompts.find(p => p.id === parseInt(id));
 
@@ -54,6 +55,14 @@ const PromptDetailPage = () => {
     navigator.clipboard.writeText(prompt.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleHelpful = () => {
+    setIsHelpful(true);
+  };
+
+  const handleNotHelpful = () => {
+    setIsHelpful(false);
   };
 
   const breadcrumbItems = [
@@ -120,10 +129,21 @@ const PromptDetailPage = () => {
                 {copied ? t('promptDetail.copied') : t('promptDetail.copyPrompt')}
               </Button>
               <Button 
-                icon={<ShareAltOutlined />}
+                type={isHelpful === true ? "primary" : "default"}
+                icon={<LikeOutlined />}
+                onClick={handleHelpful}
                 className="px-6"
               >
-                {t('promptDetail.share')}
+                {t('drawer.helpful')}
+              </Button>
+              <Button 
+                type={isHelpful === false ? "primary" : "default"}
+                icon={<DislikeOutlined />}
+                onClick={handleNotHelpful}
+                className="px-6"
+                danger={isHelpful === false}
+              >
+                {t('drawer.notHelpful')}
               </Button>
             </div>
           </div>
@@ -166,7 +186,6 @@ const PromptDetailPage = () => {
           />
         </div>
       </div>
-
       <Footer />
     </div>
   );
