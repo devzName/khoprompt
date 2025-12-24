@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 
 from app.api.deps import DbSession, get_current_user, get_optional_current_user
 from app.schemas.prompt import PromptCreate, PromptOut, PromptState, PromptUpdate
@@ -38,6 +39,23 @@ async def list_prompts(
         tag=tag,
         featured=featured,
         state=state,
+        limit=limit,
+        offset=offset,
+        current_user=current_user,
+    )
+    return items
+
+@router.get("/me", response_model=list[PromptOut])
+async def list_my_prompts(
+    session: DbSession,
+    current_user=Depends(get_current_user),
+    q: str | None = None,
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+) -> list[PromptOut]:
+    items, _total = await PromptService.list_my_prompts(
+        session,
+        q=q,
         limit=limit,
         offset=offset,
         current_user=current_user,
@@ -136,11 +154,33 @@ async def submit_prompt(
 
 
 @router.post("/{prompt_id}/view", status_code=200)
-async def add_view(prompt_id: int, fp: str | None = None) -> None:
-    try:
-        await PromptService.register_view(prompt_id, fp)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
+async def record_view(
+    prompt_id: int,
+    session: DbSession,
+    request: Request,
+    current_user=Depends(get_optional_current_user),
+    read_time: int | None = Query(None, ge=0, description="Seconds spent reading"),
+    scroll_depth: int | None = Query(None, ge=0, le=100, description="Scroll percentage"),
+) -> dict:
+    """
+    Record a validated view with anti-bot measures.
+    
+    Query params:
+    - read_time: seconds spent reading (optional, validated >= 3s)
+    - scroll_depth: percentage scrolled (optional, validated >= 30%)
+    
+    Returns: {"counted": bool, "reason": str}
+    """
+    from app.core.fingerprint import FingerprintService
+    
+    ip, user_agent = FingerprintService.extract_client_info(request)
+    user_id = current_user.id if current_user else None
+
+    result = await PromptService.record_view_validated(
+        session, prompt_id, user_id, ip, user_agent, read_time, scroll_depth
+    )
+
+    return result
 
 
 @router.post("/{prompt_id}/like", response_model=PromptOut)
@@ -193,3 +233,10 @@ async def archive_prompt(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except PromptPermissionError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+
+
+@router.post("/debug/flush-views", status_code=200)
+async def flush_views_debug(session: DbSession) -> dict:
+    """Debug endpoint to manually flush Redis view counts to database."""
+    result = await PromptService.flush_views_to_db(session)
+    return result

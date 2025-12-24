@@ -9,6 +9,7 @@ from app.schemas.prompt_category import (
     PromptCategoryCreate,
     PromptCategoryOut,
     PromptCategoryUpdate,
+    PromptCategoryStats,
 )
 
 router = APIRouter()
@@ -17,6 +18,11 @@ router = APIRouter()
 @router.get("/", response_model=list[PromptCategoryOut])
 async def list_categories(session: DbSession) -> list[PromptCategoryOut]:
     return await PromptCategoryRepository.get_all(session)
+
+
+@router.get("/stats", response_model=list[PromptCategoryStats])
+async def get_categories_stats(session: DbSession) -> list[PromptCategoryStats]:
+    return await PromptCategoryRepository.get_categories_with_counts(session)
 
 
 @router.post("/", response_model=PromptCategoryOut, status_code=status.HTTP_201_CREATED)

@@ -12,7 +12,8 @@ export const API_ENDPOINTS = {
     APPROVE: (id) => `/prompts/${id}/approve`,
     REJECT: (id) => `/prompts/${id}/reject`,
     VIEW: (id) => `/prompts/${id}/view`,
-    VOTE: (id) => `/prompts/${id}/vote`,
+    LIKE: (id) => `/prompts/${id}/like`,
+    DISLIKE: (id) => `/prompts/${id}/dislike`,
   },
 
   CATEGORIES: '/prompt-categories',

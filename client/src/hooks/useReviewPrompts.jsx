@@ -42,7 +42,7 @@ export const useReviewPrompts = () => {
             setPrompts(prompts.filter(p => p.id !== id));
         } catch (error) {
             console.error('Error approving prompt:', error);
-            message.error(t('reviewPrompts.approveError'));
+            message.error(error.message);
         }
     };
 
@@ -53,7 +53,7 @@ export const useReviewPrompts = () => {
             setPrompts(prompts.filter(p => p.id !== id));
         } catch (error) {
             console.error('Error rejecting prompt:', error);
-            message.error(t('reviewPrompts.rejectError'));
+            message.error(error.message);
         }
     };
 

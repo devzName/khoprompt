@@ -159,7 +159,8 @@
       "1": "Open ChatGPT, Claude or any AI tool you want to use",
       "2": "Paste the prompt and replace the placeholder [brackets] with your specific information",
       "3": "Press Enter to get results from AI"
-    }
+    },
+    "cannotVoteOwn": "You cannot vote on your own prompt"
   },
   "tags": {
     "title": "Explore by Tags",

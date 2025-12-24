@@ -5,8 +5,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.notification_repo import NotificationRepository
 from app.schemas.notification import NotificationCreate, NotificationOut
+from app.core.websocket import manager
 
 class NotificationService:
+    @staticmethod
+    async def _push_notification(notification_obj):
+        out = NotificationOut.model_validate(notification_obj)
+        await manager.send_personal_message(
+            {"type": "new_notification", "data": out.model_dump(mode="json")}, 
+            out.user_id
+        )
+
     @staticmethod
     async def notify_prompt_approved(session: AsyncSession, user_id: UUID, prompt_title: str, prompt_id: int):
         data = NotificationCreate(
@@ -16,7 +25,8 @@ class NotificationService:
             type="success",
             link=f"/prompt/{prompt_id}"
         )
-        await NotificationRepository.create(session, data)
+        noti = await NotificationRepository.create(session, data)
+        await NotificationService._push_notification(noti)
 
     @staticmethod
     async def notify_prompt_rejected(session: AsyncSession, user_id: UUID, prompt_title: str):
@@ -27,7 +37,8 @@ class NotificationService:
             type="error",
             link="/my-prompts"
         )
-        await NotificationRepository.create(session, data)
+        noti = await NotificationRepository.create(session, data)
+        await NotificationService._push_notification(noti)
 
     @staticmethod
     async def list_notifications(

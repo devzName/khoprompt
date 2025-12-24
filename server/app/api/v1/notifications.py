@@ -1,12 +1,39 @@
 from __future__ import annotations
 
 from uuid import UUID
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, WebSocket, WebSocketDisconnect
 from app.api.deps import DbSession, get_current_user
 from app.schemas.notification import NotificationOut
 from app.services.notification_service import NotificationService
+from app.core.websocket import manager
+from app.core.security import decode_access_token
+from app.schemas.user import TokenPayload
 
 router = APIRouter()
+
+@router.websocket("/ws")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    token: str = Query(...)
+):
+    try:
+        payload = TokenPayload(**decode_access_token(token))
+        if not payload.sub:
+            raise ValueError("No sub in token")
+        user_id = UUID(payload.sub)
+    except Exception:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    await manager.connect(user_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(user_id, websocket)
+    except Exception:
+        manager.disconnect(user_id, websocket)
+
 
 @router.get("", response_model=list[NotificationOut])
 async def list_notifications(

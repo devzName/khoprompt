@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 from datetime import datetime, timezone
+from uuid import UUID
+
 from app.models.prompt_log import PromptLog
 from app.repositories.prompt_vote_repo import PromptVoteRepository
+from app.repositories.prompt_view_repo import PromptViewRepository
 from app.core.redis_client import get_redis
+from app.core.fingerprint import FingerprintService
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -101,9 +105,9 @@ class PromptService:
     @staticmethod
     def _assert_can_approve(prompt, user: UserOut) -> None:
         if not PromptService._is_reviewer(user):
-            raise PromptPermissionError("Only reviewer can approve/reject")
+            raise PromptPermissionError("Only reviewers (admin/supervisor) can approve or reject prompts")
         if prompt.state != PromptState.SUBMITTED.value:
-            raise PromptPermissionError("Prompt must be SUBMITTED to approve/reject")
+            raise PromptPermissionError(f"Prompt must be in SUBMITTED state to be approved/rejected. Current state: {prompt.state}")
 
     @staticmethod
     def _assert_can_archive(prompt, user: UserOut) -> None:
@@ -128,6 +132,7 @@ class PromptService:
         current_user,
     ) -> tuple[list[PromptOut], int]:
         owner_filter = None if PromptService._is_reviewer(current_user) else current_user.id
+            
         state_filter = state.value if state else None
         items = await PromptRepository.list(
             session,
@@ -150,6 +155,39 @@ class PromptService:
             featured=featured,
             state=state_filter,
             owner_id=owner_filter,
+        )
+        return [PromptOut.model_validate(item) for item in items], total
+
+    @staticmethod
+    async def list_my_prompts(
+        session: AsyncSession,
+        *,
+        q: str | None = None,
+        limit: int,
+        offset: int,
+        current_user,
+    ) -> tuple[list[PromptOut], int]:
+        items = await PromptRepository.list(
+            session,
+            q=q,
+            category=None,
+            category_id=None,
+            tag=None,
+            featured=None,
+            state=None,
+            owner_id=current_user.id,
+            limit=limit,
+            offset=offset,
+        )
+        total = await PromptRepository.count(
+            session,
+            q=q,
+            category=None,
+            category_id=None,
+            tag=None,
+            featured=None,
+            state=None,
+            owner_id=current_user.id,
         )
         return [PromptOut.model_validate(item) for item in items], total
 
@@ -279,6 +317,8 @@ class PromptService:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt:
             raise PromptNotFoundError("Prompt not found")
+        if prompt.state == PromptState.APPROVED.value:
+            return PromptOut.model_validate(prompt)
         PromptService._assert_can_approve(prompt, current_user)
         prev_state = prompt.state
         prompt.state = PromptState.APPROVED.value
@@ -305,6 +345,8 @@ class PromptService:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt:
             raise PromptNotFoundError("Prompt not found")
+        if prompt.state == PromptState.REJECTED.value:
+            return PromptOut.model_validate(prompt)
         PromptService._assert_can_approve(prompt, current_user)
         prev_state = prompt.state
         prompt.state = PromptState.REJECTED.value
@@ -465,6 +507,8 @@ class PromptService:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt:
             raise PromptNotFoundError("Prompt not found")
+        if str(prompt.owner_id) == str(user_id):
+            raise PromptPermissionError("You cannot vote on your own prompt")
         old_vote = await PromptVoteRepository.get_vote(session, prompt_id, user_id)
         old_value = old_vote.value if old_vote else None
         await PromptVoteRepository.upsert_vote(session, prompt_id, user_id, value)
@@ -522,3 +566,62 @@ class PromptService:
         result = await session.execute(select(Prompt).order_by(desc(expr)).limit(limit))
         prompts = result.scalars().all()
         return [PromptOut.model_validate(p) for p in prompts]
+
+    @staticmethod
+    async def record_view_validated(
+        session: AsyncSession,
+        prompt_id: int,
+        user_id: UUID | None,
+        ip_address: str,
+        user_agent: str,
+        read_time: int | None = None,
+        scroll_depth: int | None = None,
+    ) -> dict:
+        """
+        Record a validated view with anti-bot measures.
+        
+        Returns: {"counted": bool, "reason": str}
+        """
+        # 1. Bot detection
+        if FingerprintService.is_bot(user_agent):
+            return {"counted": False, "reason": "bot_detected"}
+
+        # 2. Validation checks
+        if read_time is not None and read_time < 3:
+            return {"counted": False, "reason": "insufficient_read_time"}
+
+        if scroll_depth is not None and scroll_depth < 30:
+            return {"counted": False, "reason": "insufficient_scroll"}
+
+        # 3. Generate fingerprint for guests
+        viewer_hash = None
+        if not user_id:
+            date_str = FingerprintService.get_date_string()
+            viewer_hash = FingerprintService.generate_viewer_hash(ip_address, user_agent, date_str)
+
+        # 4. Atomic insert (idempotent)
+        is_new_view = await PromptViewRepository.try_record_view(
+            session, prompt_id, user_id, viewer_hash, ip_address, user_agent, read_time, scroll_depth
+        )
+
+        if not is_new_view:
+            return {"counted": False, "reason": "duplicate_view"}
+
+        # 5. Increment counter in DB (primary) and Redis (secondary optimization)
+        from sqlalchemy import update
+        
+        # Always update DB directly for consistency
+        await session.execute(
+            update(Prompt).where(Prompt.id == prompt_id).values(views=Prompt.views + 1)
+        )
+        
+        # Also try to update Redis for hot ranking/caching
+        try:
+            redis = get_redis()
+            await redis.zincrby("prompt:ranking", PromptService.SCORE_VIEW, prompt_id)
+        except Exception:
+            # Redis is optional, DB is source of truth
+            pass
+
+        await session.commit()
+        return {"counted": True, "reason": "success"}

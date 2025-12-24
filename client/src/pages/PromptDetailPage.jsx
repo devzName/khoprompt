@@ -10,6 +10,7 @@ import {
   UserOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ROUTES } from '../constants/routes';
@@ -19,6 +20,7 @@ import apiClient from '../axios/apiClient';
 
 const PromptDetailPage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { id } = useParams();
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,64 @@ const PromptDetailPage = () => {
     }
   }, [id, t]);
 
+  // Validated view tracking with read time and scroll depth
+  useEffect(() => {
+    if (!prompt) return;
+
+    // Don't track views for own prompts or non-approved prompts
+    const isOwnPrompt = user && prompt.owner_id === user.id;
+    const isApproved = prompt.state === 'APPROVED';
+
+    if (isOwnPrompt || !isApproved) {
+      return;
+    }
+
+    let startTime = Date.now();
+    let maxScroll = 0;
+    let viewSent = false;
+
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = total > 0 ? Math.round((scrolled / total) * 100) : 0;
+      maxScroll = Math.max(maxScroll, percent);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Send validated view after minimum engagement
+    const timer = setTimeout(async () => {
+      if (viewSent) return;
+
+      const readTime = Math.floor((Date.now() - startTime) / 1000);
+
+      // Only send if user engaged sufficiently
+      if (readTime >= 0.1 && maxScroll >= 10) {
+        viewSent = true;
+        try {
+          const response = await apiClient.post(API_ENDPOINTS.PROMPTS.VIEW(id), null, {
+            params: { read_time: readTime, scroll_depth: maxScroll }
+          });
+
+          // If view was counted, update the UI immediately
+          if (response.data.counted) {
+            setPrompt(prev => ({
+              ...prev,
+              views: (prev.views || 0) + 1
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to record view:', error);
+        }
+      }
+    }, 5000); // Wait 5 seconds before checking
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [prompt, id, user]);
+
   const handleCopyPrompt = () => {
     if (prompt) {
       navigator.clipboard.writeText(prompt.content);
@@ -57,18 +117,24 @@ const PromptDetailPage = () => {
 
   const handleVote = async (value) => {
     try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
+      if (!user) {
         message.warning(t('login.required'));
         return;
       }
-      await apiClient.post(API_ENDPOINTS.PROMPTS.VOTE(id), null, {
-        params: { value }
-      });
+
+      if (user && prompt && user.id === prompt.owner_id) {
+        message.warning(t('promptDetail.cannotVoteOwn'));
+        return;
+      }
+
+      const endpoint = value === 1 ? API_ENDPOINTS.PROMPTS.LIKE(id) : API_ENDPOINTS.PROMPTS.DISLIKE(id);
+      const response = await apiClient.post(endpoint);
+
       setIsHelpful(value === 1);
+      setPrompt(response.data);
       message.success(t('common.success'));
     } catch (error) {
-      message.error(t('common.error'));
+      message.error(error.response?.data?.detail || t('common.error'));
     }
   };
 
@@ -160,95 +226,98 @@ const PromptDetailPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
               <Button
-                type="primary"
                 size="large"
                 icon={<CopyOutlined />}
                 onClick={handleCopyPrompt}
-                className="flex-1 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 shadow-md transition-all font-bold"
+                className="flex-1 sm:flex-none h-12 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
               >
-                {copied ? t('promptDetail.copied') : t('promptDetail.copyPrompt')}
+                {copied ? t('promptDetail.copied') : t('promptDetail.copy')}
               </Button>
-              <div className="flex gap-4">
-                <Button
-                  size="large"
-                  type={isHelpful === true ? "primary" : "default"}
-                  icon={<LikeOutlined />}
-                  onClick={() => handleVote(1)}
-                  className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
-                >
-                  {t('drawer.helpful')}
-                </Button>
-                <Button
-                  size="large"
-                  type={isHelpful === false ? "primary" : "default"}
-                  icon={<DislikeOutlined />}
-                  onClick={() => handleVote(-1)}
-                  className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
-                  danger={isHelpful === false}
-                >
-                  {t('drawer.notHelpful')}
-                </Button>
-              </div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                  {t('promptDetail.promptContent')}
-                </h2>
-                <div className="bg-gray-900 rounded-xl p-6 font-mono text-sm text-gray-100 whitespace-pre-wrap leading-relaxed shadow-inner border border-gray-800">
-                  {prompt.content}
-                </div>
-              </div>
-
-              {prompt.full_description && (
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
-                    {t('drawer.detailDescription')}
-                  </h2>
-                  <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
-                    {prompt.full_description}
-                  </div>
-                </div>
+              {/* Only show vote buttons if not own prompt */}
+              {(!user || user.id !== prompt.owner_id) && (
+                <>
+                  <Button
+                    size="large"
+                    type={isHelpful === true ? "primary" : "default"}
+                    icon={<LikeOutlined />}
+                    onClick={() => handleVote(1)}
+                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
+                  >
+                    {t('drawer.helpful')}
+                  </Button>
+                  <Button
+                    size="large"
+                    type={isHelpful === false ? "primary" : "default"}
+                    icon={<DislikeOutlined />}
+                    onClick={() => handleVote(-1)}
+                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
+                    danger={isHelpful === false}
+                  >
+                    {t('drawer.notHelpful')}
+                  </Button>
+                </>
               )}
             </div>
+          </div>
+        </div>
 
-            <div className="space-y-8">
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">{t('promptDetail.instructions')}</h2>
-                <ol className="space-y-4">
-                  {instructions.map((instruction, index) => (
-                    <li key={index} className="flex gap-4 group">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        {index + 1}
-                      </div>
-                      <span className="text-gray-700 py-1 leading-relaxed">{instruction}</span>
-                    </li>
-                  ))}
-                </ol>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                {t('promptDetail.promptContent')}
+              </h2>
+              <div className="bg-gray-900 rounded-xl p-6 font-mono text-sm text-gray-100 whitespace-pre-wrap leading-relaxed shadow-inner border border-gray-800">
+                {prompt.content}
               </div>
+            </div>
 
-              <div className="bg-linear-to-br from-blue-600 to-purple-700 rounded-2xl p-6 sm:p-8 shadow-lg text-white">
-                <h2 className="text-xl font-bold mb-4">{t('promptDetail.category')}</h2>
-                <p className="text-blue-50 mb-6 leading-relaxed opacity-90">
-                  {t('promptDetail.categoryDesc')} <span className="font-bold underline underline-offset-4">{prompt.categoryInfo?.name || prompt.category}</span>
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {prompt.tagsInfo?.map((tag) => (
-                    <Tag
-                      key={tag.id}
-                      className="bg-white/10 border-white/20 text-white rounded-full px-3 py-0.5"
-                    >
-                      #{tag.name}
-                    </Tag>
-                  ))}
+            {prompt.full_description && (
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
+                  {t('drawer.detailDescription')}
+                </h2>
+                <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
+                  {prompt.full_description}
                 </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-8">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">{t('promptDetail.instructions')}</h2>
+              <ol className="space-y-4">
+                {instructions.map((instruction, index) => (
+                  <li key={index} className="flex gap-4 group">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      {index + 1}
+                    </div>
+                    <span className="text-gray-700 py-1 leading-relaxed">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="bg-linear-to-br from-blue-600 to-purple-700 rounded-2xl p-6 sm:p-8 shadow-lg text-white">
+              <h2 className="text-xl font-bold mb-4">{t('promptDetail.category')}</h2>
+              <p className="text-blue-50 mb-6 leading-relaxed opacity-90">
+                {t('promptDetail.categoryDesc')} <span className="font-bold underline underline-offset-4">{prompt.categoryInfo?.name || prompt.category}</span>
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {prompt.tagsInfo?.map((tag) => (
+                  <Tag
+                    key={tag.id}
+                    className="bg-white/10 border-white/20 text-white rounded-full px-3 py-0.5"
+                  >
+                    #{tag.name}
+                  </Tag>
+                ))}
               </div>
             </div>
           </div>

@@ -23,3 +23,7 @@ class PromptCategoryOut(PromptCategoryBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class PromptCategoryStats(PromptCategoryOut):
+    prompt_count: int

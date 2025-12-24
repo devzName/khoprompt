@@ -49,10 +49,11 @@ export const useMyPrompts = () => {
     }
   }, [user, t]);
 
+  // Only fetch once on mount
   useEffect(() => {
     fetchCategories();
     fetchTags();
-  }, [fetchCategories, fetchTags]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (user && activeTab === 'list') {

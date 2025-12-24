@@ -18,5 +18,6 @@ class NotificationOut(NotificationBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    user_id: UUID
     is_read: bool
     created_at: datetime

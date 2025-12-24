@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from sqlalchemy import insert, update, select, func, case
+from uuid import UUID
+
+from sqlalchemy import select, update
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.prompt_vote import PromptVote
@@ -9,16 +12,14 @@ from app.models.prompt import Prompt
 
 class PromptVoteRepository:
     @staticmethod
-    async def upsert_vote(session: AsyncSession, prompt_id: int, user_id, value: int) -> None:
-        # upsert vote
-        await session.execute(
-            insert(PromptVote)
-            .values(user_id=user_id, prompt_id=prompt_id, value=value)
-            .on_conflict_do_update(
-                index_elements=[PromptVote.user_id, PromptVote.prompt_id],
-                set_={"value": value},
-            )
+    async def upsert_vote(session: AsyncSession, prompt_id: int, user_id: UUID, value: int) -> None:
+        """Upsert vote using PostgreSQL-specific INSERT ... ON CONFLICT."""
+        stmt = pg_insert(PromptVote).values(user_id=user_id, prompt_id=prompt_id, value=value)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=["user_id", "prompt_id"], 
+            set_={"value": value}
         )
+        await session.execute(stmt)
 
     @staticmethod
     async def apply_vote_delta(session: AsyncSession, prompt_id: int, old_value: int | None, new_value: int) -> None:
@@ -45,7 +46,7 @@ class PromptVoteRepository:
         )
 
     @staticmethod
-    async def get_vote(session: AsyncSession, prompt_id: int, user_id) -> PromptVote | None:
+    async def get_vote(session: AsyncSession, prompt_id: int, user_id: UUID) -> PromptVote | None:
         result = await session.execute(
             select(PromptVote).where(PromptVote.prompt_id == prompt_id, PromptVote.user_id == user_id)
         )
