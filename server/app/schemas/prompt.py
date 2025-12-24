@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from uuid import UUID
+from typing import Annotated
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+
+from app.schemas.prompt_category import PromptCategoryOut
+from app.schemas.prompt_tag import PromptTagOut
 
 
 class PromptState(StrEnum):
@@ -15,12 +18,12 @@ class PromptState(StrEnum):
 
 
 class PromptBase(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
     title: str = Field(min_length=1, max_length=255)
     description: str = Field(min_length=1)
+    category_id: int | None = Field(default=None, serialization_alias="categoryId")
     category: str = Field(min_length=1, max_length=100)
     tags: list[str] = Field(default_factory=list)
+    tag_ids: list[int] = Field(default_factory=list)
 
     rating: float = 0.0
     uses: int = 0
@@ -31,13 +34,8 @@ class PromptBase(BaseModel):
     likes: int = 0
     dislikes: int = 0
 
-    full_description: str = Field(
-        default="",
-        validation_alias=AliasChoices("full_description", "fullDescription"),
-        serialization_alias="fullDescription",
-    )
+    full_description: str = ""
     content: str = ""
-    is_deleted: bool = False
 
 
 class PromptCreate(PromptBase):
@@ -47,8 +45,10 @@ class PromptCreate(PromptBase):
 class PromptUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = Field(default=None, min_length=1)
+    category_id: int | None = Field(default=None, serialization_alias="categoryId")
     category: str | None = Field(default=None, min_length=1, max_length=100)
     tags: list[str] | None = None
+    tag_ids: list[int] | None = None
 
     rating: float | None = None
     uses: int | None = None
@@ -64,13 +64,15 @@ class PromptUpdate(BaseModel):
 
 
 class PromptOut(PromptBase):
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     state: PromptState
-    owner_id: UUID | None = Field(default=None, serialization_alias="ownerId")
+    category_info: PromptCategoryOut | None = Field(
+        default=None, serialization_alias="categoryInfo", validation_alias=AliasChoices("category_ref", "category_info")
+    )
+    tags_info: list[PromptTagOut] = Field(default_factory=list, serialization_alias="tagsInfo", validation_alias=AliasChoices("tag_refs", "tags_info"))
 
 
 class PromptSeed(PromptCreate):
-    id: int
     state: PromptState = PromptState.APPROVED
