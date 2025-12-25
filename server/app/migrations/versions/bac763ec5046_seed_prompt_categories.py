@@ -1,7 +1,7 @@
 """seed_prompt_categories
 
 Revision ID: bac763ec5046
-Revises: 46d7233375b6
+Revises: 
 Create Date: 2025-12-25 10:26:38.819991
 """
 
@@ -14,15 +14,36 @@ from datetime import datetime
 
 # revision identifiers, used by Alembic.
 revision = 'bac763ec5046'
-down_revision = '46d7233375b6'
+down_revision = None
 branch_labels = None
 depends_on = None
 
 
 def upgrade() -> None:
-    # Add new columns
-    op.add_column('prompt_categories', sa.Column('description_vi', sa.Text(), nullable=True))
-    op.add_column('prompt_categories', sa.Column('display_order', sa.Integer(), nullable=True))
+    # Create the prompt_categories table if it doesn't exist
+    op.create_table(
+        'prompt_categories',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=100), nullable=False),
+        sa.Column('slug', sa.String(length=100), nullable=False),
+        sa.Column('description', sa.Text(), nullable=True),
+        sa.Column('description_vi', sa.Text(), nullable=True),
+        sa.Column('display_order', sa.Integer(), nullable=True),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column('created_by', sa.dialects.postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column('updated_by', sa.dialects.postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+        sa.Column('deleted_by', sa.dialects.postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False, server_default=sa.text('false')),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('name'),
+        sa.UniqueConstraint('slug')
+    )
+    
+    # Create indexes
+    op.create_index('ix_prompt_categories_name', 'prompt_categories', ['name'])
+    op.create_index('ix_prompt_categories_slug', 'prompt_categories', ['slug'])
 
     # Define the table structure for inserting data
     prompt_categories = table(
@@ -113,19 +134,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # Delete all seeded categories
-    op.execute(
-        """
-        DELETE FROM prompt_categories
-        WHERE slug IN (
-            'hr', 'administration', 'testing', 'development',
-            'business-analysis', 'project-management', 'design',
-            'marketing', 'data-analysis', 'other'
-        )
-        """
-    )
-
-    # Drop the new columns
-    op.drop_column('prompt_categories', 'display_order')
-    op.drop_column('prompt_categories', 'description_vi')
+    # Drop indexes first
+    op.drop_index('ix_prompt_categories_slug', 'prompt_categories')
+    op.drop_index('ix_prompt_categories_name', 'prompt_categories')
+    # Drop the entire table
+    op.drop_table('prompt_categories')
 
