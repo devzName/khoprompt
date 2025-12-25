@@ -3,17 +3,10 @@ import { API_ENDPOINTS } from '../constants/api';
 
 export const authService = {
   login: async (email, password) => {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, 
-      new URLSearchParams({
-        username: email,
-        password: password,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN_ADMIN, {
+      email: email,
+      password: password,
+    });
     return response.data;
   },
 
@@ -31,7 +24,7 @@ export const authService = {
 
   logout: () => {
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
+    window.location.href = '/';
   },
 };

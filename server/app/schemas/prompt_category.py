@@ -34,6 +34,5 @@ class PromptCategoryStats(PromptCategoryOut):
 
 
 class PromptCategoryStatsResponse(BaseModel):
-    """Response model for categories with stats including total count."""
     categories: list[PromptCategoryStats]
     total_prompts: int

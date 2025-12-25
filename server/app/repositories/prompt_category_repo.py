@@ -8,7 +8,6 @@ class PromptCategoryRepository:
 
     @staticmethod
     async def get_categories_with_counts(session: AsyncSession) -> list[dict]:
-        # Simplified version without prompts (prompt model removed)
         stmt = (
             select(PromptCategory)
             .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
@@ -16,7 +15,6 @@ class PromptCategoryRepository:
         result = await session.execute(stmt)
         categories = result.scalars().all()
 
-        # Add prompt_count = 0 for each category
         return [
             {
                 "id": cat.id,

@@ -10,6 +10,5 @@ router = APIRouter()
 
 @router.get("/stats", response_model=PromptCategoryStatsResponse)
 async def get_categories_stats(session: DbSession):
-    """Get all categories with prompt counts and total prompts, ordered by display_order."""
     return await PromptCategoryService.get_categories_with_stats(session)
 

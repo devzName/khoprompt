@@ -30,9 +30,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
-      // window.location.href = '/';
+      window.location.href = '/';
+      return Promise.reject(new Error('Session expired. Please login again.'));
     }
     
     const errorMessage = error.response?.data?.message || error.message || 'An error occurred';

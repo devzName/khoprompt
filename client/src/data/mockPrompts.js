@@ -1,4 +1,3 @@
-// Mock data for prompts - in real app this would come from API
 export const mockPrompts = [
   {
     id: 1,

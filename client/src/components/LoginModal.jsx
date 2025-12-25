@@ -22,18 +22,15 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     try {
       setFormLoading(true);
 
-      const { access_token, refresh_token } = await authService.login(email, password);
+      const { access_token } = await authService.login(email, password);
 
       localStorage.setItem('access_token', access_token);
-      if (refresh_token) {
-        localStorage.setItem('refresh_token', refresh_token);
-      }
 
       const userInfo = await authService.getCurrentUser();
       const user = {
         ...userInfo,
         name: userInfo.full_name || userInfo.email.split('@')[0],
-        picture: userInfo.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
+        picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
       };
 
       localStorage.setItem('user', JSON.stringify(user));
@@ -55,19 +52,16 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     try {
       setGoogleLoading(true);
 
-      const { access_token, refresh_token } = await authService.loginWithGoogle(idToken);
+      const { access_token } = await authService.loginWithGoogle(idToken);
 
       localStorage.setItem('access_token', access_token);
-      if (refresh_token) {
-        localStorage.setItem('refresh_token', refresh_token);
-      }
 
       const userInfo = await authService.getCurrentUser();
 
       const user = {
         ...userInfo,
         name: userInfo.full_name || userInfo.email.split('@')[0],
-        picture: userInfo.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
+        picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
       };
 
       localStorage.setItem('user', JSON.stringify(user));

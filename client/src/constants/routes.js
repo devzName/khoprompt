@@ -1,4 +1,3 @@
-// Application Routes Constants
 export const ROUTES = {
   HOME: '/',
   CATEGORY: '/category/:category',

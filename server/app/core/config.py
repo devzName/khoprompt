@@ -29,9 +29,6 @@ class Settings(BaseSettings):
     detailed_error_logs: bool = Field(default=False, validation_alias="DETAILED_ERROR_LOGS")
     secret_key: str = Field(default="change-me", validation_alias="SECRET_KEY")
     access_token_expire_minutes: int = Field(default=60, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
-    refresh_token_expire_minutes: int = Field(
-        default=60 * 24 * 7, validation_alias="REFRESH_TOKEN_EXPIRE_MINUTES"
-    )
     algorithm: str = Field(default="HS256", validation_alias="ALGORITHM")
     google_client_id: str | None = Field(default=None, validation_alias="GOOGLE_CLIENT_ID")
 
