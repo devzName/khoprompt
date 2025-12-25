@@ -35,13 +35,13 @@ services:
     networks:
       - app-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: app-redis
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    networks:
-      - app-net
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: app-redis
+  #   ports:
+  #     - "${REDIS_PORT:-6379}:6379"
+  #   networks:
+  #     - app-net
 
 volumes:
   pgdata:

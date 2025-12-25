@@ -4,7 +4,14 @@
       "Bash(npm create:*)",
       "Bash(npm init:*)",
       "Bash(npm install:*)",
-      "Bash(npx tailwindcss:*)"
+      "Bash(npx tailwindcss:*)",
+      "Bash(rm:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python -m app.main:*)",
+      "Bash(poetry --version:*)",
+      "Bash(poetry install:*)",
+      "Bash(poetry run python:*)",
+      "Bash(poetry run uvicorn:*)"
     ]
   }
 }
