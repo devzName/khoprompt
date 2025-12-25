@@ -13,7 +13,8 @@ from app.core.security import hash_password
 async def create_admin_user():
     db_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:Tinhvan123@localhost:5432/app")
     
-    if 'db:5432' in db_url:
+    # Only swap db to localhost if NOT running in Docker
+    if 'db:5432' in db_url and not os.getenv("IS_IN_DOCKER"):
         db_url = db_url.replace('db:5432', 'localhost:5432')
         print(f"Swapped DB host to localhost: {db_url}")
     
