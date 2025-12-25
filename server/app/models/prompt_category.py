@@ -14,5 +14,7 @@ class PromptCategory(AuditMixin, Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
     slug: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description_vi: Mapped[str | None] = mapped_column(Text, nullable=True)
+    display_order: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     prompts: Mapped[list["Prompt"]] = relationship("Prompt", back_populates="category_ref")

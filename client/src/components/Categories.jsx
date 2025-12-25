@@ -13,12 +13,11 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
+import { API_ENDPOINTS } from '../constants/api';
+import apiClient from '../axios/apiClient';
 
 const Categories = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,28 +39,24 @@ const Categories = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/v1/prompt-categories/stats');
-        if (response.ok) {
-          const data = await response.json();
+        const response = await apiClient.get(API_ENDPOINTS.CATEGORIES.STATS);
+        const { categories, total_prompts } = response.data;
 
-          const totalCount = data.reduce((acc, cat) => acc + cat.prompt_count, 0);
-
-          const formattedCategories = [
-            {
-              title: t('categories.all'),
-              slug: 'all',
-              icon: <AppstoreOutlined />,
-              count: totalCount
-            },
-            ...data.map(cat => ({
-              title: cat.name,
-              slug: cat.slug,
-              icon: getIcon(cat.name),
-              count: cat.prompt_count
-            }))
-          ];
-          setCategories(formattedCategories);
-        }
+        const formattedCategories = [
+          {
+            title: t('categories.all'),
+            slug: 'all',
+            icon: <AppstoreOutlined />,
+            count: total_prompts
+          },
+          ...categories.map(cat => ({
+            title: cat.name,
+            slug: cat.slug,
+            icon: getIcon(cat.name),
+            count: cat.prompt_count
+          }))
+        ];
+        setCategories(formattedCategories);
       } catch (error) {
         console.error('Error fetching category stats:', error);
       } finally {
@@ -71,14 +66,6 @@ const Categories = () => {
 
     fetchStats();
   }, [t]);
-
-  const handleCategoryClick = (slug) => {
-    if (slug === 'all') {
-      navigate('/'); // Or a search page if you have one, homepage lists all usually
-    } else {
-      navigate(ROUTES.CATEGORY_PATH(slug));
-    }
-  };
 
   if (loading) return null;
 
@@ -101,8 +88,7 @@ const Categories = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              onClick={() => handleCategoryClick(category.slug)}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 cursor-pointer group"
+              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 group"
             >
               <div className="flex items-center gap-4">
                 <div className="text-blue-600 text-3xl group-hover:scale-110 transition-transform duration-300">

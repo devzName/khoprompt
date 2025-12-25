@@ -17,7 +17,10 @@ export const API_ENDPOINTS = {
     FEED_LATEST: '/prompts/feed/latest',
   },
 
-  CATEGORIES: '/prompt-categories',
+  CATEGORIES: {
+    BASE: '/prompt-categories',
+    STATS: '/prompt-categories/stats',
+  },
 
   TAGS: '/prompt-tags',
 

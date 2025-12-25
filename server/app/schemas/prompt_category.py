@@ -7,6 +7,8 @@ class PromptCategoryBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     slug: str = Field(min_length=1, max_length=100)
     description: str | None = None
+    description_vi: str | None = None
+    display_order: int | None = None
 
 
 class PromptCategoryCreate(PromptCategoryBase):
@@ -17,6 +19,8 @@ class PromptCategoryUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
     slug: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = None
+    description_vi: str | None = None
+    display_order: int | None = None
 
 
 class PromptCategoryOut(PromptCategoryBase):
@@ -27,3 +31,9 @@ class PromptCategoryOut(PromptCategoryBase):
 
 class PromptCategoryStats(PromptCategoryOut):
     prompt_count: int
+
+
+class PromptCategoryStatsResponse(BaseModel):
+    """Response model for categories with stats including total count."""
+    categories: list[PromptCategoryStats]
+    total_prompts: int
