@@ -6,7 +6,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
 import LoginModal from './LoginModal';
-import NotificationBell from './shared/NotificationBell';
+// import NotificationBell from './shared/NotificationBell';
 import { ROUTES } from '../constants/routes';
 
 const Header = () => {
@@ -84,7 +84,7 @@ const Header = () => {
 
               {user && (
                 <>
-                  <NotificationBell />
+                  {/* <NotificationBell /> */}
                   <Dropdown
                     menu={{ items: userMenuItems }}
                     placement="bottomRight"
