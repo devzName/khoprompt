@@ -27,7 +27,14 @@
     "footer": "Đăng nhập để trải nghiệm đầy đủ tính năng của Prompt Library",
     "success": "Đăng nhập thành công!",
     "error": "Đăng nhập thất bại. Vui lòng thử lại!",
-    "fillAllFields": "Vui lòng điền đầy đủ thông tin"
+    "fillAllFields": "Vui lòng điền đầy đủ thông tin",
+    "rememberMe": "Ghi nhớ tài khoản",
+    "required": "Vui lòng đăng nhập để tiếp tục"
+  },
+  "googleLoginRequired": {
+    "title": "Cần đăng nhập bằng Google",
+    "subtitle": "Tính năng này chỉ dành cho người dùng đăng nhập bằng tài khoản Google",
+    "backHome": "Về trang chủ"
   },
   "sidebar": {
     "backToHome": "Quay về trang chủ",

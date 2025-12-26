@@ -1,7 +1,7 @@
-import { Modal, message, Input, Button, Divider } from 'antd';
+import { Modal, message, Input, Button, Divider, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../services/authService';
 
@@ -11,6 +11,17 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const [formLoading, setFormLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('rememberedCredentials');
+    if (savedCredentials) {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(savedCredentials);
+      setEmail(savedEmail || '');
+      setPassword(savedPassword || '');
+      setRememberMe(true);
+    }
+  }, [open]);
 
   const handleFormLogin = async (e) => {
     e.preventDefault();
@@ -26,6 +37,15 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
       localStorage.setItem('access_token', access_token);
 
+      if (rememberMe) {
+        localStorage.setItem('rememberedCredentials', JSON.stringify({
+          email,
+          password
+        }));
+      } else {
+        localStorage.removeItem('rememberedCredentials');
+      }
+
       const userInfo = await authService.getCurrentUser();
       const user = {
         ...userInfo,
@@ -38,8 +58,10 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       onLoginSuccess(user);
       onClose();
 
-      setEmail('');
-      setPassword('');
+      if (!rememberMe) {
+        setEmail('');
+        setPassword('');
+      }
     } catch (error) {
       console.error('Login error:', error);
       message.error(t('login.error'));
@@ -115,6 +137,17 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-xl"
           />
+          
+          <div className="flex items-center justify-between">
+            <Checkbox
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="text-sm text-gray-600"
+            >
+              {t('login.rememberMe')}
+            </Checkbox>
+          </div>
+
           <Button
             type="primary"
             size="large"

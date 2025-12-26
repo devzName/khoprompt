@@ -27,7 +27,14 @@
     "footer": "Sign in to experience all features of Prompt Library",
     "success": "Login successful!",
     "error": "Login failed. Please try again!",
-    "fillAllFields": "Please fill in all fields"
+    "fillAllFields": "Please fill in all fields",
+    "rememberMe": "Remember me",
+    "required": "Please login to continue"
+  },
+  "googleLoginRequired": {
+    "title": "Google Login Required",
+    "subtitle": "This feature is only available for users who sign in with Google account",
+    "backHome": "Back to Home"
   },
   "sidebar": {
     "backToHome": "Back to home",
