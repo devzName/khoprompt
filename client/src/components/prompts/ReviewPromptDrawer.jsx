@@ -38,7 +38,6 @@ const ReviewPromptDrawer = ({ open, onClose, prompt, onApprove, onReject, curren
             color={PROMPT_STATUS_COLORS[prompt?.status] || 'default'}
             className="text-sm font-medium px-3 py-1"
           >
-            {getStatusLabel(prompt?.status, t)}
           </Tag>
         </div>
       }

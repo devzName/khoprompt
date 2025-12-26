@@ -29,7 +29,6 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             color={PROMPT_STATUS_COLORS[prompt?.status] || 'green'}
             className="text-sm font-medium px-3 py-1"
           >
-            {getStatusLabel(prompt?.status, t) || 'Approved'}
           </Tag>
         </div>
       }
