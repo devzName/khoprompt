@@ -4,6 +4,7 @@ import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
 import { promptService } from '../services/promptService';
+import { promptCategoriesService } from '../services/promptCategoriesService';
 
 export const useMyPrompts = () => {
   const { user, logout } = useAuth();
@@ -15,6 +16,20 @@ export const useMyPrompts = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await promptCategoriesService.getCategories();
+      setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const fetchMyPrompts = useCallback(async () => {
     if (!user) return;
@@ -59,14 +74,15 @@ export const useMyPrompts = () => {
     try {
       setLoading(true);
 
+      const categoryObj = categories.find(c => c.value === values.category);
+
       const payload = {
         title: values.title,
         description: values.description,
         content: values.content,
         category_id: values.category,
-        category: values.category ? 'Selected Category' : 'General',
+        category: categoryObj ? categoryObj.label : 'General',
         tags: values.tags || [],
-        tag_ids: [],
         full_description: values.notes || ""
       };
 
@@ -118,7 +134,6 @@ export const useMyPrompts = () => {
   ];
 
   return {
-    // State
     user,
     searchValue,
     mobileMenuOpen,
@@ -127,8 +142,6 @@ export const useMyPrompts = () => {
     loading,
     prompts,
     menuItems,
-
-    // Actions
     setMobileMenuOpen,
     setActiveTab,
     handleCreatePrompt,

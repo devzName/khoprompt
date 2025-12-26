@@ -30,7 +30,7 @@ const CategorizationSection = ({ categories, predefinedTags }) => {
             mode="tags"
             placeholder={t('myPrompts.createPrompt.tagsPlaceholder')}
             size="large"
-            options={predefinedTags.map(tag => ({ label: tag, value: tag }))}
+            options={predefinedTags}
           />
         </Form.Item>
       </div>

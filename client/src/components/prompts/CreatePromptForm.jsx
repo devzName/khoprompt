@@ -35,7 +35,7 @@ const CreatePromptForm = ({
     const fetchTags = async () => {
       try {
         const data = await promptTagsService.getTags();
-        setPredefinedTags(data.map(tag => tag.name));
+        setPredefinedTags(data.map(tag => ({ label: tag.name, value: tag.id })));
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -44,6 +44,10 @@ const CreatePromptForm = ({
     fetchCategories();
     fetchTags();
   }, []);
+
+  const handleFormSubmit = (values) => {
+    onSubmit(values);
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full">
@@ -56,7 +60,7 @@ const CreatePromptForm = ({
 
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full p-4 sm:p-6">
-          <Form form={form} layout="vertical" onFinish={onSubmit}>
+          <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
             <BasicInfoSection />
             <ContentSection />
             <CategorizationSection categories={categories} predefinedTags={predefinedTags} />
