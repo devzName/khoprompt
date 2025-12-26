@@ -1,5 +1,5 @@
-import { EyeOutlined, CopyOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined } from '@ant-design/icons';
-import { Drawer, Button, Tag } from 'antd';
+import { EyeOutlined, CopyOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
+import { Drawer, Button, Tag, Avatar } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 
@@ -111,6 +111,30 @@ const MyPromptDrawer = ({ open, onClose, prompt }) => {
                 <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
                   {prompt.full_description}
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Author Info */}
+          {prompt.user && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('myPromptDrawer.author')}</h3>
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border">
+                <Avatar 
+                  size={48} 
+                  src={prompt.user.picture || prompt.user.avatar_url} 
+                  icon={<UserOutlined />}
+                  className="shrink-0"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900 mb-1">
+                    {prompt.user.full_name || prompt.user.name || 'Unknown User'}
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <MailOutlined className="text-xs" />
+                    <span>{prompt.user.email || 'No email'}</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}

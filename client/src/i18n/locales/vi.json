@@ -126,6 +126,7 @@
     "createdAt": "Tạo lúc",
     "promptContent": "Nội dung Prompt",
     "notes": "Ghi chú",
+    "author": "Tác giả",
     "copy": "Copy"
   },
   "hero": {

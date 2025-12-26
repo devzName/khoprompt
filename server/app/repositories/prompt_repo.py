@@ -75,6 +75,22 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
+    async def get_pending_prompts(session: AsyncSession, limit: int = 100) -> list[Prompt]:
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.status == PromptStatus.PENDING)
+            .order_by(Prompt.created_at.desc())
+            .limit(limit)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
     async def update(session: AsyncSession, prompt: Prompt, update_data: dict) -> Prompt:
         # Extract tags from update_data
         tag_ids = update_data.pop('tags', None)

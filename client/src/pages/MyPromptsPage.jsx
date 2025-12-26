@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
-import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
+import { FileTextOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
+import { ROUTES } from '../constants/routes';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import PromptsList from '../components/prompts/PromptsList';
+import ReviewPromptsList from '../components/prompts/ReviewPromptsList';
 
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
@@ -18,13 +22,16 @@ const MyPromptsPage = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
+  const [pendingPrompts, setPendingPrompts] = useState([]);
   const [hasLoadedPrompts, setHasLoadedPrompts] = useState(false);
 
   useEffect(() => {
     if (user?.id && activeTab === 'list' && !hasLoadedPrompts) {
       fetchMyPrompts();
+    } else if (user?.user_type === 'admin' && activeTab === 'review' && !hasLoadedPrompts) {
+      fetchPendingPrompts();
     }
-  }, [user?.id, activeTab, hasLoadedPrompts]);
+  }, [user?.id, user?.user_type, activeTab, hasLoadedPrompts]);
 
   const fetchMyPrompts = async () => {
     try {
@@ -37,6 +44,24 @@ const MyPromptsPage = () => {
       notification.error({
         message: t('common.error', 'Error'),
         description: t('myPrompts.errorFetching', 'Error fetching prompts'),
+        placement: 'topRight'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPendingPrompts = async () => {
+    try {
+      setLoading(true);
+      const data = await promptService.getPendingPrompts();
+      setPendingPrompts(data);
+      setHasLoadedPrompts(true);
+    } catch (error) {
+      console.error('Error fetching pending prompts:', error);
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('reviewPrompts.errorFetching', 'Error fetching pending prompts'),
         placement: 'topRight'
       });
     } finally {
@@ -151,6 +176,54 @@ const MyPromptsPage = () => {
     }
   };
 
+  const handleApprovePrompt = async (id) => {
+    try {
+      setLoading(true);
+      
+      await promptService.approvePrompt(id);
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('reviewPrompts.approveSuccess', 'Prompt approved successfully'),
+        placement: 'topRight'
+      });
+      setHasLoadedPrompts(false);
+      fetchPendingPrompts();
+    } catch (error) {
+      console.error('Error approving prompt:', error);
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('reviewPrompts.approveError', 'Error approving prompt'),
+        placement: 'topRight'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectPrompt = async (id) => {
+    try {
+      setLoading(true);
+      
+      await promptService.rejectPrompt(id);
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('reviewPrompts.rejectSuccess', 'Prompt rejected successfully'),
+        placement: 'topRight'
+      });
+      setHasLoadedPrompts(false);
+      fetchPendingPrompts();
+    } catch (error) {
+      console.error('Error rejecting prompt:', error);
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('reviewPrompts.rejectError', 'Error rejecting prompt'),
+        placement: 'topRight'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     logout(() => setMobileMenuOpen(false));
   };
@@ -172,6 +245,16 @@ const MyPromptsPage = () => {
       }
     },
     { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => handleCreatePrompt() },
+    // Admin only menu
+    ...(user?.user_type === 'admin' ? [{
+      key: 'review-prompts',
+      icon: <CheckCircleOutlined />,
+      label: t('sidebar.reviewPrompts'),
+      action: () => {
+        setActiveTab('review');
+        setHasLoadedPrompts(false);
+      }
+    }] : [])
   ];
 
   return (
@@ -212,6 +295,16 @@ const MyPromptsPage = () => {
             onSubmitPrompt={handleSubmitForReview}
             onEditPrompt={handleEditPrompt}
             onDeletePrompt={handleDeletePrompt}
+          />
+        ) : activeTab === 'review' && user?.user_type === 'admin' ? (
+          <ReviewPromptsList
+            searchValue={searchValue}
+            onSearchChange={handleSearchChange}
+            onMenuClick={() => setMobileMenuOpen(true)}
+            prompts={pendingPrompts}
+            loading={loading}
+            onApprovePrompt={handleApprovePrompt}
+            onRejectPrompt={handleRejectPrompt}
           />
         ) : (
           <CreatePromptForm

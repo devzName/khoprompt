@@ -12,6 +12,11 @@ export const promptService = {
     return response.data;
   },
 
+  getPendingPrompts: async (params = {}) => {
+    const response = await apiClient.get(API_ENDPOINTS.PROMPTS.PENDING, { params });
+    return response.data;
+  },
+
   getPromptById: async (id) => {
     const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BY_ID(id));
     return response.data;

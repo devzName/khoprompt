@@ -126,6 +126,7 @@
     "createdAt": "Created at",
     "promptContent": "Prompt Content",
     "notes": "Notes",
+    "author": "Author",
     "copy": "Copy"
   },
   "hero": {

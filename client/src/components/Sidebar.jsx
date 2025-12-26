@@ -29,7 +29,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
   const getActiveClass = (itemKey) => {
     const isActive = (itemKey === 'my-prompts' && activeTab === 'list') ||
       (itemKey === 'create-prompt' && activeTab === 'create') ||
-      (itemKey === 'review-list' && activeTab === 'review-list');
+      (itemKey === 'review-prompts' && activeTab === 'review');
     return isActive
       ? 'bg-blue-50 text-blue-600 font-medium'
       : 'text-gray-700 hover:bg-gray-50';

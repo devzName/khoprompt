@@ -57,7 +57,8 @@ class PromptService:
             "user": {
                 "id": str(prompt.user.id),
                 "full_name": prompt.user.full_name,
-                "email": prompt.user.email
+                "email": prompt.user.email,
+                "avatar_url": prompt.user.avatar_url
             } if prompt.user else None,
             "category": {
                 "id": prompt.category.id,
@@ -115,7 +116,8 @@ class PromptService:
                 "user": {
                     "id": str(prompt.user.id),
                     "full_name": prompt.user.full_name,
-                    "email": prompt.user.email
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url
                 } if prompt.user else None,
                 "category": {
                     "id": prompt.category.id,
@@ -150,6 +152,44 @@ class PromptService:
                 "created_at": prompt.created_at,
                 "updated_at": prompt.updated_at,
                 "user": None,
+                "category": {
+                    "id": prompt.category.id,
+                    "name": prompt.category.name,
+                    "slug": prompt.category.slug
+                } if prompt.category else None,
+                "tags": [
+                    {"id": tag.id, "name": tag.name} 
+                    for tag in prompt.tags
+                ]
+            }
+            for prompt in prompts
+        ]
+
+    @staticmethod
+    async def get_pending_prompts(session: AsyncSession, limit: int = 100) -> list[dict]:
+        prompts = await PromptRepository.get_pending_prompts(session, limit)
+        
+        return [
+            {
+                "id": prompt.id,
+                "title": prompt.title,
+                "description": prompt.description,
+                "content": prompt.content,
+                "full_description": prompt.full_description,
+                "status": prompt.status,
+                "category_id": prompt.category_id,
+                "user_id": str(prompt.user_id),
+                "view_count": prompt.view_count,
+                "like_count": prompt.like_count,
+                "dislike_count": prompt.dislike_count,
+                "created_at": prompt.created_at,
+                "updated_at": prompt.updated_at,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url
+                } if prompt.user else None,
                 "category": {
                     "id": prompt.category.id,
                     "name": prompt.category.name,

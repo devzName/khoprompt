@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   PROMPTS: {
     BASE: '/prompts',
     MY: '/prompts/my',
+    PENDING: '/prompts/pending',
     BY_ID: (id) => `/prompts/${id}`,
     SUBMIT: (id) => `/prompts/${id}/submit`,
     APPROVE: (id) => `/prompts/${id}/approve`,
