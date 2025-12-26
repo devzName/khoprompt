@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Button, Input, Typography, Tag, Spin } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
+import MyPromptDrawer from './MyPromptDrawer';
 
 const { Text, Title } = Typography;
 
@@ -19,28 +21,21 @@ const PromptsList = ({
   onDeletePrompt
 }) => {
   const { t } = useTranslation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(null);
 
   const filteredPrompts = prompts.filter(prompt =>
     prompt.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
     prompt.description?.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const handleQuickView = (prompt) => {
+    setSelectedPrompt(prompt);
+    setDrawerOpen(true);
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      <style>
-        {`
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
       <PageHeader
         title={t('myPrompts.title')}
         description={t('myPrompts.description')}
@@ -73,11 +68,8 @@ const PromptsList = ({
       <div className="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-blue-50/30">
         <div className="w-full p-4 sm:p-6">
           {loading ? (
-            <div className="flex flex-col justify-center items-center py-20">
-              <div className="relative">
-                <Spin size="large" />
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-xl opacity-20 animate-pulse" />
-              </div>
+            <div className="flex flex-col justify-center items-center h-full min-h-[60vh]">
+              <Spin size="large" />
               <Text className="mt-4 text-gray-600">{t('common.loading', 'Đang tải...')}</Text>
             </div>
           ) : filteredPrompts.length === 0 ? (
@@ -96,10 +88,6 @@ const PromptsList = ({
                 <div
                   key={prompt.id}
                   className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    animation: 'fadeInUp 0.6s ease-out forwards'
-                  }}
                 >
                   {/* Status Badge */}
                   <div className="absolute top-4 right-4 z-10">
@@ -198,16 +186,28 @@ const PromptsList = ({
                         </Button>
                       </div>
                       
-                      {/* Row 2: Delete */}
-                      <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => onDeletePrompt && onDeletePrompt(prompt.id)}
-                        className="w-full rounded-xl border-red-200 text-red-600 hover:border-red-400 hover:text-red-700 transition-all duration-200 hover:shadow-sm"
-                        size="middle"
-                      >
-                        {t('myPrompts.delete', 'Xóa')}
-                      </Button>
+                      {/* Row 2: Quick View and Delete */}
+                      <div className="flex gap-2">
+                        <Button
+                          type="default"
+                          icon={<EyeOutlined />}
+                          onClick={() => handleQuickView(prompt)}
+                          className="flex-1 rounded-xl border-gray-200 hover:border-green-400 hover:text-green-600 transition-all duration-200 hover:shadow-sm"
+                          size="middle"
+                        >
+                          {t('latest.quickView', 'Xem nhanh')}
+                        </Button>
+                        
+                        <Button
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => onDeletePrompt && onDeletePrompt(prompt.id)}
+                          className="flex-1 rounded-xl border-red-200 text-red-600 hover:border-red-400 hover:text-red-700 transition-all duration-200 hover:shadow-sm"
+                          size="middle"
+                        >
+                          {t('myPrompts.delete')}
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -219,6 +219,12 @@ const PromptsList = ({
           )}
         </div>
       </div>
+
+      <MyPromptDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        prompt={selectedPrompt}
+      />
     </div>
   );
 };

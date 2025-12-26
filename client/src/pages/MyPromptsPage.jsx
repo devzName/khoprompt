@@ -127,6 +127,30 @@ const MyPromptsPage = () => {
     }
   };
 
+  const handleDeletePrompt = async (id) => {
+    try {
+      setLoading(true);
+      
+      await promptService.deletePrompt(id);
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('myPrompts.deleteSuccess', 'Prompt deleted successfully'),
+        placement: 'topRight'
+      });
+      setHasLoadedPrompts(false);
+      fetchMyPrompts();
+    } catch (error) {
+      console.error('Error deleting prompt:', error);
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('myPrompts.deleteError', 'Error deleting prompt'),
+        placement: 'topRight'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     logout(() => setMobileMenuOpen(false));
   };
@@ -187,6 +211,7 @@ const MyPromptsPage = () => {
             loading={loading}
             onSubmitPrompt={handleSubmitForReview}
             onEditPrompt={handleEditPrompt}
+            onDeletePrompt={handleDeletePrompt}
           />
         ) : (
           <CreatePromptForm

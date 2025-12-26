@@ -27,6 +27,11 @@ export const promptService = {
     return response.data;
   },
 
+  deletePrompt: async (id) => {
+    const response = await apiClient.delete(API_ENDPOINTS.PROMPTS.BY_ID(id));
+    return response.data;
+  },
+
   submitPrompt: async (id) => {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.SUBMIT(id));
     return response.data;
