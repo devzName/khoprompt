@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Drawer, Form, message } from 'antd';
 import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { promptService } from '../services/promptService';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import PromptsList from '../components/prompts/PromptsList';
@@ -17,6 +18,26 @@ const MyPromptsPage = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
+
+  // Fetch user's prompts
+  useEffect(() => {
+    if (user && activeTab === 'list') {
+      fetchMyPrompts();
+    }
+  }, [user, activeTab]);
+
+  const fetchMyPrompts = async () => {
+    try {
+      setLoading(true);
+      const data = await promptService.getPrompts();
+      setPrompts(data);
+    } catch (error) {
+      console.error('Error fetching prompts:', error);
+      message.error(t('myPrompts.errorFetching', 'Error fetching prompts'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreatePrompt = () => {
     setEditingPrompt(null);
@@ -44,18 +65,18 @@ const MyPromptsPage = () => {
     try {
       setLoading(true);
       
-      // TODO: Implement API call
-      console.log('Submit prompt:', values);
-      
       if (editingPrompt) {
+        await promptService.updatePrompt(editingPrompt.id, values);
         message.success(t('myPrompts.editPrompt.success', 'Prompt updated successfully'));
       } else {
+        await promptService.createPrompt(values);
         message.success(t('myPrompts.createPrompt.success'));
       }
 
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
+      fetchMyPrompts(); // Refresh the list
     } catch (error) {
       console.error('Error saving prompt:', error);
       message.error(t('myPrompts.createPrompt.error'));
@@ -68,10 +89,9 @@ const MyPromptsPage = () => {
     try {
       setLoading(true);
       
-      // TODO: Implement API call
-      console.log('Submit for review:', id);
-      
+      await promptService.submitPrompt(id);
       message.success(t('myPrompts.submitSuccess'));
+      fetchMyPrompts(); // Refresh the list
     } catch (error) {
       console.error('Error submitting prompt:', error);
       message.error(t('myPrompts.submitError'));

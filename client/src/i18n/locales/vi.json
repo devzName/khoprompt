@@ -79,6 +79,7 @@
     },
     "submitSuccess": "Gửi duyệt thành công!",
     "submitError": "Gửi duyệt thất bại",
+    "errorFetching": "Lỗi khi tải danh sách prompts",
     "createPrompt": {
       "title": "Tạo prompt mới",
       "description": "Tạo và chia sẻ prompt hữu ích đến mọi người trong cộng đồng",

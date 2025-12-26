@@ -6,8 +6,7 @@ import FeaturedPrompts from '../components/FeaturedPrompts';
 import LatestPrompts from '../components/LatestPrompts';
 import TagsSection from '../components/TagsSection';
 import Footer from '../components/Footer';
-import apiClient from '../axios/apiClient';
-import { API_ENDPOINTS } from '../constants/api';
+import { promptService } from '../services/promptService';
 
 const HomePage = () => {
   const [latestPrompts, setLatestPrompts] = useState([]);
@@ -29,10 +28,8 @@ const HomePage = () => {
 
     const fetchFeaturedPrompts = async () => {
       try {
-        const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BASE, {
-          params: { featured: true, limit: 6 }
-        });
-        setFeaturedPrompts(response.data);
+        const response = await promptService.getPrompts();
+        setFeaturedPrompts(response);
       } catch (error) {
         console.error('Failed to fetch featured prompts:', error);
       } finally {
