@@ -54,6 +54,15 @@
   "myPrompts": {
     "breadcrumb": "Dashboard",
     "title": "Prompts của tôi",
+    "description": "Quản lý và theo dõi tất cả prompts của bạn",
+    "searchPlaceholder": "Tìm kiếm prompts...",
+    "noPrompts": "Bạn chưa có prompt nào",
+    "noPromptsDescription": "Tạo prompt đầu tiên của bạn để bắt đầu chia sẻ với cộng đồng",
+    "noResults": "Không tìm thấy kết quả",
+    "noResultsDescription": "Thử thay đổi từ khóa tìm kiếm của bạn",
+    "edit": "Chỉnh sửa",
+    "submitForReview": "Gửi duyệt",
+    "createdAt": "Tạo lúc",
     "search": "Tìm kiếm prompts...",
     "all": "Tất cả",
     "public": "Công khai",
@@ -68,8 +77,8 @@
       "REJECTED": "Từ chối",
       "ARCHIVED": "Lưu trữ"
     },
-    "submitSuccess": "Đăng ký thành công!",
-    "submitError": "Đăng ký thất bại",
+    "submitSuccess": "Gửi duyệt thành công!",
+    "submitError": "Gửi duyệt thất bại",
     "createPrompt": {
       "title": "Tạo prompt mới",
       "description": "Tạo và chia sẻ prompt hữu ích đến mọi người trong cộng đồng",
@@ -97,6 +106,11 @@
       "create": "Tạo prompt",
       "success": "Tạo prompt thành công!",
       "error": "Có lỗi xảy ra khi tạo prompt"
+    },
+    "editPrompt": {
+      "title": "Chỉnh sửa prompt",
+      "description": "Cập nhật thông tin prompt của bạn",
+      "success": "Cập nhật prompt thành công!"
     }
   },
   "hero": {

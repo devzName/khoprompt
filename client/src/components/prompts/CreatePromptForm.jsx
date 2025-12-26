@@ -35,7 +35,7 @@ const CreatePromptForm = ({
     const fetchTags = async () => {
       try {
         const data = await promptTagsService.getTags();
-        setPredefinedTags(data.map(tag => ({ label: tag.name, value: tag.id })));
+        setPredefinedTags(data.map(tag => ({ label: tag.name, value: tag.id.toString() })));
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -46,7 +46,13 @@ const CreatePromptForm = ({
   }, []);
 
   const handleFormSubmit = (values) => {
-    onSubmit(values);
+    // Convert string tag IDs back to numbers for API
+    const processedValues = {
+      ...values,
+      tags: values.tags ? values.tags.map(tagId => parseInt(tagId, 10)) : []
+    };
+    
+    onSubmit(processedValues);
   };
 
   return (

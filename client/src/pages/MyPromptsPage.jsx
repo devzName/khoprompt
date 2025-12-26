@@ -1,31 +1,97 @@
-import { Drawer } from 'antd';
+import { useState } from 'react';
+import { Drawer, Form, message } from 'antd';
+import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import PromptsList from '../components/prompts/PromptsList';
-import { useMyPrompts } from '../hooks/useMyPrompts.jsx';
 
 const MyPromptsPage = () => {
-  const {
-    user,
-    searchValue,
-    mobileMenuOpen,
-    activeTab,
-    form,
-    loading,
-    prompts,
-    predefinedTags,
-    categories,
-    menuItems,
-    setMobileMenuOpen,
-    setActiveTab,
-    handleCreatePrompt,
-    handleSubmitPrompt,
-    handleSubmitForReview,
-    handleLogout,
-    handleSearchChange,
-    handleEditPrompt,
-    editingPrompt,
-  } = useMyPrompts();
+  const { user, logout } = useAuth();
+  const { t } = useTranslation();
+  const [searchValue, setSearchValue] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('list');
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [editingPrompt, setEditingPrompt] = useState(null);
+  const [prompts, setPrompts] = useState([]);
+
+  const handleCreatePrompt = () => {
+    setEditingPrompt(null);
+    form.resetFields();
+    setActiveTab('create');
+  };
+
+  const handleEditPrompt = (prompt) => {
+    setEditingPrompt(prompt);
+    form.setFieldsValue({
+      title: prompt.title,
+      description: prompt.description,
+      content: prompt.content,
+      category_id: prompt.category_id,
+      tags: prompt.tags?.map(tag => {
+        const tagId = typeof tag === 'object' ? tag.id : tag;
+        return tagId.toString();
+      }) || [],
+      full_description: prompt.full_description
+    });
+    setActiveTab('create');
+  };
+
+  const handleSubmitPrompt = async (values) => {
+    try {
+      setLoading(true);
+      
+      // TODO: Implement API call
+      console.log('Submit prompt:', values);
+      
+      if (editingPrompt) {
+        message.success(t('myPrompts.editPrompt.success', 'Prompt updated successfully'));
+      } else {
+        message.success(t('myPrompts.createPrompt.success'));
+      }
+
+      form.resetFields();
+      setEditingPrompt(null);
+      setActiveTab('list');
+    } catch (error) {
+      console.error('Error saving prompt:', error);
+      message.error(t('myPrompts.createPrompt.error'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitForReview = async (id) => {
+    try {
+      setLoading(true);
+      
+      // TODO: Implement API call
+      console.log('Submit for review:', id);
+      
+      message.success(t('myPrompts.submitSuccess'));
+    } catch (error) {
+      console.error('Error submitting prompt:', error);
+      message.error(t('myPrompts.submitError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    logout(() => setMobileMenuOpen(false));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const menuItems = [
+    { key: 'my-prompts', icon: <FileTextOutlined />, label: t('sidebar.myPrompts'), action: () => setActiveTab('list') },
+    { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => handleCreatePrompt() },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50">
