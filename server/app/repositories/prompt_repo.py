@@ -92,6 +92,27 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6) -> list[Prompt]:
+        """Get featured prompts based on engagement metrics (likes, views) and recency"""
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.status == PromptStatus.APPROVED)
+            .order_by(
+                # Order by engagement score: (like_count * 2 + view_count) descending
+                (Prompt.like_count * 2 + Prompt.view_count).desc(),
+                Prompt.created_at.desc()
+            )
+            .limit(limit)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
     async def update(session: AsyncSession, prompt: Prompt, update_data: dict) -> Prompt:
         # Extract tags from update_data
         tag_ids = update_data.pop('tags', None)

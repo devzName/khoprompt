@@ -46,6 +46,15 @@ async def get_my_prompts(
     prompts = await PromptService.get_user_prompts_with_details(session, current_user.id)
     return prompts
 
+@router.get("/featured", response_model=list[PromptWithDetails])
+async def get_featured_prompts(
+    session: DbSession,
+    limit: int = 6
+):
+    """Get featured prompts based on engagement metrics (public access)"""
+    prompts = await PromptService.get_featured_prompts(session, limit)
+    return prompts
+
 @router.get("/{prompt_id}", response_model=PromptWithDetails)
 async def get_prompt(prompt_id: int, session: DbSession):
     """Get a prompt by ID"""

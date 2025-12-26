@@ -49,7 +49,8 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
 
   const handleQuickView = (e, prompt) => {
     e.stopPropagation();
-    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
+    setSelectedPrompt(prompt);
+    setDrawerOpen(true);
   };
 
   const handleCardClick = (prompt) => {
@@ -81,11 +82,13 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                    {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
+                    {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                   </span>
                   <div className="flex items-center gap-1 text-yellow-500">
                     <StarOutlined className="text-sm" />
-                    <span className="text-sm font-medium text-gray-700">{prompt.rating}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {prompt.rating || ((prompt.like_count || 0) > 0 ? (prompt.like_count / Math.max(1, (prompt.like_count || 0) + (prompt.dislike_count || 0)) * 5).toFixed(1) : '5.0')}
+                    </span>
                   </div>
                 </div>
 
@@ -93,15 +96,22 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {prompt.tags?.map((tag, index) => (
+                  {prompt.tags?.slice(0, 3).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
                       #{typeof tag === 'object' ? tag.name : tag}
                     </span>
                   ))}
+                  {prompt.tags?.length > 3 && (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
+                      +{prompt.tags.length - 3}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between text-sm mt-auto">
-                  <span className="text-gray-500">{t('featured.by')} {prompt.author}</span>
+                  <div className="flex items-center gap-3 text-gray-500">
+                    <span>{t('featured.by')} {prompt.author || prompt.user?.full_name || 'Unknown'}</span>
+                  </div>
                   <button
                     onClick={(e) => handleQuickView(e, prompt)}
                     className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"

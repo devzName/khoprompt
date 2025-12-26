@@ -17,7 +17,8 @@ const HomePage = () => {
   useEffect(() => {
     const fetchLatestPrompts = async () => {
       try {
-        
+        const response = await promptService.getPrompts();
+        setLatestPrompts(response);
       } catch (error) {
         console.error('Failed to fetch latest prompts:', error);
       } finally {
@@ -27,7 +28,7 @@ const HomePage = () => {
 
     const fetchFeaturedPrompts = async () => {
       try {
-        const response = await promptService.getPrompts();
+        const response = await promptService.getFeaturedPrompts(6);
         setFeaturedPrompts(response);
       } catch (error) {
         console.error('Failed to fetch featured prompts:', error);

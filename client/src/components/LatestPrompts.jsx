@@ -87,7 +87,8 @@ const LatestPrompts = ({
 
   const handleQuickView = (e, prompt) => {
     e.stopPropagation();
-    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
+    setSelectedPrompt(prompt);
+    setDrawerOpen(true);
   };
 
   const handleCardClick = (prompt) => {
@@ -119,7 +120,7 @@ const LatestPrompts = ({
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
-                    {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
+                    {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                   </span>
                   {prompt.featured && (
                     <StarOutlined className="text-yellow-500 text-sm" />
@@ -143,9 +144,11 @@ const LatestPrompts = ({
                 </div>
 
                 <div className="flex items-center justify-between text-xs mt-auto">
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <StarOutlined className="text-yellow-500" />
-                    <span>{prompt.rating}</span>
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <StarOutlined className="text-yellow-500" />
+                      <span>{prompt.rating || ((prompt.like_count || 0) > 0 ? (prompt.like_count / Math.max(1, (prompt.like_count || 0) + (prompt.dislike_count || 0)) * 5).toFixed(1) : '5.0')}</span>
+                    </div>
                   </div>
                   <button
                     onClick={(e) => handleQuickView(e, prompt)}

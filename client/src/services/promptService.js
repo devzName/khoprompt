@@ -17,6 +17,11 @@ export const promptService = {
     return response.data;
   },
 
+  getFeaturedPrompts: async (limit = 6) => {
+    const response = await apiClient.get(API_ENDPOINTS.PROMPTS.FEATURED, { params: { limit } });
+    return response.data;
+  },
+
   getPromptById: async (id) => {
     const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BY_ID(id));
     return response.data;

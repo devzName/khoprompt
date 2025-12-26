@@ -141,6 +141,48 @@ class PromptService:
         ]
 
     @staticmethod
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6) -> list[dict]:
+        """Get featured prompts based on engagement metrics"""
+        prompts = await PromptRepository.get_featured_prompts(session, limit)
+        
+        return [
+            {
+                "id": prompt.id,
+                "title": prompt.title,
+                "description": prompt.description,
+                "content": prompt.content,
+                "full_description": prompt.full_description,
+                "status": prompt.status,
+                "category_id": prompt.category_id,
+                "user_id": str(prompt.user_id),
+                "view_count": prompt.view_count,
+                "like_count": prompt.like_count,
+                "dislike_count": prompt.dislike_count,
+                "created_at": prompt.created_at,
+                "updated_at": prompt.updated_at,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url
+                } if prompt.user else None,
+                "category": {
+                    "id": prompt.category.id,
+                    "name": prompt.category.name,
+                    "slug": prompt.category.slug
+                } if prompt.category else None,
+                "tags": [
+                    {"id": tag.id, "name": tag.name} 
+                    for tag in prompt.tags
+                ],
+                # Calculate rating based on engagement
+                "rating": round((prompt.like_count * 2 + prompt.view_count * 0.1) / max(1, prompt.like_count + prompt.dislike_count + 1), 1),
+                "author": prompt.user.full_name if prompt.user else "Unknown"
+            }
+            for prompt in prompts
+        ]
+
+    @staticmethod
     async def get_user_prompts_with_details(session: AsyncSession, user_id: UUID) -> list[dict]:
         prompts = await PromptRepository.get_by_user(session, user_id)
         
