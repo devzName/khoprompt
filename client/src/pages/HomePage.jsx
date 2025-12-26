@@ -17,8 +17,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchLatestPrompts = async () => {
       try {
-        // const response = await apiClient.get(API_ENDPOINTS.PROMPTS.FEED_LATEST);
-        // setLatestPrompts(response.data);
+        
       } catch (error) {
         console.error('Failed to fetch latest prompts:', error);
       } finally {

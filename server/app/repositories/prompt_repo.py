@@ -12,17 +12,14 @@ class PromptRepository:
 
     @staticmethod
     async def create(session: AsyncSession, prompt_data: dict, user_id: UUID) -> Prompt:
-        # Extract tags from prompt_data
         tag_ids = prompt_data.pop('tags', [])
         
-        # Create prompt
         prompt = Prompt(
             **prompt_data,
             user_id=user_id,
             status=PromptStatus.PENDING
         )
         
-        # Add tags if provided
         if tag_ids:
             stmt = select(PromptTag).where(PromptTag.id.in_(tag_ids))
             result = await session.execute(stmt)
@@ -82,12 +79,10 @@ class PromptRepository:
         # Extract tags from update_data
         tag_ids = update_data.pop('tags', None)
         
-        # Update prompt fields
         for field, value in update_data.items():
             if hasattr(prompt, field):
                 setattr(prompt, field, value)
         
-        # Update tags if provided
         if tag_ids is not None:
             stmt = select(PromptTag).where(PromptTag.id.in_(tag_ids))
             result = await session.execute(stmt)

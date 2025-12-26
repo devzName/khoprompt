@@ -46,11 +46,15 @@ const CreatePromptForm = ({
   }, []);
 
   const handleFormSubmit = (values) => {
-    // Convert string tag IDs back to numbers for API
+    // Convert form values to API format
     const processedValues = {
       ...values,
+      category_id: values.category, // Chuyển từ category thành category_id cho API
       tags: values.tags ? values.tags.map(tagId => parseInt(tagId, 10)) : []
     };
+    
+    // Remove the original category field
+    delete processedValues.category;
     
     onSubmit(processedValues);
   };

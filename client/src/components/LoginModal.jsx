@@ -1,4 +1,4 @@
-import { Modal, message, Input, Button, Divider, Checkbox } from 'antd';
+import { Modal, notification, Input, Button, Divider, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
@@ -26,7 +26,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const handleFormLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      message.error(t('login.fillAllFields'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('login.fillAllFields'),
+        placement: 'topRight'
+      });
       return;
     }
 
@@ -54,7 +58,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       };
 
       localStorage.setItem('user', JSON.stringify(user));
-      message.success(t('login.success'));
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('login.success'),
+        placement: 'topRight'
+      });
       onLoginSuccess(user);
       onClose();
 
@@ -64,7 +72,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      message.error(t('login.error'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('login.error'),
+        placement: 'topRight'
+      });
     } finally {
       setFormLoading(false);
     }
@@ -88,12 +100,20 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
       localStorage.setItem('user', JSON.stringify(user));
 
-      message.success(t('login.success'));
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('login.success'),
+        placement: 'topRight'
+      });
       onLoginSuccess(user);
       onClose();
     } catch (error) {
       console.error('Google login error:', error);
-      message.error(t('login.error'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('login.error'),
+        placement: 'topRight'
+      });
     } finally {
       setGoogleLoading(false);
     }
@@ -178,7 +198,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
                 }}
                 onError={() => {
                   console.error('Login Failed');
-                  message.error(t('login.error'));
+                  notification.error({
+                    message: t('common.error', 'Error'),
+                    description: t('login.error'),
+                    placement: 'topRight'
+                  });
                 }}
                 useOneTap={false}
                 width="100%"

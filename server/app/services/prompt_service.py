@@ -148,7 +148,7 @@ class PromptService:
                 "dislike_count": prompt.dislike_count,
                 "created_at": prompt.created_at,
                 "updated_at": prompt.updated_at,
-                "user": None,  # Not needed for user's own prompts
+                "user": None,
                 "category": {
                     "id": prompt.category.id,
                     "name": prompt.category.name,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button, Avatar, Tag, Breadcrumb, Spin, message } from 'antd';
+import { Button, Avatar, Tag, Breadcrumb, Spin, notification } from 'antd';
 import {
   CopyOutlined,
   EyeOutlined,
@@ -37,7 +37,11 @@ const PromptDetailPage = () => {
         apiClient.post(API_ENDPOINTS.PROMPTS.VIEW(id)).catch(() => { });
       } catch (error) {
         console.error('Error fetching prompt:', error);
-        message.error(t('promptDetail.notFound'));
+        notification.error({
+          message: t('common.error', 'Error'),
+          description: t('promptDetail.notFound'),
+          placement: 'topRight'
+        });
       } finally {
         setLoading(false);
       }
@@ -48,11 +52,9 @@ const PromptDetailPage = () => {
     }
   }, [id, t]);
 
-  // Validated view tracking with read time and scroll depth
   useEffect(() => {
     if (!prompt) return;
 
-    // Don't track views for own prompts or non-approved prompts
     const isOwnPrompt = user && prompt.owner_id === user.id;
     const isApproved = prompt.state === 'APPROVED';
 
@@ -73,13 +75,11 @@ const PromptDetailPage = () => {
 
     window.addEventListener('scroll', handleScroll);
 
-    // Send validated view after minimum engagement
     const timer = setTimeout(async () => {
       if (viewSent) return;
 
       const readTime = Math.floor((Date.now() - startTime) / 1000);
 
-      // Only send if user engaged sufficiently
       if (readTime >= 0.1 && maxScroll >= 10) {
         viewSent = true;
         try {
@@ -87,7 +87,6 @@ const PromptDetailPage = () => {
             params: { read_time: readTime, scroll_depth: maxScroll }
           });
 
-          // If view was counted, update the UI immediately
           if (response.data.counted) {
             setPrompt(prev => ({
               ...prev,
@@ -98,7 +97,7 @@ const PromptDetailPage = () => {
           console.error('Failed to record view:', error);
         }
       }
-    }, 5000); // Wait 5 seconds before checking
+    }, 5000);
 
     return () => {
       clearTimeout(timer);
@@ -111,19 +110,31 @@ const PromptDetailPage = () => {
       navigator.clipboard.writeText(prompt.content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      message.success(t('promptDetail.copied'));
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('promptDetail.copied'),
+        placement: 'topRight'
+      });
     }
   };
 
   const handleVote = async (value) => {
     try {
       if (!user) {
-        message.warning(t('login.required'));
+        notification.warning({
+          message: t('common.warning', 'Warning'),
+          description: t('login.required'),
+          placement: 'topRight'
+        });
         return;
       }
 
       if (user && prompt && user.id === prompt.owner_id) {
-        message.warning(t('promptDetail.cannotVoteOwn'));
+        notification.warning({
+          message: t('common.warning', 'Warning'),
+          description: t('promptDetail.cannotVoteOwn'),
+          placement: 'topRight'
+        });
         return;
       }
 
@@ -132,9 +143,17 @@ const PromptDetailPage = () => {
 
       setIsHelpful(value === 1);
       setPrompt(response.data);
-      message.success(t('common.success'));
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('common.success'),
+        placement: 'topRight'
+      });
     } catch (error) {
-      message.error(error.response?.data?.detail || t('common.error'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: error.response?.data?.detail || t('common.error'),
+        placement: 'topRight'
+      });
     }
   };
 

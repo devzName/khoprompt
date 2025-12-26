@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Drawer, Form, message } from 'antd';
+import { Drawer, Form, notification } from 'antd';
 import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -20,7 +20,6 @@ const MyPromptsPage = () => {
   const [prompts, setPrompts] = useState([]);
   const [hasLoadedPrompts, setHasLoadedPrompts] = useState(false);
 
-  // Fetch user's prompts
   useEffect(() => {
     if (user?.id && activeTab === 'list' && !hasLoadedPrompts) {
       fetchMyPrompts();
@@ -35,7 +34,11 @@ const MyPromptsPage = () => {
       setHasLoadedPrompts(true);
     } catch (error) {
       console.error('Error fetching prompts:', error);
-      message.error(t('myPrompts.errorFetching', 'Error fetching prompts'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('myPrompts.errorFetching', 'Error fetching prompts'),
+        placement: 'topRight'
+      });
     } finally {
       setLoading(false);
     }
@@ -53,7 +56,7 @@ const MyPromptsPage = () => {
       title: prompt.title,
       description: prompt.description,
       content: prompt.content,
-      category_id: prompt.category_id,
+      category: prompt.category_id,
       tags: prompt.tags?.map(tag => {
         const tagId = typeof tag === 'object' ? tag.id : tag;
         return tagId.toString();
@@ -69,20 +72,32 @@ const MyPromptsPage = () => {
       
       if (editingPrompt) {
         await promptService.updatePrompt(editingPrompt.id, values);
-        message.success(t('myPrompts.editPrompt.success', 'Prompt updated successfully'));
+        notification.success({
+          message: t('common.success', 'Success'),
+          description: t('myPrompts.editPrompt.success', 'Prompt updated successfully'),
+          placement: 'topRight'
+        });
       } else {
         await promptService.createPrompt(values);
-        message.success(t('myPrompts.createPrompt.success'));
+        notification.success({
+          message: t('common.success', 'Success'),
+          description: t('myPrompts.createPrompt.success'),
+          placement: 'topRight'
+        });
       }
 
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
-      setHasLoadedPrompts(false); // Reset để load lại data
-      fetchMyPrompts(); // Refresh the list
+      setHasLoadedPrompts(false);
+      fetchMyPrompts();
     } catch (error) {
       console.error('Error saving prompt:', error);
-      message.error(t('myPrompts.createPrompt.error'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('myPrompts.createPrompt.error'),
+        placement: 'topRight'
+      });
     } finally {
       setLoading(false);
     }
@@ -93,12 +108,20 @@ const MyPromptsPage = () => {
       setLoading(true);
       
       await promptService.submitPrompt(id);
-      message.success(t('myPrompts.submitSuccess'));
-      setHasLoadedPrompts(false); // Reset để load lại data
-      fetchMyPrompts(); // Refresh the list
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('myPrompts.submitSuccess'),
+        placement: 'topRight'
+      });
+      setHasLoadedPrompts(false);
+      fetchMyPrompts();
     } catch (error) {
       console.error('Error submitting prompt:', error);
-      message.error(t('myPrompts.submitError'));
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('myPrompts.submitError'),
+        placement: 'topRight'
+      });
     } finally {
       setLoading(false);
     }
@@ -120,7 +143,7 @@ const MyPromptsPage = () => {
       action: () => {
         setActiveTab('list');
         if (activeTab !== 'list') {
-          setHasLoadedPrompts(false); // Reset để load lại data khi chuyển về tab list
+          setHasLoadedPrompts(false);
         }
       }
     },
