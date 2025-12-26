@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Button, Input, Typography, Tag, Spin } from 'antd';
-import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Input, Typography, Tag, Spin, Modal } from 'antd';
+import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
-import MyPromptDrawer from './MyPromptDrawer';
+import ReviewPromptDrawer from './ReviewPromptDrawer';
 
 const { Text, Title } = Typography;
 
@@ -18,7 +18,8 @@ const PromptsList = ({
   loading = false,
   onSubmitPrompt,
   onEditPrompt,
-  onDeletePrompt
+  onDeletePrompt,
+  currentUser
 }) => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -32,6 +33,20 @@ const PromptsList = ({
   const handleQuickView = (prompt) => {
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
+  };
+
+  const handleDeletePrompt = (promptId, promptTitle) => {
+    Modal.confirm({
+      title: t('myPrompts.deleteConfirmTitle'),
+      icon: <ExclamationCircleOutlined />,
+      content: t('myPrompts.deleteConfirmContent'),
+      okText: t('myPrompts.deleteConfirmOk'),
+      cancelText: t('myPrompts.deleteConfirmCancel'),
+      okType: 'danger',
+      onOk() {
+        onDeletePrompt && onDeletePrompt(promptId);
+      },
+    });
   };
 
   return (
@@ -201,7 +216,7 @@ const PromptsList = ({
                         <Button
                           danger
                           icon={<DeleteOutlined />}
-                          onClick={() => onDeletePrompt && onDeletePrompt(prompt.id)}
+                          onClick={() => handleDeletePrompt(prompt.id, prompt.title)}
                           className="flex-1 rounded-xl border-red-200 text-red-600 hover:border-red-400 hover:text-red-700 transition-all duration-200 hover:shadow-sm"
                           size="middle"
                         >
@@ -220,10 +235,11 @@ const PromptsList = ({
         </div>
       </div>
 
-      <MyPromptDrawer
+      <ReviewPromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}
+        currentUser={currentUser}
       />
     </div>
   );

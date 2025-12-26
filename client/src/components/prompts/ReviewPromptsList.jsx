@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Button, Input, Typography, Tag, Spin } from 'antd';
-import { SearchOutlined, CheckOutlined, CloseOutlined, EyeOutlined, CalendarOutlined, UserOutlined } from '@ant-design/icons';
+import { SearchOutlined, CheckOutlined, CloseOutlined, EyeOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
-import MyPromptDrawer from './MyPromptDrawer';
+import ReviewPromptDrawer from './ReviewPromptDrawer';
 
 const { Text, Title } = Typography;
 
@@ -16,7 +16,8 @@ const ReviewPromptsList = ({
   prompts = [],
   loading = false,
   onApprovePrompt,
-  onRejectPrompt
+  onRejectPrompt,
+  currentUser
 }) => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -194,10 +195,13 @@ const ReviewPromptsList = ({
         </div>
       </div>
 
-      <MyPromptDrawer
+      <ReviewPromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}
+        onApprove={onApprovePrompt}
+        onReject={onRejectPrompt}
+        currentUser={currentUser}
       />
     </div>
   );

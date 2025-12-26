@@ -19,7 +19,7 @@ async def create_prompt(
 ):
     """Create a new prompt (requires authentication)"""
     try:
-        result = await PromptService.create_prompt(session, prompt_data, current_user.id)
+        result = await PromptService.create_prompt(session, prompt_data, current_user.id, current_user.user_type)
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -105,3 +105,33 @@ async def delete_prompt(
     if not success:
         raise HTTPException(status_code=404, detail="Prompt not found or access denied")
     return {"message": "Prompt deleted successfully"}
+
+@router.post("/{prompt_id}/approve", response_model=PromptOut)
+async def approve_prompt(
+    prompt_id: int,
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Approve a prompt (admin only)"""
+    if current_user.user_type != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await PromptService.approve_prompt(session, prompt_id, current_user.id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Prompt not found or cannot be approved")
+    return result
+
+@router.post("/{prompt_id}/reject", response_model=PromptOut)
+async def reject_prompt(
+    prompt_id: int,
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Reject a prompt (admin only)"""
+    if current_user.user_type != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await PromptService.reject_prompt(session, prompt_id, current_user.id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Prompt not found or cannot be rejected")
+    return result

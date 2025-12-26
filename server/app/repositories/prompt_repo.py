@@ -65,6 +65,7 @@ class PromptRepository:
         stmt = (
             select(Prompt)
             .options(
+                selectinload(Prompt.user),
                 selectinload(Prompt.category),
                 selectinload(Prompt.tags)
             )

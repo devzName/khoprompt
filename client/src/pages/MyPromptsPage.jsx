@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
 import { FileTextOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
-import { ROUTES } from '../constants/routes';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import PromptsList from '../components/prompts/PromptsList';
@@ -14,7 +12,6 @@ import ReviewPromptsList from '../components/prompts/ReviewPromptsList';
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
@@ -295,6 +292,7 @@ const MyPromptsPage = () => {
             onSubmitPrompt={handleSubmitForReview}
             onEditPrompt={handleEditPrompt}
             onDeletePrompt={handleDeletePrompt}
+            currentUser={user}
           />
         ) : activeTab === 'review' && user?.user_type === 'admin' ? (
           <ReviewPromptsList
@@ -305,6 +303,7 @@ const MyPromptsPage = () => {
             loading={loading}
             onApprovePrompt={handleApprovePrompt}
             onRejectPrompt={handleRejectPrompt}
+            currentUser={user}
           />
         ) : (
           <CreatePromptForm

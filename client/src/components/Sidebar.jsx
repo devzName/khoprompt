@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { ArrowLeftOutlined, CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
@@ -21,11 +21,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
     if (isMobile && onClose) onClose();
   };
 
-  const handleBackToHome = () => {
-    navigate(ROUTES.HOME);
-    if (isMobile && onClose) onClose();
-  };
-
   const getActiveClass = (itemKey) => {
     const isActive = (itemKey === 'my-prompts' && activeTab === 'list') ||
       (itemKey === 'create-prompt' && activeTab === 'create') ||
@@ -40,7 +35,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
       <div className="flex flex-col h-full bg-white">
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <Logo size="medium" />
+            <Logo size="medium" onClick={() => navigate(ROUTES.HOME)} />
             <Button
               type="text"
               icon={<CloseOutlined />}
@@ -49,16 +44,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
               size="small"
             />
           </div>
-        </div>
-
-        <div className="p-4">
-          <button
-            onClick={handleBackToHome}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm w-full text-left transition-colors"
-          >
-            <ArrowLeftOutlined />
-            <span>{t('sidebar.backToHome')}</span>
-          </button>
         </div>
 
         <nav className="flex-1 px-4">
@@ -78,7 +63,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
 
         {user && (
           <div className="p-4 border-t border-gray-100">
-            <UserProfile user={user} menuItems={userMenuItems} placement="topCenter" size={40} />
+            <UserProfile user={user} menuItems={userMenuItems} placement="top" size={40} />
           </div>
         )}
       </div>
@@ -89,16 +74,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
     <div className="w-64 bg-white border-r h-screen flex flex-col">
       <div className="p-4 border-b">
         <Logo size="medium" onClick={() => navigate(ROUTES.HOME)} />
-      </div>
-
-      <div className="p-4">
-        <button
-          onClick={handleBackToHome}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm w-full text-left transition-colors"
-        >
-          <ArrowLeftOutlined />
-          <span>{t('sidebar.backToHome')}</span>
-        </button>
       </div>
 
       <nav className="flex-1 px-3 py-2 overflow-y-auto">

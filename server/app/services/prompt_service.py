@@ -11,12 +11,20 @@ from app.constants.prompt_status import PromptStatus
 class PromptService:
 
     @staticmethod
-    async def create_prompt(session: AsyncSession, prompt_data: PromptCreate, user_id: UUID) -> dict:
+    async def create_prompt(session: AsyncSession, prompt_data: PromptCreate, user_id: UUID, user_type: str = None) -> dict:
         prompt = await PromptRepository.create(
             session, 
             prompt_data.model_dump(), 
             user_id
         )
+        
+        # If user is admin, auto-approve the prompt
+        if user_type == 'admin':
+            prompt = await PromptRepository.update(
+                session,
+                prompt,
+                {"status": PromptStatus.APPROVED}
+            )
         
         return {
             "id": prompt.id,
@@ -151,7 +159,13 @@ class PromptService:
                 "dislike_count": prompt.dislike_count,
                 "created_at": prompt.created_at,
                 "updated_at": prompt.updated_at,
-                "user": None,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url,
+                    "user_type": prompt.user.user_type
+                } if prompt.user else None,
                 "category": {
                     "id": prompt.category.id,
                     "name": prompt.category.name,
@@ -287,3 +301,71 @@ class PromptService:
         # Delete the prompt
         await PromptRepository.delete(session, prompt)
         return True
+
+    @staticmethod
+    async def approve_prompt(session: AsyncSession, prompt_id: int, admin_user_id: UUID) -> dict | None:
+        """Approve a prompt (admin only)"""
+        prompt = await PromptRepository.get_by_id(session, prompt_id)
+        if not prompt:
+            return None
+            
+        # Only allow approving pending prompts
+        if prompt.status != PromptStatus.PENDING:
+            return None
+            
+        # Update status to APPROVED
+        updated_prompt = await PromptRepository.update(
+            session, 
+            prompt, 
+            {"status": PromptStatus.APPROVED}
+        )
+        
+        return {
+            "id": updated_prompt.id,
+            "title": updated_prompt.title,
+            "description": updated_prompt.description,
+            "content": updated_prompt.content,
+            "full_description": updated_prompt.full_description,
+            "status": updated_prompt.status,
+            "category_id": updated_prompt.category_id,
+            "user_id": str(updated_prompt.user_id),
+            "view_count": updated_prompt.view_count,
+            "like_count": updated_prompt.like_count,
+            "dislike_count": updated_prompt.dislike_count,
+            "created_at": updated_prompt.created_at,
+            "updated_at": updated_prompt.updated_at
+        }
+
+    @staticmethod
+    async def reject_prompt(session: AsyncSession, prompt_id: int, admin_user_id: UUID) -> dict | None:
+        """Reject a prompt (admin only)"""
+        prompt = await PromptRepository.get_by_id(session, prompt_id)
+        if not prompt:
+            return None
+            
+        # Only allow rejecting pending prompts
+        if prompt.status != PromptStatus.PENDING:
+            return None
+            
+        # Update status to REJECTED
+        updated_prompt = await PromptRepository.update(
+            session, 
+            prompt, 
+            {"status": PromptStatus.REJECTED}
+        )
+        
+        return {
+            "id": updated_prompt.id,
+            "title": updated_prompt.title,
+            "description": updated_prompt.description,
+            "content": updated_prompt.content,
+            "full_description": updated_prompt.full_description,
+            "status": updated_prompt.status,
+            "category_id": updated_prompt.category_id,
+            "user_id": str(updated_prompt.user_id),
+            "view_count": updated_prompt.view_count,
+            "like_count": updated_prompt.like_count,
+            "dislike_count": updated_prompt.dislike_count,
+            "created_at": updated_prompt.created_at,
+            "updated_at": updated_prompt.updated_at
+        }
