@@ -102,7 +102,7 @@ const PromptsList = ({
               {filteredPrompts.map((prompt, index) => (
                 <div
                   key={prompt.id}
-                  className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
+                  className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 flex flex-col h-full"
                 >
                   {/* Status Badge */}
                   <div className="absolute top-4 right-4 z-10">
@@ -115,7 +115,7 @@ const PromptsList = ({
                   </div>
 
                   {/* Card Content */}
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     {/* Title */}
                     <Title 
                       level={4} 
@@ -126,35 +126,36 @@ const PromptsList = ({
                     </Title>
 
                     {/* Description */}
-                    <Text 
-                      type="secondary" 
-                      className="text-sm leading-relaxed line-clamp-3 mb-4 block"
-                    >
+                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4 flex-1">
                       {prompt.description}
-                    </Text>
+                    </p>
 
                     {/* Tags */}
-                    {prompt.tags && prompt.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {prompt.tags.slice(0, 3).map((tag, index) => (
-                          <Tag 
-                            key={index} 
-                            color="blue"
-                            className="rounded-full text-xs px-2 py-0.5"
-                          >
-                            #{typeof tag === 'object' ? tag.name : tag}
-                          </Tag>
-                        ))}
-                        {prompt.tags.length > 3 && (
-                          <Tag 
-                            color="blue"
-                            className="rounded-full text-xs px-2 py-0.5"
-                          >
-                            +{prompt.tags.length - 3}
-                          </Tag>
-                        )}
-                      </div>
-                    )}
+                    <div className="mb-4 min-h-[32px] flex items-start">
+                      {prompt.tags && prompt.tags.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {prompt.tags.slice(0, 3).map((tag, index) => (
+                            <Tag 
+                              key={index} 
+                              color="blue"
+                              className="rounded-full text-xs px-2 py-0.5"
+                            >
+                              #{typeof tag === 'object' ? tag.name : tag}
+                            </Tag>
+                          ))}
+                          {prompt.tags.length > 3 && (
+                            <Tag 
+                              color="blue"
+                              className="rounded-full text-xs px-2 py-0.5"
+                            >
+                              +{prompt.tags.length - 3}
+                            </Tag>
+                          )}
+                        </div>
+                      ) : (
+                        <div></div>
+                      )}
+                    </div>
 
                     {/* Meta Info */}
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
@@ -174,8 +175,8 @@ const PromptsList = ({
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col gap-2">
+                    {/* Action Buttons - Always at bottom */}
+                    <div className="flex flex-col gap-2 mt-auto">
                       {/* Row 1: Edit and Submit */}
                       <div className="flex gap-2">
                         <Button

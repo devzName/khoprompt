@@ -92,17 +92,17 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                   </div>
                 </div>
 
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{prompt.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {prompt.tags?.slice(0, 3).map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                    <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
                       #{typeof tag === 'object' ? tag.name : tag}
                     </span>
                   ))}
                   {prompt.tags?.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
+                    <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
                       +{prompt.tags.length - 3}
                     </span>
                   )}

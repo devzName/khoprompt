@@ -49,7 +49,7 @@ const HomePage = () => {
       <LatestPrompts
         prompts={latestPrompts}
         maxItems={16}
-        columns={4}
+        columns={3}
         loading={loadingLatest}
       />
       <TagsSection />
