@@ -15,28 +15,6 @@ export const useMyPrompts = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [predefinedTags, setPredefinedTags] = useState([]);
-  const [availableTags, setAvailableTags] = useState([]);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      const data = await promptService.getCategories();
-      setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  }, []);
-
-  const fetchTags = useCallback(async () => {
-    try {
-      const data = await promptService.getTags();
-      setAvailableTags(data);
-      setPredefinedTags(data.map(tag => tag.name));
-    } catch (error) {
-      console.error('Error fetching tags:', error);
-    }
-  }, []);
 
   const fetchMyPrompts = useCallback(async () => {
     if (!user) return;
@@ -51,12 +29,6 @@ export const useMyPrompts = () => {
       setLoading(false);
     }
   }, [user, t]);
-
-  // Only fetch once on mount
-  useEffect(() => {
-    fetchCategories();
-    fetchTags();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (user && activeTab === 'list') {
@@ -87,28 +59,14 @@ export const useMyPrompts = () => {
     try {
       setLoading(true);
 
-      const categoryObj = categories.find(c => c.value === values.category);
-
-      const tagIds = [];
-      const tagNames = [];
-
-      (values.tags || []).forEach(val => {
-        const found = availableTags.find(t => t.name === val);
-        if (found) {
-          tagIds.push(found.id);
-        }
-        // Always send tag names for display/fallback
-        tagNames.push(val);
-      });
-
       const payload = {
         title: values.title,
         description: values.description,
         content: values.content,
         category_id: values.category,
-        category: categoryObj ? categoryObj.label : 'General',
-        tags: tagNames,
-        tag_ids: tagIds,
+        category: values.category ? 'Selected Category' : 'General',
+        tags: values.tags || [],
+        tag_ids: [],
         full_description: values.notes || ""
       };
 
@@ -168,8 +126,6 @@ export const useMyPrompts = () => {
     form,
     loading,
     prompts,
-    predefinedTags,
-    categories,
     menuItems,
 
     // Actions

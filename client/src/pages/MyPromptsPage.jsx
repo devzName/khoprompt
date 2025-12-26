@@ -69,8 +69,6 @@ const MyPromptsPage = () => {
           <CreatePromptForm
             form={form}
             loading={loading}
-            categories={categories}
-            predefinedTags={predefinedTags}
             onSubmit={handleSubmitPrompt}
             onCancel={() => setActiveTab('list')}
             onMenuClick={() => setMobileMenuOpen(true)}

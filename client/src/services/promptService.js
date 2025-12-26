@@ -48,19 +48,4 @@ export const promptService = {
     });
     return response.data;
   },
-
-  getCategories: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.CATEGORIES);
-    return response.data;
-  },
-
-  getTopCategories: async (limit = 5) => {
-    const response = await apiClient.get(`${API_ENDPOINTS.CATEGORIES}/top`, { params: { limit } });
-    return response.data;
-  },
-
-  getTags: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.TAGS);
-    return response.data;
-  },
 };

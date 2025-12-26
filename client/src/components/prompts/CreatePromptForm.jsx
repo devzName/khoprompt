@@ -1,4 +1,5 @@
 import { Form } from 'antd';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../shared/PageHeader';
 import BasicInfoSection from './BasicInfoSection';
@@ -6,18 +7,43 @@ import ContentSection from './ContentSection';
 import CategorizationSection from './CategorizationSection';
 import NotesSection from './NotesSection';
 import FormActions from './FormActions';
+import { promptCategoriesService } from '../../services/promptCategoriesService';
+import { promptTagsService } from '../../services/promptTagsService';
 
 const CreatePromptForm = ({
   form,
   loading,
-  categories,
-  predefinedTags,
   onSubmit,
   onCancel,
   onMenuClick,
   isEditing = false
 }) => {
   const { t } = useTranslation();
+  const [categories, setCategories] = useState([]);
+  const [predefinedTags, setPredefinedTags] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await promptCategoriesService.getCategories();
+        setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    const fetchTags = async () => {
+      try {
+        const data = await promptTagsService.getTags();
+        setPredefinedTags(data.map(tag => tag.name));
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchCategories();
+    fetchTags();
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col h-full">
