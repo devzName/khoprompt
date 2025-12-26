@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from uuid import UUID
@@ -6,6 +6,7 @@ from uuid import UUID
 from app.models.prompt import Prompt
 from app.models.prompt_tag import PromptTag
 from app.constants.prompt_status import PromptStatus
+from app.utils.slug import create_slug, ensure_unique_slug
 
 
 class PromptRepository:
@@ -14,8 +15,20 @@ class PromptRepository:
     async def create(session: AsyncSession, prompt_data: dict, user_id: UUID) -> Prompt:
         tag_ids = prompt_data.pop('tags', [])
         
+        # Generate slug from title
+        base_slug = create_slug(prompt_data['title'])
+        
+        # Get existing slugs to ensure uniqueness
+        existing_slugs_stmt = select(Prompt.slug).where(Prompt.slug.like(f"{base_slug}%"))
+        existing_slugs_result = await session.execute(existing_slugs_stmt)
+        existing_slugs = [row[0] for row in existing_slugs_result.fetchall()]
+        
+        # Ensure unique slug
+        unique_slug = ensure_unique_slug(base_slug, existing_slugs)
+        
         prompt = Prompt(
             **prompt_data,
+            slug=unique_slug,
             user_id=user_id,
             status=PromptStatus.DRAFT
         )
@@ -41,6 +54,20 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
             .where(Prompt.id == prompt_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def get_by_slug(session: AsyncSession, slug: str) -> Prompt | None:
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.slug == slug)
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
@@ -116,6 +143,22 @@ class PromptRepository:
     async def update(session: AsyncSession, prompt: Prompt, update_data: dict) -> Prompt:
         # Extract tags from update_data
         tag_ids = update_data.pop('tags', None)
+        
+        # Check if title is being updated and regenerate slug if needed
+        if 'title' in update_data and update_data['title'] != prompt.title:
+            base_slug = create_slug(update_data['title'])
+            
+            # Get existing slugs to ensure uniqueness (excluding current prompt)
+            existing_slugs_stmt = select(Prompt.slug).where(
+                Prompt.slug.like(f"{base_slug}%"),
+                Prompt.id != prompt.id
+            )
+            existing_slugs_result = await session.execute(existing_slugs_stmt)
+            existing_slugs = [row[0] for row in existing_slugs_result.fetchall()]
+            
+            # Ensure unique slug
+            unique_slug = ensure_unique_slug(base_slug, existing_slugs)
+            update_data['slug'] = unique_slug
         
         for field, value in update_data.items():
             if hasattr(prompt, field):

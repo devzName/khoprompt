@@ -32,6 +32,7 @@ class PromptOut(PromptBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    slug: str
     status: str
     user_id: UUID
     view_count: int

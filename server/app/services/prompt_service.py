@@ -18,7 +18,6 @@ class PromptService:
             user_id
         )
         
-        # If user is admin, auto-approve the prompt
         if user_type == 'admin':
             prompt = await PromptRepository.update(
                 session,
@@ -29,6 +28,7 @@ class PromptService:
         return {
             "id": prompt.id,
             "title": prompt.title,
+            "slug": prompt.slug,
             "description": prompt.description,
             "content": prompt.content,
             "full_description": prompt.full_description,
@@ -47,10 +47,49 @@ class PromptService:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt:
             return None
+
+        return {
+            "id": prompt.id,
+            "title": prompt.title,
+            "slug": prompt.slug,
+            "description": prompt.description,
+            "content": prompt.content,
+            "full_description": prompt.full_description,
+            "status": prompt.status,
+            "category_id": prompt.category_id,
+            "user_id": str(prompt.user_id),
+            "view_count": prompt.view_count,
+            "like_count": prompt.like_count,
+            "dislike_count": prompt.dislike_count,
+            "created_at": prompt.created_at,
+            "updated_at": prompt.updated_at,
+            "user": {
+                "id": str(prompt.user.id),
+                "full_name": prompt.user.full_name,
+                "email": prompt.user.email,
+                "avatar_url": prompt.user.avatar_url
+            } if prompt.user else None,
+            "category": {
+                "id": prompt.category.id,
+                "name": prompt.category.name,
+                "slug": prompt.category.slug
+            } if prompt.category else None,
+            "tags": [
+                {"id": tag.id, "name": tag.name} 
+                for tag in prompt.tags
+            ]
+        }
+
+    @staticmethod
+    async def get_prompt_by_slug(session: AsyncSession, slug: str) -> dict | None:
+        prompt = await PromptRepository.get_by_slug(session, slug)
+        if not prompt:
+            return None
             
         return {
             "id": prompt.id,
             "title": prompt.title,
+            "slug": prompt.slug,
             "description": prompt.description,
             "content": prompt.content,
             "full_description": prompt.full_description,
@@ -87,6 +126,7 @@ class PromptService:
             {
                 "id": prompt.id,
                 "title": prompt.title,
+                "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
                 "full_description": prompt.full_description,
@@ -110,6 +150,7 @@ class PromptService:
             {
                 "id": prompt.id,
                 "title": prompt.title,
+                "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
                 "full_description": prompt.full_description,
@@ -149,6 +190,7 @@ class PromptService:
             {
                 "id": prompt.id,
                 "title": prompt.title,
+                "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
                 "full_description": prompt.full_description,
@@ -175,7 +217,6 @@ class PromptService:
                     {"id": tag.id, "name": tag.name} 
                     for tag in prompt.tags
                 ],
-                # Calculate rating based on engagement
                 "rating": round((prompt.like_count * 2 + prompt.view_count * 0.1) / max(1, prompt.like_count + prompt.dislike_count + 1), 1),
                 "author": prompt.user.full_name if prompt.user else "Unknown"
             }
@@ -190,6 +231,7 @@ class PromptService:
             {
                 "id": prompt.id,
                 "title": prompt.title,
+                "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
                 "full_description": prompt.full_description,
@@ -229,6 +271,7 @@ class PromptService:
             {
                 "id": prompt.id,
                 "title": prompt.title,
+                "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
                 "full_description": prompt.full_description,
@@ -265,15 +308,11 @@ class PromptService:
         if not prompt or prompt.user_id != user_id:
             return None
             
-        # Allow updating draft prompts and approved prompts
-        # If approved prompt is updated, change status to PENDING for re-review
         if prompt.status not in [PromptStatus.DRAFT, PromptStatus.APPROVED]:
             return None
         
-        # Prepare update data
         update_data = prompt_data.model_dump(exclude_unset=True)
         
-        # If updating an approved prompt, change status to PENDING
         if prompt.status == PromptStatus.APPROVED:
             update_data["status"] = PromptStatus.PENDING
             
@@ -286,6 +325,7 @@ class PromptService:
         return {
             "id": updated_prompt.id,
             "title": updated_prompt.title,
+            "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
             "full_description": updated_prompt.full_description,
@@ -306,11 +346,9 @@ class PromptService:
         if not prompt or prompt.user_id != user_id:
             return None
             
-        # Only allow submitting draft prompts
         if prompt.status != PromptStatus.DRAFT:
             return None
             
-        # Update status to PENDING
         updated_prompt = await PromptRepository.update(
             session, 
             prompt, 
@@ -320,6 +358,7 @@ class PromptService:
         return {
             "id": updated_prompt.id,
             "title": updated_prompt.title,
+            "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
             "full_description": updated_prompt.full_description,
@@ -340,7 +379,6 @@ class PromptService:
         if not prompt or prompt.user_id != user_id:
             return False
             
-        # Delete the prompt
         await PromptRepository.delete(session, prompt)
         return True
 
@@ -351,11 +389,9 @@ class PromptService:
         if not prompt:
             return None
             
-        # Only allow approving pending prompts
         if prompt.status != PromptStatus.PENDING:
             return None
             
-        # Update status to APPROVED
         updated_prompt = await PromptRepository.update(
             session, 
             prompt, 
@@ -365,6 +401,7 @@ class PromptService:
         return {
             "id": updated_prompt.id,
             "title": updated_prompt.title,
+            "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
             "full_description": updated_prompt.full_description,
@@ -385,11 +422,9 @@ class PromptService:
         if not prompt:
             return None
             
-        # Only allow rejecting pending prompts
         if prompt.status != PromptStatus.PENDING:
             return None
             
-        # Update status to REJECTED
         updated_prompt = await PromptRepository.update(
             session, 
             prompt, 
@@ -399,6 +434,7 @@ class PromptService:
         return {
             "id": updated_prompt.id,
             "title": updated_prompt.title,
+            "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
             "full_description": updated_prompt.full_description,

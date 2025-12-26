@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
     PENDING: '/prompts/pending',
     FEATURED: '/prompts/featured',
     BY_ID: (id) => `/prompts/${id}`,
+    BY_SLUG: (slug) => `/prompts/slug/${slug}`,
     SUBMIT: (id) => `/prompts/${id}/submit`,
     APPROVE: (id) => `/prompts/${id}/approve`,
     REJECT: (id) => `/prompts/${id}/reject`,

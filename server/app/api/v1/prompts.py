@@ -59,6 +59,16 @@ async def get_featured_prompts(
 async def get_prompt(prompt_id: int, session: DbSession):
     """Get a prompt by ID"""
     prompt = await PromptService.get_prompt_by_id(session, prompt_id)
+
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt not found")
+    
+    return prompt
+
+@router.get("/slug/{slug}", response_model=PromptWithDetails)
+async def get_prompt_by_slug(slug: str, session: DbSession):
+    """Get a prompt by slug"""
+    prompt = await PromptService.get_prompt_by_slug(session, slug)
     if not prompt:
         raise HTTPException(status_code=404, detail="Prompt not found")
     return prompt

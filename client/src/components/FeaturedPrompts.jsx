@@ -73,7 +73,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   };
 
   const handleCardClick = (prompt) => {
-    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.slug));
   };
 
   return (

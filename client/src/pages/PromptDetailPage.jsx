@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 const PromptDetailPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { id } = useParams();
+  const { slug } = useParams();
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -30,7 +30,7 @@ const PromptDetailPage = () => {
     const fetchPromptDetail = async () => {
       try {
         setLoading(true);
-        const response = await promptService.getPromptById(id);
+        const response = await promptService.getPromptBySlug(slug);
         setPrompt(response);
       } catch (error) {
         console.error('Error fetching prompt:', error);
@@ -44,10 +44,10 @@ const PromptDetailPage = () => {
       }
     };
 
-    if (id) {
+    if (slug) {
       fetchPromptDetail();
     }
-  }, [id, t]);
+  }, [slug, t]);
 
   const handleCopyPrompt = () => {
     if (prompt) {

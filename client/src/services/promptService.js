@@ -27,6 +27,11 @@ export const promptService = {
     return response.data;
   },
 
+  getPromptBySlug: async (slug) => {
+    const response = await apiClient.get(API_ENDPOINTS.PROMPTS.BY_SLUG(slug));
+    return response.data;
+  },
+
   createPrompt: async (promptData) => {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.BASE, promptData);
     return response.data;
