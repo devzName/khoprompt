@@ -24,6 +24,15 @@ async def create_prompt(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.get("/my", response_model=list[PromptWithDetails])
+async def get_my_prompts(
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Get current user's prompts (requires authentication)"""
+    prompts = await PromptService.get_user_prompts_with_details(session, current_user.id)
+    return prompts
+
 @router.get("/{prompt_id}", response_model=PromptWithDetails)
 async def get_prompt(prompt_id: int, session: DbSession):
     """Get a prompt by ID"""
@@ -33,13 +42,11 @@ async def get_prompt(prompt_id: int, session: DbSession):
     return prompt
 
 @router.get("/", response_model=list[PromptWithDetails])
-async def get_user_prompts(
-    session: DbSession,
-    current_user: User = Depends(get_current_user),
-    limit: int = 100
+async def get_approved_prompts(
+    session: DbSession
 ):
-    """Get current user's prompts with tags (requires authentication)"""
-    prompts = await PromptService.get_user_prompts_with_details(session, current_user.id, limit)
+    """Get approved prompts (public access)"""
+    prompts = await PromptService.get_approved_prompts(session)
     return prompts
 
 @router.patch("/{prompt_id}", response_model=PromptOut)

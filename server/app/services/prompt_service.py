@@ -93,8 +93,45 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_user_prompts_with_details(session: AsyncSession, user_id: UUID, limit: int = 100) -> list[dict]:
-        prompts = await PromptRepository.get_by_user(session, user_id, limit)
+    async def get_approved_prompts(session: AsyncSession) -> list[dict]:
+        prompts = await PromptRepository.get_approved_prompts(session)
+        
+        return [
+            {
+                "id": prompt.id,
+                "title": prompt.title,
+                "description": prompt.description,
+                "content": prompt.content,
+                "full_description": prompt.full_description,
+                "status": prompt.status,
+                "category_id": prompt.category_id,
+                "user_id": str(prompt.user_id),
+                "view_count": prompt.view_count,
+                "like_count": prompt.like_count,
+                "dislike_count": prompt.dislike_count,
+                "created_at": prompt.created_at,
+                "updated_at": prompt.updated_at,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email
+                } if prompt.user else None,
+                "category": {
+                    "id": prompt.category.id,
+                    "name": prompt.category.name,
+                    "slug": prompt.category.slug
+                } if prompt.category else None,
+                "tags": [
+                    {"id": tag.id, "name": tag.name} 
+                    for tag in prompt.tags
+                ]
+            }
+            for prompt in prompts
+        ]
+
+    @staticmethod
+    async def get_user_prompts_with_details(session: AsyncSession, user_id: UUID) -> list[dict]:
+        prompts = await PromptRepository.get_by_user(session, user_id)
         
         return [
             {

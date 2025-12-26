@@ -5,6 +5,7 @@ from uuid import UUID
 
 from app.models.prompt import Prompt
 from app.models.prompt_tag import PromptTag
+from app.constants.prompt_status import PromptStatus
 
 
 class PromptRepository:
@@ -18,7 +19,7 @@ class PromptRepository:
         prompt = Prompt(
             **prompt_data,
             user_id=user_id,
-            status='pending'
+            status=PromptStatus.PENDING
         )
         
         # Add tags if provided
@@ -48,7 +49,22 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_by_user(session: AsyncSession, user_id: UUID, limit: int = 100) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession) -> list[Prompt]:
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.status == PromptStatus.APPROVED)
+            .order_by(Prompt.created_at.desc())
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_by_user(session: AsyncSession, user_id: UUID) -> list[Prompt]:
         stmt = (
             select(Prompt)
             .options(
@@ -57,7 +73,6 @@ class PromptRepository:
             )
             .where(Prompt.user_id == user_id)
             .order_by(Prompt.created_at.desc())
-            .limit(limit)
         )
         result = await session.execute(stmt)
         return result.scalars().all()

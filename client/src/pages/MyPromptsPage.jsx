@@ -18,19 +18,21 @@ const MyPromptsPage = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
+  const [hasLoadedPrompts, setHasLoadedPrompts] = useState(false);
 
   // Fetch user's prompts
   useEffect(() => {
-    if (user && activeTab === 'list') {
+    if (user?.id && activeTab === 'list' && !hasLoadedPrompts) {
       fetchMyPrompts();
     }
-  }, [user, activeTab]);
+  }, [user?.id, activeTab, hasLoadedPrompts]);
 
   const fetchMyPrompts = async () => {
     try {
       setLoading(true);
-      const data = await promptService.getPrompts();
+      const data = await promptService.getMyPrompts();
       setPrompts(data);
+      setHasLoadedPrompts(true);
     } catch (error) {
       console.error('Error fetching prompts:', error);
       message.error(t('myPrompts.errorFetching', 'Error fetching prompts'));
@@ -76,6 +78,7 @@ const MyPromptsPage = () => {
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
+      setHasLoadedPrompts(false); // Reset để load lại data
       fetchMyPrompts(); // Refresh the list
     } catch (error) {
       console.error('Error saving prompt:', error);
@@ -91,6 +94,7 @@ const MyPromptsPage = () => {
       
       await promptService.submitPrompt(id);
       message.success(t('myPrompts.submitSuccess'));
+      setHasLoadedPrompts(false); // Reset để load lại data
       fetchMyPrompts(); // Refresh the list
     } catch (error) {
       console.error('Error submitting prompt:', error);
@@ -109,7 +113,17 @@ const MyPromptsPage = () => {
   };
 
   const menuItems = [
-    { key: 'my-prompts', icon: <FileTextOutlined />, label: t('sidebar.myPrompts'), action: () => setActiveTab('list') },
+    { 
+      key: 'my-prompts', 
+      icon: <FileTextOutlined />, 
+      label: t('sidebar.myPrompts'), 
+      action: () => {
+        setActiveTab('list');
+        if (activeTab !== 'list') {
+          setHasLoadedPrompts(false); // Reset để load lại data khi chuyển về tab list
+        }
+      }
+    },
     { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => handleCreatePrompt() },
   ];
 
