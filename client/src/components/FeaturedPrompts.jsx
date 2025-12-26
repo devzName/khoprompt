@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
-
+import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 
 const FeaturedPrompts = ({ prompts = [], loading = false }) => {
@@ -47,10 +47,29 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
     return null;
   }
 
-  const handleQuickView = (e, prompt) => {
+  const handleQuickView = async (e, prompt) => {
     e.stopPropagation();
-    setSelectedPrompt(prompt);
-    setDrawerOpen(true);
+    try {
+      const detailedPrompt = await promptService.getPromptById(prompt.id);
+      setSelectedPrompt(detailedPrompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Failed to fetch prompt details:', error);
+      setSelectedPrompt(prompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    }
   };
 
   const handleCardClick = (prompt) => {

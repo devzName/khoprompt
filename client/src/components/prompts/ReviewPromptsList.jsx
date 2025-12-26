@@ -32,6 +32,12 @@ const ReviewPromptsList = ({
   const handleQuickView = (prompt) => {
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
+    setTimeout(() => {
+      const drawerBody = document.querySelector('.ant-drawer-body');
+      if (drawerBody) {
+        drawerBody.scrollTop = 0;
+      }
+    }, 100);
   };
 
   return (

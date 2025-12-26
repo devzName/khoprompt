@@ -6,6 +6,7 @@ import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../const
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
 import ReviewPromptDrawer from './ReviewPromptDrawer';
+import { promptService } from '../../services/promptService';
 
 const { Text, Title } = Typography;
 
@@ -30,9 +31,28 @@ const PromptsList = ({
     prompt.description?.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const handleQuickView = (prompt) => {
-    setSelectedPrompt(prompt);
-    setDrawerOpen(true);
+  const handleQuickView = async (prompt) => {
+    try {
+      const detailedPrompt = await promptService.getPromptById(prompt.id);
+      setSelectedPrompt(detailedPrompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Failed to fetch prompt details:', error);
+      setSelectedPrompt(prompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    }
   };
 
   const handleDeletePrompt = (promptId, promptTitle) => {
@@ -104,7 +124,6 @@ const PromptsList = ({
                   key={prompt.id}
                   className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 flex flex-col h-full"
                 >
-                  {/* Status Badge */}
                   <div className="absolute top-4 right-4 z-10">
                     <Tag 
                       color={PROMPT_STATUS_COLORS[prompt.status] || 'default'}
@@ -114,9 +133,7 @@ const PromptsList = ({
                     </Tag>
                   </div>
 
-                  {/* Card Content */}
                   <div className="p-6 flex flex-col flex-1">
-                    {/* Title */}
                     <Title 
                       level={4} 
                       className="mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 pr-16"
@@ -125,12 +142,10 @@ const PromptsList = ({
                       {prompt.title}
                     </Title>
 
-                    {/* Description */}
                     <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4 flex-1">
                       {prompt.description}
                     </p>
 
-                    {/* Tags */}
                     <div className="mb-4 min-h-[32px] flex items-start">
                       {prompt.tags && prompt.tags.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
@@ -157,7 +172,6 @@ const PromptsList = ({
                       )}
                     </div>
 
-                    {/* Meta Info */}
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                       <div className="flex items-center gap-1">
                         <CalendarOutlined />
@@ -175,9 +189,7 @@ const PromptsList = ({
                       </div>
                     </div>
 
-                    {/* Action Buttons - Always at bottom */}
                     <div className="flex flex-col gap-2 mt-auto">
-                      {/* Row 1: Edit and Submit */}
                       <div className="flex gap-2">
                         <Button
                           type="default"
@@ -202,7 +214,6 @@ const PromptsList = ({
                         </Button>
                       </div>
                       
-                      {/* Row 2: Quick View and Delete */}
                       <div className="flex gap-2">
                         <Button
                           type="default"
@@ -227,7 +238,6 @@ const PromptsList = ({
                     </div>
                   </div>
 
-                  {/* Hover Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-50/0 group-hover:from-blue-50/30 group-hover:to-purple-50/20 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}

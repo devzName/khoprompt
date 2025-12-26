@@ -4,6 +4,7 @@ import { FireOutlined, StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
+import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 
 const LatestPrompts = ({
@@ -85,10 +86,29 @@ const LatestPrompts = ({
     });
   };
 
-  const handleQuickView = (e, prompt) => {
+  const handleQuickView = async (e, prompt) => {
     e.stopPropagation();
-    setSelectedPrompt(prompt);
-    setDrawerOpen(true);
+    try {
+      const detailedPrompt = await promptService.getPromptById(prompt.id);
+      setSelectedPrompt(detailedPrompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Failed to fetch prompt details:', error);
+      setSelectedPrompt(prompt);
+      setDrawerOpen(true);
+      setTimeout(() => {
+        const drawerBody = document.querySelector('.ant-drawer-body');
+        if (drawerBody) {
+          drawerBody.scrollTop = 0;
+        }
+      }, 100);
+    }
   };
 
   const handleCardClick = (prompt) => {
