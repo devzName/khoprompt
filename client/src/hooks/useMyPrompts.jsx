@@ -35,7 +35,7 @@ export const useMyPrompts = () => {
     if (!user) return;
     try {
       setLoading(true);
-      const data = await promptService.getPrompts({ limit: 100 });
+      const data = await promptService.getPrompts();
       setPrompts(data);
     } catch (error) {
       console.error('Error fetching prompts:', error);

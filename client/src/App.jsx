@@ -5,6 +5,7 @@ import CategoryPage from './pages/CategoryPage';
 import MyPromptsPage from './pages/MyPromptsPage';
 import ReviewPromptsPage from './pages/ReviewPromptsPage';
 import ManagePromptsPage from './pages/ManagePromptsPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 
 function App() {
@@ -14,9 +15,30 @@ function App() {
         <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.CATEGORY} element={<CategoryPage />} />
         <Route path={ROUTES.PROMPT_DETAIL} element={<PromptDetailPage />} />
-        <Route path={ROUTES.MY_PROMPTS} element={<MyPromptsPage />} />
-        <Route path={ROUTES.REVIEW_PROMPTS} element={<ReviewPromptsPage />} />
-        <Route path={ROUTES.MANAGE_PROMPTS} element={<ManagePromptsPage />} />
+        <Route 
+          path={ROUTES.MY_PROMPTS} 
+          element={
+            <ProtectedRoute>
+              <MyPromptsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path={ROUTES.REVIEW_PROMPTS} 
+          element={
+            <ProtectedRoute>
+              <ReviewPromptsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path={ROUTES.MANAGE_PROMPTS} 
+          element={
+            <ProtectedRoute>
+              <ManagePromptsPage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Router>
   );
