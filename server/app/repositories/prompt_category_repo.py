@@ -27,3 +27,12 @@ class PromptCategoryRepository:
             }
             for cat in categories
         ]
+
+    @staticmethod
+    async def get_all(session: AsyncSession) -> list[PromptCategory]:
+        stmt = (
+            select(PromptCategory)
+            .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()

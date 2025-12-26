@@ -16,3 +16,8 @@ class PromptCategoryService:
             'categories': categories,
             'total_prompts': total_prompts
         }
+
+    @staticmethod
+    async def get_all_categories(session: AsyncSession) -> list:
+        categories = await PromptCategoryRepository.get_all(session)
+        return [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
