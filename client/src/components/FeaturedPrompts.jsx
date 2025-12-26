@@ -81,7 +81,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                    {prompt.category}
+                    {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
                   </span>
                   <div className="flex items-center gap-1 text-yellow-500">
                     <StarOutlined className="text-sm" />
@@ -93,9 +93,9 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {prompt.tags.map((tag, index) => (
+                  {prompt.tags?.map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
-                      #{tag}
+                      #{typeof tag === 'object' ? tag.name : tag}
                     </span>
                   ))}
                 </div>

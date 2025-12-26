@@ -38,11 +38,11 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('drawer.categoryTags')}</h3>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md">
-                {prompt.category}
+                {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
               </span>
-              {prompt.tags.map((tag, index) => (
+              {prompt.tags?.map((tag, index) => (
                 <span key={index} className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md">
-                  {tag}
+                  {typeof tag === 'object' ? tag.name : tag}
                 </span>
               ))}
             </div>

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import String, Boolean, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from uuid import UUID, uuid4
 from datetime import datetime
@@ -25,3 +25,6 @@ class User(AuditMixin, Base):
     
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    
+    # Relationship with prompts
+    prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='user')

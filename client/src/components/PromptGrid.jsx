@@ -60,7 +60,7 @@ const PromptGrid = ({
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
-                    {prompt.category}
+                    {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
                   </span>
                   {prompt.featured && (
                     <StarOutlined className="text-yellow-500 text-sm" />
@@ -73,7 +73,7 @@ const PromptGrid = ({
                 <div className="flex flex-wrap gap-1 mb-3">
                   {prompt.tags?.slice(0, 2).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
-                      #{tag}
+                      #{typeof tag === 'object' ? tag.name : tag}
                     </span>
                   ))}
                   {prompt.tags?.length > 2 && (

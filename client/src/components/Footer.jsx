@@ -1,24 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 
 const Footer = () => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await promptService.getTopCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error('Failed to fetch footer categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   return (
     <footer className="bg-gray-900 text-white py-8">

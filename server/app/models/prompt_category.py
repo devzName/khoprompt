@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 from app.models.mixins import AuditMixin
@@ -16,3 +16,6 @@ class PromptCategory(AuditMixin, Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     description_vi: Mapped[str | None] = mapped_column(Text, nullable=True)
     display_order: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    
+    # Relationship with prompts
+    prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='category')
