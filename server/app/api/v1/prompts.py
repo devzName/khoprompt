@@ -56,8 +56,39 @@ async def update_prompt(
     session: DbSession,
     current_user: User = Depends(get_current_user)
 ):
-    """Update a prompt (requires authentication and ownership)"""
+    """Update a prompt (requires authentication and ownership, draft and approved prompts can be updated)"""
     result = await PromptService.update_prompt(session, prompt_id, prompt_data, current_user.id)
     if not result:
-        raise HTTPException(status_code=404, detail="Prompt not found or access denied")
+        # Check if prompt exists and belongs to user
+        prompt = await PromptService.get_prompt_by_id(session, prompt_id)
+        if not prompt:
+            raise HTTPException(status_code=404, detail="Prompt not found")
+        if prompt["user_id"] != str(current_user.id):
+            raise HTTPException(status_code=403, detail="Access denied")
+        # If prompt exists and belongs to user but update failed, it's in pending/rejected status
+        raise HTTPException(status_code=400, detail="Only draft and approved prompts can be updated")
     return result
+
+@router.post("/{prompt_id}/submit", response_model=PromptOut)
+async def submit_prompt_for_review(
+    prompt_id: int,
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Submit a draft prompt for review (requires authentication and ownership)"""
+    result = await PromptService.submit_prompt_for_review(session, prompt_id, current_user.id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Prompt not found, access denied, or prompt is not in draft status")
+    return result
+
+@router.delete("/{prompt_id}")
+async def delete_prompt(
+    prompt_id: int,
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a prompt (requires authentication and ownership)"""
+    success = await PromptService.delete_prompt(session, prompt_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Prompt not found or access denied")
+    return {"message": "Prompt deleted successfully"}

@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { Button, Input, Typography, Card, Tag, Spin } from 'antd';
-import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Button, Input, Typography, Tag, Spin } from 'antd';
+import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
+import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
 
@@ -17,10 +15,10 @@ const PromptsList = ({
   prompts = [],
   loading = false,
   onSubmitPrompt,
-  onEditPrompt
+  onEditPrompt,
+  onDeletePrompt
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const filteredPrompts = prompts.filter(prompt =>
     prompt.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -29,6 +27,20 @@ const PromptsList = ({
 
   return (
     <div className="flex-1 flex flex-col h-full">
+      <style>
+        {`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
       <PageHeader
         title={t('myPrompts.title')}
         description={t('myPrompts.description')}
@@ -36,95 +48,172 @@ const PromptsList = ({
         onMenuClick={onMenuClick}
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <Input
-            placeholder={t('myPrompts.searchPlaceholder')}
-            prefix={<SearchOutlined />}
-            value={searchValue}
-            onChange={onSearchChange}
-            className="flex-1 max-w-md"
-            size="large"
-          />
+          <div className="relative flex-1 max-w-md">
+            <Input
+              placeholder={t('myPrompts.searchPlaceholder')}
+              prefix={<SearchOutlined className="text-gray-400" />}
+              value={searchValue}
+              onChange={onSearchChange}
+              className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
+              size="large"
+            />
+          </div>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={onCreatePrompt}
             size="large"
-            className="whitespace-nowrap"
+            className="whitespace-nowrap rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {t('myPrompts.createPrompt.title')}
           </Button>
         </div>
       </PageHeader>
 
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-blue-50/30">
         <div className="w-full p-4 sm:p-6">
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <Spin size="large" />
+            <div className="flex flex-col justify-center items-center py-20">
+              <div className="relative">
+                <Spin size="large" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-xl opacity-20 animate-pulse" />
+              </div>
+              <Text className="mt-4 text-gray-600">{t('common.loading', 'Đang tải...')}</Text>
             </div>
           ) : filteredPrompts.length === 0 ? (
-            <EmptyState
-              icon={FileTextOutlined}
-              title={searchValue ? t('myPrompts.noResults') : t('myPrompts.noPrompts')}
-              description={searchValue ? t('myPrompts.noResultsDescription') : t('myPrompts.noPromptsDescription')}
-              actionText={!searchValue ? t('myPrompts.createPrompt.title') : undefined}
-              onAction={!searchValue ? onCreatePrompt : undefined}
-            />
+            <div className="py-12">
+              <EmptyState
+                icon={FileTextOutlined}
+                title={searchValue ? t('myPrompts.noResults') : t('myPrompts.noPrompts')}
+                description={searchValue ? t('myPrompts.noResultsDescription') : t('myPrompts.noPromptsDescription')}
+                actionText={!searchValue ? t('myPrompts.createPrompt.title') : undefined}
+                onAction={!searchValue ? onCreatePrompt : undefined}
+              />
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPrompts.map((prompt) => (
-                <Card
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+              {filteredPrompts.map((prompt, index) => (
+                <div
                   key={prompt.id}
-                  className="hover:shadow-lg transition-shadow duration-200"
-                  actions={[
-                    <Button
-                      key="edit"
-                      type="text"
-                      icon={<EditOutlined />}
-                      onClick={() => onEditPrompt(prompt)}
-                    >
-                      {t('myPrompts.edit')}
-                    </Button>,
-                    <Button
-                      key="submit"
-                      type="text"
-                      icon={<SendOutlined />}
-                      onClick={() => onSubmitPrompt(prompt.id)}
-                      disabled={prompt.status !== 'draft'}
-                    >
-                      {t('myPrompts.submitForReview')}
-                    </Button>
-                  ]}
+                  className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                    animation: 'fadeInUp 0.6s ease-out forwards'
+                  }}
                 >
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <Title level={5} className="mb-0 line-clamp-1">
-                        {prompt.title}
-                      </Title>
-                      <Tag color={prompt.status === 'approved' ? 'green' : prompt.status === 'pending' ? 'orange' : 'default'}>
-                        {prompt.status}
-                      </Tag>
-                    </div>
-                    <Text type="secondary" className="text-sm line-clamp-2">
-                      {prompt.description}
-                    </Text>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {prompt.tags?.slice(0, 3).map((tag, index) => (
-                      <Tag key={index} size="small">
-                        {typeof tag === 'object' ? tag.name : tag}
-                      </Tag>
-                    ))}
-                    {prompt.tags?.length > 3 && (
-                      <Tag size="small">+{prompt.tags.length - 3}</Tag>
-                    )}
+                  {/* Status Badge */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <Tag 
+                      color={PROMPT_STATUS_COLORS[prompt.status] || 'default'}
+                      className="rounded-full px-3 py-1 text-xs font-medium border-0 shadow-sm backdrop-blur-sm"
+                    >
+                      {getStatusLabel(prompt.status, t)}
+                    </Tag>
                   </div>
 
-                  <div className="text-xs text-gray-500">
-                    {t('myPrompts.createdAt')}: {new Date(prompt.created_at).toLocaleDateString()}
+                  {/* Card Content */}
+                  <div className="p-6">
+                    {/* Title */}
+                    <Title 
+                      level={4} 
+                      className="mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 pr-16"
+                      style={{ marginBottom: '12px' }}
+                    >
+                      {prompt.title}
+                    </Title>
+
+                    {/* Description */}
+                    <Text 
+                      type="secondary" 
+                      className="text-sm leading-relaxed line-clamp-3 mb-4 block"
+                    >
+                      {prompt.description}
+                    </Text>
+
+                    {/* Tags */}
+                    {prompt.tags && prompt.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {prompt.tags.slice(0, 3).map((tag, index) => (
+                          <Tag 
+                            key={index} 
+                            color="blue"
+                            className="rounded-full text-xs px-2 py-0.5"
+                          >
+                            #{typeof tag === 'object' ? tag.name : tag}
+                          </Tag>
+                        ))}
+                        {prompt.tags.length > 3 && (
+                          <Tag 
+                            color="blue"
+                            className="rounded-full text-xs px-2 py-0.5"
+                          >
+                            +{prompt.tags.length - 3}
+                          </Tag>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Meta Info */}
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <CalendarOutlined />
+                        <span>{new Date(prompt.created_at).toLocaleString('vi-VN', {
+                          day: '2-digit',
+                          month: '2-digit', 
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <EyeOutlined />
+                        <span>{prompt.view_count || 0} lượt xem</span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-2">
+                      {/* Row 1: Edit and Submit */}
+                      <div className="flex gap-2">
+                        <Button
+                          type="default"
+                          icon={<EditOutlined />}
+                          onClick={() => onEditPrompt(prompt)}
+                          disabled={prompt.status === PROMPT_STATUS.PENDING || prompt.status === PROMPT_STATUS.REJECTED}
+                          className="flex-1 rounded-xl border-gray-200 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 hover:shadow-sm disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
+                          size="middle"
+                        >
+                          {t('myPrompts.edit')}
+                        </Button>
+                        
+                        <Button
+                          type="primary"
+                          icon={<SendOutlined />}
+                          onClick={() => onSubmitPrompt(prompt.id)}
+                          disabled={prompt.status !== PROMPT_STATUS.DRAFT}
+                          className="flex-1 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-sm hover:shadow-md disabled:from-gray-300 disabled:to-gray-400 transition-all duration-200"
+                          size="middle"
+                        >
+                          {t('myPrompts.submitForReview')}
+                        </Button>
+                      </div>
+                      
+                      {/* Row 2: Delete */}
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => onDeletePrompt && onDeletePrompt(prompt.id)}
+                        className="w-full rounded-xl border-red-200 text-red-600 hover:border-red-400 hover:text-red-700 transition-all duration-200 hover:shadow-sm"
+                        size="middle"
+                      >
+                        {t('myPrompts.delete', 'Xóa')}
+                      </Button>
+                    </div>
                   </div>
-                </Card>
+
+                  {/* Hover Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-50/0 group-hover:from-blue-50/30 group-hover:to-purple-50/20 transition-all duration-300 pointer-events-none" />
+                </div>
               ))}
             </div>
           )}

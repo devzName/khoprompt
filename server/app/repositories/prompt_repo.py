@@ -17,7 +17,7 @@ class PromptRepository:
         prompt = Prompt(
             **prompt_data,
             user_id=user_id,
-            status=PromptStatus.PENDING
+            status=PromptStatus.DRAFT
         )
         
         if tag_ids:
