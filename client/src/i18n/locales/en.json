@@ -9,7 +9,7 @@
   "header": {
     "title": "Prompt Library",
     "subtitle": "AI Prompt Collection",
-    "search": "Search prompts, authors, tags...",
+    "search": "Search prompt...",
     "createPrompt": "Create Prompt",
     "myPrompts": "My Prompts",
     "reviewPrompts": "Review Prompts",
@@ -55,7 +55,7 @@
     "breadcrumb": "Dashboard",
     "title": "My Prompts",
     "description": "Manage and track all your prompts",
-    "searchPlaceholder": "Search prompts...",
+    "searchPlaceholder": "Search prompt...",
     "noPrompts": "You don't have any prompts yet",
     "noPromptsDescription": "Create your first prompt to start sharing with the community",
     "noResults": "No results found",
@@ -253,6 +253,7 @@
     "viewDetail": "View Details"
   },
   "reviewPrompts": {
+    "description": "Review and manage pending prompts",
     "errorFetching": "Error fetching pending prompts",
     "approveSuccess": "Prompt approved successfully!",
     "approveError": "Error approving prompt",

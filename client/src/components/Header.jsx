@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button, Avatar, Dropdown } from 'antd';
-import { SearchOutlined, PlusOutlined, GlobalOutlined } from '@ant-design/icons';
+import { PlusOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useLanguage } from '../hooks/useLanguage';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
@@ -117,6 +117,7 @@ const Header = () => {
                     menu={{ items: userMenuItems }}
                     placement="bottomRight"
                     arrow={{ pointAtCenter: true }}
+                    trigger={['click']}
                   >
                     <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
                       <Avatar size={36} src={user.picture} className="border-2 border-gray-200" />

@@ -45,14 +45,14 @@ const ReviewPromptsList = ({
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
         title={t('sidebar.reviewPrompts')}
-        description="Duyệt và quản lý các prompts chờ phê duyệt"
+        description={t('reviewPrompts.description', 'Duyệt và quản lý các prompts chờ phê duyệt')}
         breadcrumb={t('sidebar.reviewPrompts')}
         onMenuClick={onMenuClick}
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="relative flex-1 max-w-md">
             <Search
-              placeholder="Tìm kiếm prompts, tác giả..."
+              placeholder={t('myPrompts.searchPlaceholder')}
               value={searchValue}
               onChange={onSearchChange}
               onSearch={onSearchSubmit}

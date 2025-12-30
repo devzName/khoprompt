@@ -9,7 +9,7 @@
   "header": {
     "title": "Prompt Library",
     "subtitle": "AI Prompt Collection",
-    "search": "Tìm kiếm prompt, tác giả, tag...",
+    "search": "Tìm kiếm prompt...",
     "createPrompt": "Tạo Prompt",
     "myPrompts": "Prompts của tôi",
     "reviewPrompts": "Duyệt Prompt",
@@ -55,7 +55,7 @@
     "breadcrumb": "Dashboard",
     "title": "Prompts của tôi",
     "description": "Quản lý và theo dõi tất cả prompts của bạn",
-    "searchPlaceholder": "Tìm kiếm prompts...",
+    "searchPlaceholder": "Tìm kiếm prompt...",
     "noPrompts": "Bạn chưa có prompt nào",
     "noPromptsDescription": "Tạo prompt đầu tiên của bạn để bắt đầu chia sẻ với cộng đồng",
     "noResults": "Không tìm thấy kết quả",
@@ -253,6 +253,7 @@
     "viewDetail": "Xem chi tiết"
   },
   "reviewPrompts": {
+    "description": "Duyệt và quản lý các prompts chờ phê duyệt",
     "errorFetching": "Lỗi khi tải danh sách prompt chờ duyệt",
     "approveSuccess": "Đã duyệt prompt thành công!",
     "approveError": "Lỗi khi duyệt prompt",
