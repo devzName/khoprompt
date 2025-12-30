@@ -9,10 +9,13 @@ import {
   BulbOutlined,
   BarChartOutlined,
   AppstoreOutlined,
-  FolderOutlined
+  FolderOutlined,
+  DownOutlined,
+  UpOutlined
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from 'antd';
 import { API_ENDPOINTS } from '../constants/api';
 import apiClient from '../axios/apiClient';
 
@@ -20,6 +23,9 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true); // Mặc định hiển thị tất cả
+  
+  const INITIAL_DISPLAY_COUNT = 4; // Chỉ hiển thị 1 hàng (4 danh mục) khi thu gọn
 
   const getIcon = (name) => {
     switch (name) {
@@ -79,23 +85,36 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
 
   if (loading) return null;
 
+  // Xác định danh mục nào sẽ hiển thị
+  const displayedCategories = isExpanded ? categories : categories.slice(0, INITIAL_DISPLAY_COUNT);
+  const hasMoreCategories = categories.length > INITIAL_DISPLAY_COUNT;
+
   return (
     <section className="py-4 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <FolderOutlined className="text-2xl text-blue-600" />
-            <h2 className="text-3xl font-bold text-gray-900">
-              {t('categories.title')}
-            </h2>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <FolderOutlined className="text-2xl text-blue-600" />
+              <h2 className="text-3xl font-bold text-gray-900">
+                {t('categories.title', 'Danh mục Prompts')}
+              </h2>
+            </div>
+            {hasMoreCategories && (
+              <Button
+                type="text"
+                shape="circle"
+                icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-10 h-10 flex items-center justify-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
+                title={isExpanded ? 'Thu gọn' : 'Xem thêm'}
+              />
+            )}
           </div>
-          <p className="text-gray-600">
-            {t('categories.subtitle')}
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {categories.map((category, index) => {
+          {displayedCategories.map((category, index) => {
             const isSelected = selectedCategory?.id === category.id || (!selectedCategory && category.slug === 'all');
             
             return (
