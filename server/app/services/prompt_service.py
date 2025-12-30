@@ -1,13 +1,14 @@
-from __future__ import annotations
-
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, text
 from uuid import UUID
 import math
 
 from app.repositories.prompt_repo import PromptRepository
+from app.models.prompt_view import PromptView
 from app.schemas.prompt import PromptCreate, PromptUpdate
 from app.schemas.pagination import PaginatedResponse, PaginationMeta
 from app.constants.prompt_status import PromptStatus
+from app.core.rate_limiter import ViewRateLimiter
 
 
 class PromptService:
@@ -516,3 +517,51 @@ class PromptService:
             "created_at": updated_prompt.created_at,
             "updated_at": updated_prompt.updated_at
         }
+    @staticmethod
+    async def track_view(session: AsyncSession, prompt_id: int, user_id: UUID | None = None, ip_address: str | None = None, user_agent: str | None = None) -> bool:
+        prompt = await PromptRepository.get_by_id(session, prompt_id)
+        if not prompt or prompt.status != PromptStatus.APPROVED:
+            return False
+        
+        if user_id and prompt.user_id == user_id:
+            return False
+        
+        if ip_address:
+            if await ViewRateLimiter.is_suspicious_pattern(ip_address, user_agent):
+                return False
+            
+            if not await ViewRateLimiter.check_ip_rate_limit(ip_address, max_views=10, window_minutes=10):
+                return False
+        
+        if user_id:
+            user_view_query = select(PromptView).where(
+                PromptView.prompt_id == prompt_id,
+                PromptView.user_id == user_id
+            )
+            result = await session.execute(user_view_query)
+            if result.scalar_one_or_none():
+                return False
+        else:
+            if ip_address:
+                ip_view_query = select(PromptView).where(
+                    PromptView.prompt_id == prompt_id,
+                    PromptView.ip_address == ip_address
+                )
+                result = await session.execute(ip_view_query)
+                if result.scalar_one_or_none():
+                    return False
+        
+        new_view = PromptView(
+            prompt_id=prompt_id,
+            user_id=user_id,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        session.add(new_view)
+        
+        await PromptRepository.update(session, prompt, {
+            "view_count": prompt.view_count + 1
+        })
+        
+        await session.commit()
+        return True

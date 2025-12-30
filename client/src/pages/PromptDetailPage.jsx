@@ -18,6 +18,7 @@ import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
+import { useViewTracking } from '../hooks/useViewTracking';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
 
@@ -32,6 +33,28 @@ const PromptDetailPage = () => {
   const [voteLoading, setVoteLoading] = useState(false);
   const [voteStats, setVoteStats] = useState({ helpful_count: 0, not_helpful_count: 0 });
   const [currentRating, setCurrentRating] = useState(null);
+
+  // Track view với điều kiện và callback để refresh stats
+  const refreshStats = async () => {
+    if (prompt?.id) {
+      try {
+        const updatedStats = await voteService.getPromptVoteStats(prompt.id);
+        setVoteStats(updatedStats);
+        setPrompt(prev => ({
+          ...prev,
+          view_count: updatedStats.view_count || 0
+        }));
+      } catch (error) {
+        console.error('Error refreshing stats:', error);
+      }
+    }
+  };
+
+  const hasTrackedView = useViewTracking(
+    prompt?.id, 
+    prompt?.status === 'approved',
+    refreshStats
+  );
 
   useEffect(() => {
     const fetchPromptDetail = async () => {
@@ -50,6 +73,12 @@ const PromptDetailPage = () => {
               rating: response.rating,
               like_count: stats.helpful_count || 0,
               dislike_count: stats.not_helpful_count || 0
+            }));
+            
+            // Cập nhật view count từ stats
+            setPrompt(prev => ({
+              ...prev,
+              view_count: stats.view_count || 0
             }));
           } catch (error) {
             console.error('Error fetching vote stats:', error);
@@ -141,6 +170,12 @@ const PromptDetailPage = () => {
         rating: prompt.rating,
         like_count: updatedStats.helpful_count || 0,
         dislike_count: updatedStats.not_helpful_count || 0
+      }));
+      
+      // Cập nhật view count từ stats
+      setPrompt(prev => ({
+        ...prev,
+        view_count: updatedStats.view_count || 0
       }));
       
       notification.success({

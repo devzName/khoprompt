@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import DbSession
-from app.api.auth_deps import get_current_user
+from app.api.auth_deps import get_current_user, get_current_user_optional
 from app.services.prompt_service import PromptService
 from app.schemas.prompt import PromptCreate, PromptUpdate, PromptOut, PromptWithDetails
 from app.schemas.pagination import PaginatedResponse
@@ -135,6 +135,36 @@ async def delete_prompt(
     if not success:
         raise HTTPException(status_code=404, detail="Prompt not found or access denied")
     return {"message": "Prompt deleted successfully"}
+
+@router.post("/{prompt_id}/view")
+async def track_prompt_view(
+    prompt_id: int,
+    request: Request,
+    session: DbSession,
+    current_user: User | None = Depends(get_current_user_optional)
+):
+    """Track a view for a prompt (optional authentication)"""
+    try:
+        user_id = current_user.id if current_user else None
+        
+        # Get client IP (handle proxy headers)
+        client_ip = request.headers.get("x-forwarded-for")
+        if client_ip:
+            client_ip = client_ip.split(",")[0].strip()
+        else:
+            client_ip = request.client.host if request.client else None
+        
+        # Get user agent
+        user_agent = request.headers.get("user-agent")
+        
+        success = await PromptService.track_view(session, prompt_id, user_id, client_ip, user_agent)
+        
+        if success:
+            return {"message": "View tracked successfully"}
+        else:
+            return {"message": "View not tracked (duplicate or spam prevention)"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/{prompt_id}/approve", response_model=PromptOut)
 async def approve_prompt(

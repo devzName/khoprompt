@@ -101,7 +101,8 @@ class VoteService:
         
         return {
             "prompt_id": prompt_id,
-            "like_count": stats['like_count'],
-            "dislike_count": stats['dislike_count'],
+            "helpful_count": stats['like_count'],
+            "not_helpful_count": stats['dislike_count'],
+            "view_count": prompt.view_count,
             "user_vote": user_vote
         }
