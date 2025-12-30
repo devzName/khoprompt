@@ -72,9 +72,29 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
+      
+      let errorMessage = t('login.error');
+      
+      if (error.response) {
+        const status = error.response.status;
+        const errorDetail = error.response.data?.detail;
+        
+        if (status === 401) {
+          if (errorDetail && errorDetail.includes('Invalid')) {
+            errorMessage = t('login.invalidCredentials');
+          } else {
+            errorMessage = t('login.invalidCredentials');
+          }
+        } else if (status >= 500) {
+          errorMessage = t('login.serverError');
+        }
+      } else if (error.request) {
+        errorMessage = t('login.networkError');
+      }
+      
       notification.error({
         message: t('common.error', 'Error'),
-        description: t('login.error'),
+        description: errorMessage,
         placement: 'topRight'
       });
     } finally {
@@ -109,9 +129,24 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       onClose();
     } catch (error) {
       console.error('Google login error:', error);
+      
+      let errorMessage = t('login.error');
+      
+      if (error.response) {
+        const status = error.response.status;
+        
+        if (status === 401) {
+          errorMessage = t('login.invalidGoogleToken');
+        } else if (status >= 500) {
+          errorMessage = t('login.serverError');
+        }
+      } else if (error.request) {
+        errorMessage = t('login.networkError');
+      }
+      
       notification.error({
         message: t('common.error', 'Error'),
-        description: t('login.error'),
+        description: errorMessage,
         placement: 'topRight'
       });
     } finally {
