@@ -1,7 +1,4 @@
 # khoprompt-server
-
-FastAPI + PostgreSQL (async) backend for `client/src/data/mockPrompts.js`.
-
 ## Requirements
 
 - Python 3.11+
@@ -27,6 +24,13 @@ poetry run alembic upgrade head
 
 ```bash
 cd server
+
+Bước 1: Stop & xoá volume
+docker compose down -v
+
+Bước 2: Start lại
+docker compose up -d
+
 poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -36,4 +40,3 @@ poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 cd server
 poetry run python -m app.scripts.seed_mock_prompts
 ```
-
