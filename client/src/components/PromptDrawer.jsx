@@ -1,5 +1,5 @@
 import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined, CalendarOutlined, UserOutlined, MailOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Drawer, Button, Tag, Avatar, Divider } from 'antd';
+import { Drawer, Button, Tag, Avatar, Divider, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
@@ -11,7 +11,19 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
   const handleCopy = () => {
     if (prompt?.content) {
-      navigator.clipboard.writeText(prompt.content);
+      // Convert HTML to plain text for copying
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = prompt.content;
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
+      navigator.clipboard.writeText(plainText);
+      
+      // Show success notification
+      notification.success({
+        message: t('common.success', 'Success'),
+        description: t('promptDetail.copied', 'Đã copy!'),
+        placement: 'topRight',
+        duration: 2
+      });
     }
   };
 
@@ -189,13 +201,14 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-blue-500 pl-3">
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
-            <div className="bg-gray-900 rounded-lg p-4 relative">
-              <pre className="whitespace-pre-wrap text-sm text-white font-mono overflow-x-auto leading-relaxed">
-                {prompt.content}
-              </pre>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 relative">
+              <div 
+                className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
+              />
               <Button
                 icon={<CopyOutlined />}
-                className="absolute top-2 right-2 bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
                 size="small"
                 onClick={handleCopy}
               >

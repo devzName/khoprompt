@@ -24,3 +24,124 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* CKEditor custom styles */
+.ck-editor__editable {
+  min-height: 200px !important;
+  border-radius: 8px !important;
+}
+
+.ck-editor__editable:focus {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.ck.ck-toolbar {
+  border-radius: 8px 8px 0 0 !important;
+  border-color: #d9d9d9 !important;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  border-radius: 0 0 8px 8px !important;
+  border-color: #d9d9d9 !important;
+}
+
+/* Prose styles for HTML content display */
+.prose {
+  color: #374151;
+  max-width: none;
+}
+
+.prose h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 2.25rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.prose p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.625;
+}
+
+.prose ul, .prose ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.prose ul > li {
+  list-style-type: disc;
+}
+
+.prose ol > li {
+  list-style-type: decimal;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #6b7280;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.prose th, .prose td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.prose code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}

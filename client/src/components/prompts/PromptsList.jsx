@@ -248,7 +248,7 @@ const PromptsList = ({
           )}
 
           {/* Pagination */}
-          {pagination && displayPrompts.length > 0 && (
+          {pagination && displayPrompts.length > 0 && pagination.total > pagination.pageSize && (
             <div className="flex justify-center mt-8">
               <Pagination
                 current={pagination.current}

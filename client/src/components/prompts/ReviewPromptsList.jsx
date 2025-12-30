@@ -142,7 +142,7 @@ const ReviewPromptsList = ({
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                       <div className="flex items-center gap-1">
                         <CalendarOutlined />
-                        <span>{new Date(prompt.created_at).toLocaleString('vi-VN', {
+                        <span>{new Date(prompt.created_at).toLocaleString(t('common.locale', 'vi-VN'), {
                           day: '2-digit',
                           month: '2-digit', 
                           year: 'numeric',
@@ -152,7 +152,7 @@ const ReviewPromptsList = ({
                       </div>
                       <div className="flex items-center gap-1">
                         <EyeOutlined />
-                        <span>{prompt.view_count || 0} lượt xem</span>
+                        <span>{prompt.view_count || 0} {t('myPromptDrawer.views', 'lượt xem')}</span>
                       </div>
                     </div>
 
@@ -202,7 +202,7 @@ const ReviewPromptsList = ({
           )}
 
           {/* Pagination */}
-          {pagination && displayPrompts.length > 0 && (
+          {pagination && displayPrompts.length > 0 && pagination.total > pagination.pageSize && (
             <div className="flex justify-center mt-8">
               <Pagination
                 current={pagination.current}

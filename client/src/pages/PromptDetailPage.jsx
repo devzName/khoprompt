@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Button, Avatar, Tag, Breadcrumb, Spin, notification } from 'antd';
 import {
   CopyOutlined,
@@ -52,7 +52,11 @@ const PromptDetailPage = () => {
 
   const handleCopyPrompt = () => {
     if (prompt) {
-      navigator.clipboard.writeText(prompt.content);
+      // Convert HTML to plain text for copying
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = prompt.content;
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
+      navigator.clipboard.writeText(plainText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       notification.success({
@@ -216,11 +220,14 @@ const PromptDetailPage = () => {
                 <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                 {t('promptDetail.promptContent')}
               </h2>
-              <div className="bg-gray-900 rounded-xl p-6 pr-12 font-mono text-sm text-gray-100 whitespace-pre-wrap leading-relaxed shadow-inner border border-gray-800 relative">
-                {prompt.content}
+              <div className="bg-white rounded-xl border border-gray-200 p-6 pr-12 relative">
+                <div 
+                  className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
+                />
                 <Button
                   icon={<CopyOutlined />}
-                  className="absolute top-2 right-2 bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                  className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
                   size="small"
                   onClick={handleCopyPrompt}
                 >

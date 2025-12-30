@@ -4,7 +4,9 @@
     "edit": "Sửa",
     "submit": "Duyệt",
     "error": "Lỗi",
-    "success": "Thành công"
+    "success": "Thành công",
+    "loading": "Đang tải...",
+    "locale": "vi-VN"
   },
   "header": {
     "title": "Prompt Library",

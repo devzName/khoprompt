@@ -100,7 +100,7 @@ const PromptGrid = ({
             ))}
           </div>
 
-          {showPagination && (
+          {showPagination && prompts.length > pageSize && (
             <div className="flex justify-center mt-8">
               <Pagination
                 current={currentPage}
