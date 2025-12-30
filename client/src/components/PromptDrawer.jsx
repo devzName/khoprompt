@@ -1,11 +1,11 @@
-import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined, CalendarOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
+import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined, CalendarOutlined, UserOutlined, MailOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Drawer, Button, Tag, Avatar, Divider } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
 import { PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
 
-const PromptDrawer = ({ open, onClose, prompt }) => {
+const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -19,6 +19,25 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
     navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
     onClose();
   };
+
+  const handleApprove = () => {
+    if (onApprove && prompt?.id) {
+      onApprove(prompt.id);
+      onClose();
+    }
+  };
+
+  const handleReject = () => {
+    if (onReject && prompt?.id) {
+      onReject(prompt.id);
+      onClose();
+    }
+  };
+
+  // Show approve/reject buttons only for admin and pending prompts
+  const showApprovalButtons = currentUser?.user_type === 'admin' && prompt?.status === 'pending';
+  // Show like/dislike buttons for regular users (not admin review mode)
+  const showVoteButtons = !showApprovalButtons && (!currentUser || currentUser.id !== prompt?.user_id);
 
   return (
     <Drawer
@@ -38,24 +57,57 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
       size="large"
       className="prompt-drawer"
       footer={
-        <div className="space-y-3">
+        showApprovalButtons ? (
           <div className="flex gap-3">
             <Button 
-              type="primary" 
-              icon={<LikeOutlined />}
-              className="flex-1"
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={handleApprove}
+              className="flex-1 bg-green-500 hover:bg-green-600 border-green-500"
               size="large"
             >
-              {t('drawer.helpful')}
+              {t('reviewPrompts.approve', 'Duyệt')}
             </Button>
             <Button 
-              icon={<DislikeOutlined />}
+              danger
+              icon={<CloseOutlined />}
+              onClick={handleReject}
               className="flex-1"
               size="large"
             >
-              {t('drawer.notHelpful')}
+              {t('reviewPrompts.reject', 'Từ chối')}
             </Button>
           </div>
+        ) : showVoteButtons ? (
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Button 
+                type="primary" 
+                icon={<LikeOutlined />}
+                className="flex-1"
+                size="large"
+              >
+                {t('drawer.helpful', 'Hữu ích')}
+              </Button>
+              <Button 
+                icon={<DislikeOutlined />}
+                className="flex-1"
+                size="large"
+              >
+                {t('drawer.notHelpful', 'Không hữu ích')}
+              </Button>
+            </div>
+            <Button 
+              type="primary" 
+              icon={<LinkOutlined />}
+              className="w-full"
+              size="large"
+              onClick={handleViewDetail}
+            >
+              {t('drawer.viewDetail', 'Xem chi tiết')}
+            </Button>
+          </div>
+        ) : (
           <Button 
             type="primary" 
             icon={<LinkOutlined />}
@@ -63,9 +115,9 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
             size="large"
             onClick={handleViewDetail}
           >
-            {t('drawer.viewDetail')}
+            {t('drawer.viewDetail', 'Xem chi tiết')}
           </Button>
-        </div>
+        )
       }
     >
       {prompt && (
@@ -134,9 +186,11 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
 
           {/* Prompt Content - Highlighted */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.promptContent')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-blue-500 pl-3">
+              {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
+            </h3>
             <div className="bg-gray-900 rounded-lg p-4 relative">
-              <pre className="whitespace-pre-wrap text-sm text-green-400 font-mono overflow-x-auto">
+              <pre className="whitespace-pre-wrap text-sm text-white font-mono overflow-x-auto leading-relaxed">
                 {prompt.content}
               </pre>
               <Button
@@ -145,7 +199,7 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
                 size="small"
                 onClick={handleCopy}
               >
-                {t('reviewPromptDrawer.copy')}
+                {t('reviewPromptDrawer.copy', 'Copy')}
               </Button>
             </div>
           </div>
@@ -153,8 +207,10 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
           {/* Notes */}
           {prompt.full_description && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.notes')}</h3>
-              <div className="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-400">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-purple-500 pl-3">
+                {t('reviewPromptDrawer.notes', 'Ghi chú')}
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
                   {prompt.full_description}
                 </p>
@@ -166,7 +222,9 @@ const PromptDrawer = ({ open, onClose, prompt }) => {
 
           {/* Category & Tags */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.categoryTags')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-orange-500 pl-3">
+              {t('reviewPromptDrawer.categoryTags', 'Danh mục & Tags')}
+            </h3>
             <div className="flex flex-wrap gap-2">
               {prompt.category && (
                 <span className="px-3 py-1 bg-purple-600 text-white text-sm font-medium rounded-md">

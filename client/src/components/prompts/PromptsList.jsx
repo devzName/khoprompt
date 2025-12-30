@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
-import ReviewPromptDrawer from './ReviewPromptDrawer';
+import PromptDrawer from '../PromptDrawer';
 import { promptService } from '../../services/promptService';
 
 const { Text, Title } = Typography;
@@ -246,7 +246,7 @@ const PromptsList = ({
         </div>
       </div>
 
-      <ReviewPromptDrawer
+      <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}

@@ -244,11 +244,10 @@ const PromptDetailPage = () => {
 
             {prompt.full_description && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
-                  {t('reviewPromptDrawer.notes')}
+                <h2 className="text-xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-3">
+                  {t('reviewPromptDrawer.notes', 'Ghi chú')}
                 </h2>
-                <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
+                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
                   {prompt.full_description}
                 </div>
               </div>
