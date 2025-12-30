@@ -13,11 +13,17 @@ const HomePage = () => {
   const [featuredPrompts, setFeaturedPrompts] = useState([]);
   const [loadingLatest, setLoadingLatest] = useState(true);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null); // null means "all"
 
   useEffect(() => {
     const fetchLatestPrompts = async () => {
       try {
-        const response = await promptService.getPrompts();
+        setLoadingLatest(true);
+        const params = {};
+        if (selectedCategory) {
+          params.category_id = selectedCategory.id;
+        }
+        const response = await promptService.getPrompts(params);
         setLatestPrompts(response);
       } catch (error) {
         console.error('Failed to fetch latest prompts:', error);
@@ -28,7 +34,9 @@ const HomePage = () => {
 
     const fetchFeaturedPrompts = async () => {
       try {
-        const response = await promptService.getFeaturedPrompts(6);
+        setLoadingFeatured(true);
+        const categoryId = selectedCategory ? selectedCategory.id : null;
+        const response = await promptService.getFeaturedPrompts(6, categoryId);
         setFeaturedPrompts(response);
       } catch (error) {
         console.error('Failed to fetch featured prompts:', error);
@@ -39,12 +47,15 @@ const HomePage = () => {
 
     fetchLatestPrompts();
     fetchFeaturedPrompts();
-  }, []);
+  }, [selectedCategory]);
   return (
     <div className="min-h-screen">
       <Header />
       <Hero />
-      <Categories />
+      <Categories 
+        selectedCategory={selectedCategory}
+        onCategorySelect={setSelectedCategory}
+      />
       <FeaturedPrompts prompts={featuredPrompts} loading={loadingFeatured} />
       <LatestPrompts
         prompts={latestPrompts}

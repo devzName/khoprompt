@@ -49,10 +49,11 @@ async def get_my_prompts(
 @router.get("/featured", response_model=list[PromptWithDetails])
 async def get_featured_prompts(
     session: DbSession,
-    limit: int = 6
+    limit: int = 6,
+    category_id: int | None = None
 ):
     """Get featured prompts based on engagement metrics (public access)"""
-    prompts = await PromptService.get_featured_prompts(session, limit)
+    prompts = await PromptService.get_featured_prompts(session, limit, category_id)
     return prompts
 
 @router.get("/{prompt_id}", response_model=PromptWithDetails)
@@ -75,10 +76,11 @@ async def get_prompt_by_slug(slug: str, session: DbSession):
 
 @router.get("/", response_model=list[PromptWithDetails])
 async def get_approved_prompts(
-    session: DbSession
+    session: DbSession,
+    category_id: int | None = None
 ):
     """Get approved prompts (public access)"""
-    prompts = await PromptService.get_approved_prompts(session)
+    prompts = await PromptService.get_approved_prompts(session, category_id)
     return prompts
 
 @router.patch("/{prompt_id}", response_model=PromptOut)

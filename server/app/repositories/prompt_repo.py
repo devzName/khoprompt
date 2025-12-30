@@ -73,7 +73,7 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None) -> list[Prompt]:
         stmt = (
             select(Prompt)
             .options(
@@ -82,8 +82,12 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
             .where(Prompt.status == PromptStatus.APPROVED)
-            .order_by(Prompt.created_at.desc())
         )
+        
+        if category_id is not None:
+            stmt = stmt.where(Prompt.category_id == category_id)
+            
+        stmt = stmt.order_by(Prompt.created_at.desc())
         result = await session.execute(stmt)
         return result.scalars().all()
 
@@ -119,7 +123,7 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
-    async def get_featured_prompts(session: AsyncSession, limit: int = 6) -> list[Prompt]:
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None) -> list[Prompt]:
         """Get featured prompts based on engagement metrics (likes, views) and recency"""
         stmt = (
             select(Prompt)
@@ -129,13 +133,17 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
             .where(Prompt.status == PromptStatus.APPROVED)
-            .order_by(
-                # Order by engagement score: (like_count * 2 + view_count) descending
-                (Prompt.like_count * 2 + Prompt.view_count).desc(),
-                Prompt.created_at.desc()
-            )
-            .limit(limit)
         )
+        
+        if category_id is not None:
+            stmt = stmt.where(Prompt.category_id == category_id)
+            
+        stmt = stmt.order_by(
+            # Order by engagement score: (like_count * 2 + view_count) descending
+            (Prompt.like_count * 2 + Prompt.view_count).desc(),
+            Prompt.created_at.desc()
+        ).limit(limit)
+        
         result = await session.execute(stmt)
         return result.scalars().all()
 

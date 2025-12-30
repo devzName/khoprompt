@@ -143,8 +143,8 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession) -> list[dict]:
-        prompts = await PromptRepository.get_approved_prompts(session)
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None) -> list[dict]:
+        prompts = await PromptRepository.get_approved_prompts(session, category_id)
         
         return [
             {
@@ -182,9 +182,9 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_featured_prompts(session: AsyncSession, limit: int = 6) -> list[dict]:
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None) -> list[dict]:
         """Get featured prompts based on engagement metrics"""
-        prompts = await PromptRepository.get_featured_prompts(session, limit)
+        prompts = await PromptRepository.get_featured_prompts(session, limit, category_id)
         
         return [
             {
