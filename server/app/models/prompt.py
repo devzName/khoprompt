@@ -44,6 +44,9 @@ class Prompt(AuditMixin, Base):
         back_populates='prompts'
     )
     
+    # Votes relationship
+    votes: Mapped[list['PromptVote']] = relationship('PromptVote', back_populates='prompt')
+    
     # Stats
     view_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     like_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

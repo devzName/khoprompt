@@ -229,7 +229,9 @@
       "2": "Paste the prompt and replace the placeholder [brackets] with your specific information",
       "3": "Press Enter to get results from AI"
     },
-    "cannotVoteOwn": "You cannot vote on your own prompt"
+    "cannotVoteOwn": "You cannot vote on your own prompt",
+    "votedHelpful": "Voted as helpful!",
+    "votedNotHelpful": "Voted as not helpful!"
   },
   "tags": {
     "title": "Explore by Tags",

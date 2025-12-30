@@ -229,7 +229,9 @@
       "2": "Paste prompt và thay thế các placeholder [brackets] với thông tin cụ thể của bạn",
       "3": "Nhấn Enter để nhận kết quả từ AI"
     },
-    "cannotVoteOwn": "Bạn không thể bình chọn cho prompt của chính mình"
+    "cannotVoteOwn": "Bạn không thể bình chọn cho prompt của chính mình",
+    "votedHelpful": "Đã đánh giá prompt là hữu ích!",
+    "votedNotHelpful": "Đã đánh giá prompt là không hữu ích!"
   },
   "tags": {
     "title": "Khám phá theo Tags",

@@ -16,6 +16,7 @@ import Footer from '../components/Footer';
 import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
+import { voteService } from '../services/voteService';
 import dayjs from 'dayjs';
 
 const PromptDetailPage = () => {
@@ -25,7 +26,9 @@ const PromptDetailPage = () => {
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [isHelpful, setIsHelpful] = useState(null);
+  const [userVote, setUserVote] = useState(null);
+  const [voteLoading, setVoteLoading] = useState(false);
+  const [voteStats, setVoteStats] = useState({ helpful_count: 0, not_helpful_count: 0 });
 
   useEffect(() => {
     const fetchPromptDetail = async () => {
@@ -33,6 +36,26 @@ const PromptDetailPage = () => {
         setLoading(true);
         const response = await promptService.getPromptBySlug(slug);
         setPrompt(response);
+        
+        // Fetch vote stats
+        if (response.id) {
+          try {
+            const stats = await voteService.getPromptVoteStats(response.id);
+            setVoteStats(stats);
+          } catch (error) {
+            console.error('Error fetching vote stats:', error);
+          }
+          
+          // Fetch user's vote if logged in
+          if (user) {
+            try {
+              const vote = await voteService.getUserVote(response.id);
+              setUserVote(vote);
+            } catch (error) {
+              console.error('Error fetching user vote:', error);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error fetching prompt:', error);
         notification.error({
@@ -48,7 +71,7 @@ const PromptDetailPage = () => {
     if (slug) {
       fetchPromptDetail();
     }
-  }, [slug, t]);
+  }, [slug, t, user]);
 
   const handleCopyPrompt = () => {
     if (prompt) {
@@ -67,7 +90,7 @@ const PromptDetailPage = () => {
     }
   };
 
-  const handleVote = async (value) => {
+  const handleVote = async (isHelpful) => {
     try {
       if (!user) {
         notification.warning({
@@ -87,18 +110,37 @@ const PromptDetailPage = () => {
         return;
       }
 
-      setIsHelpful(value === 1);
+      setVoteLoading(true);
+      
+      // Call API to vote
+      await voteService.votePrompt(prompt.id, isHelpful);
+      
+      // Update local state với format giống API response
+      setUserVote({ 
+        prompt_id: prompt.id,
+        is_helpful: isHelpful,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+      
+      // Refresh vote stats
+      const updatedStats = await voteService.getPromptVoteStats(prompt.id);
+      setVoteStats(updatedStats);
+      
       notification.success({
         message: t('common.success', 'Success'),
-        description: t('common.success'),
+        description: isHelpful ? t('promptDetail.votedHelpful') : t('promptDetail.votedNotHelpful'),
         placement: 'topRight'
       });
     } catch (error) {
+      console.error('Error voting:', error);
       notification.error({
         message: t('common.error', 'Error'),
         description: error.response?.data?.detail || t('common.error'),
         placement: 'topRight'
       });
+    } finally {
+      setVoteLoading(false);
     }
   };
 
@@ -167,11 +209,11 @@ const PromptDetailPage = () => {
                   </div>
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                     <LikeOutlined className="text-green-500" />
-                    <span className="font-semibold text-gray-700">{prompt.like_count || 0}</span>
+                    <span className="font-semibold text-gray-700">{voteStats.helpful_count || 0}</span>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                     <DislikeOutlined className="text-red-500" />
-                    <span className="font-semibold text-gray-700">{prompt.dislike_count || 0}</span>
+                    <span className="font-semibold text-gray-700">{voteStats.not_helpful_count || 0}</span>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                     <CalendarOutlined className="text-purple-500" />
@@ -190,20 +232,22 @@ const PromptDetailPage = () => {
                 <>
                   <Button
                     size="large"
-                    type={isHelpful === true ? "primary" : "default"}
+                    type={userVote?.is_helpful === true ? "primary" : "default"}
                     icon={<LikeOutlined />}
-                    onClick={() => handleVote(1)}
-                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
+                    onClick={() => handleVote(true)}
+                    loading={voteLoading}
+                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
                   >
                     {t('drawer.helpful')}
                   </Button>
                   <Button
                     size="large"
-                    type={isHelpful === false ? "primary" : "default"}
+                    type={userVote?.is_helpful === false ? "primary" : "default"}
                     icon={<DislikeOutlined />}
-                    onClick={() => handleVote(-1)}
-                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isHelpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
-                    danger={isHelpful === false}
+                    onClick={() => handleVote(false)}
+                    loading={voteLoading}
+                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
+                    danger={userVote?.is_helpful === false}
                   >
                     {t('drawer.notHelpful')}
                   </Button>

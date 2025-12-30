@@ -21,6 +21,12 @@ export const API_ENDPOINTS = {
     FEED_LATEST: '/prompts/feed/latest',
   },
 
+  VOTES: {
+    PROMPTS: '/votes/prompts',
+    USER_VOTE: (promptId) => `/votes/prompts/${promptId}/user-vote`,
+    STATS: (promptId) => `/votes/prompts/${promptId}/stats`,
+  },
+
   CATEGORIES: {
     BASE: '/prompt-categories',
     STATS: '/prompt-categories/stats',
