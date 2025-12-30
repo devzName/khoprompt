@@ -3,10 +3,13 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { ROUTES } from '../constants/routes';
 
 const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -65,6 +68,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       });
       onLoginSuccess(user);
       onClose();
+      navigate(ROUTES.HOME);
 
       if (!rememberMe) {
         setEmail('');
@@ -127,6 +131,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       });
       onLoginSuccess(user);
       onClose();
+      navigate(ROUTES.HOME);
     } catch (error) {
       console.error('Google login error:', error);
       
