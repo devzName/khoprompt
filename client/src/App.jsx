@@ -5,6 +5,7 @@ import CategoryPage from './pages/CategoryPage';
 import MyPromptsPage from './pages/MyPromptsPage';
 import ReviewPromptsPage from './pages/ReviewPromptsPage';
 import ManagePromptsPage from './pages/ManagePromptsPage';
+import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 
@@ -39,6 +40,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        {/* Catch all unmatched routes */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

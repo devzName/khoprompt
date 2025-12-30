@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { Button, Avatar, Tag, Breadcrumb, Spin, notification } from 'antd';
 import {
   CopyOutlined,
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import dayjs from 'dayjs';
@@ -110,21 +111,7 @@ const PromptDetailPage = () => {
   }
 
   if (!prompt) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-            <p className="text-gray-600 mb-4">{t('promptDetail.notFound')}</p>
-            <Link to={ROUTES.HOME} className="text-blue-600 hover:text-blue-800 font-medium">
-              {t('promptDetail.backHome')}
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   const instructions = [
