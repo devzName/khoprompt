@@ -7,7 +7,8 @@ import {
   LikeOutlined,
   DislikeOutlined,
   CalendarOutlined,
-  UserOutlined
+  UserOutlined,
+  StarOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -17,6 +18,7 @@ import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
+import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
 
 const PromptDetailPage = () => {
@@ -29,6 +31,7 @@ const PromptDetailPage = () => {
   const [userVote, setUserVote] = useState(null);
   const [voteLoading, setVoteLoading] = useState(false);
   const [voteStats, setVoteStats] = useState({ helpful_count: 0, not_helpful_count: 0 });
+  const [currentRating, setCurrentRating] = useState(null);
 
   useEffect(() => {
     const fetchPromptDetail = async () => {
@@ -42,6 +45,12 @@ const PromptDetailPage = () => {
           try {
             const stats = await voteService.getPromptVoteStats(response.id);
             setVoteStats(stats);
+            // Cập nhật rating dựa trên vote stats mới
+            setCurrentRating(calculateSimpleRating({
+              rating: response.rating,
+              like_count: stats.helpful_count || 0,
+              dislike_count: stats.not_helpful_count || 0
+            }));
           } catch (error) {
             console.error('Error fetching vote stats:', error);
           }
@@ -127,6 +136,13 @@ const PromptDetailPage = () => {
       const updatedStats = await voteService.getPromptVoteStats(prompt.id);
       setVoteStats(updatedStats);
       
+      // Cập nhật rating dựa trên vote stats mới
+      setCurrentRating(calculateSimpleRating({
+        rating: prompt.rating,
+        like_count: updatedStats.helpful_count || 0,
+        dislike_count: updatedStats.not_helpful_count || 0
+      }));
+      
       notification.success({
         message: t('common.success', 'Success'),
         description: isHelpful ? t('promptDetail.votedHelpful') : t('promptDetail.votedNotHelpful'),
@@ -203,6 +219,14 @@ const PromptDetailPage = () => {
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">{prompt.description}</p>
 
                 <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
+                  {formatRating(currentRating) && (
+                    <div className={`flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 ${getRatingContainerColor(currentRating)}`}>
+                      <StarOutlined />
+                      <span className="font-semibold">
+                        {formatRating(currentRating)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                     <EyeOutlined className="text-blue-500" />
                     <span className="font-semibold text-gray-700">{prompt.view_count || 0}</span>

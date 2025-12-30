@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { Pagination } from 'antd';
 import PromptDrawer from './PromptDrawer';
+import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 
 const PromptGrid = ({ 
   prompts = [], 
@@ -84,10 +85,14 @@ const PromptGrid = ({
                 </div>
                 
                 <div className="flex items-center justify-between text-xs mt-auto">
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <StarOutlined className="text-yellow-500" />
-                    <span>{prompt.rating || '4.5'}</span>
-                  </div>
+                  {formatRating(calculateSimpleRating(prompt)) && (
+                    <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
+                      <StarOutlined />
+                      <span>
+                        {formatRating(calculateSimpleRating(prompt))}
+                      </span>
+                    </div>
+                  )}
                   <button 
                     onClick={(e) => handleQuickView(e, prompt)}
                     className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium"

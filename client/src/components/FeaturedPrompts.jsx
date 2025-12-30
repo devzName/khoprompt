@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
+import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 
 const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const { t } = useTranslation();
@@ -103,12 +104,14 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
                     {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                   </span>
-                  <div className="flex items-center gap-1 text-yellow-500">
-                    <StarOutlined className="text-sm" />
-                    <span className="text-sm font-medium text-gray-700">
-                      {prompt.rating || ((prompt.like_count || 0) > 0 ? (prompt.like_count / Math.max(1, (prompt.like_count || 0) + (prompt.dislike_count || 0)) * 5).toFixed(1) : '5.0')}
-                    </span>
-                  </div>
+                  {formatRating(calculateSimpleRating(prompt)) && (
+                    <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
+                      <StarOutlined className="text-sm" />
+                      <span className="text-sm font-medium">
+                        {formatRating(calculateSimpleRating(prompt))}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
