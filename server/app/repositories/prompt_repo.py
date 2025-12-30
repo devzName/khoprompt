@@ -113,7 +113,19 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
-    async def get_by_user(session: AsyncSession, user_id: UUID) -> list[Prompt]:
+    async def get_user_prompts_count(session: AsyncSession, user_id: UUID, search: str | None = None) -> int:
+        stmt = select(func.count(Prompt.id)).where(Prompt.user_id == user_id)
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
+    async def get_user_prompts_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9, search: str | None = None) -> list[Prompt]:
+        offset = (page - 1) * limit
+        
         stmt = (
             select(Prompt)
             .options(
@@ -122,13 +134,29 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
             .where(Prompt.user_id == user_id)
-            .order_by(Prompt.created_at.desc())
         )
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
         result = await session.execute(stmt)
         return result.scalars().all()
 
     @staticmethod
-    async def get_pending_prompts(session: AsyncSession, limit: int = 100) -> list[Prompt]:
+    async def get_pending_prompts_count(session: AsyncSession, search: str | None = None) -> int:
+        stmt = select(func.count(Prompt.id)).where(Prompt.status == PromptStatus.PENDING)
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
+    async def get_pending_prompts_paginated(session: AsyncSession, page: int = 1, limit: int = 12, search: str | None = None) -> list[Prompt]:
+        offset = (page - 1) * limit
+        
         stmt = (
             select(Prompt)
             .options(
@@ -137,9 +165,31 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
             .where(Prompt.status == PromptStatus.PENDING)
-            .order_by(Prompt.created_at.desc())
-            .limit(limit)
         )
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_pending_prompts(session: AsyncSession, limit: int = 100, search: str | None = None) -> list[Prompt]:
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.status == PromptStatus.PENDING)
+        )
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        stmt = stmt.order_by(Prompt.created_at.desc()).limit(limit)
         result = await session.execute(stmt)
         return result.scalars().all()
 

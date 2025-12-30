@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Button, Input, Typography, Tag, Spin } from 'antd';
-import { SearchOutlined, CheckOutlined, CloseOutlined, EyeOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Button, Input, Typography, Tag, Spin, Pagination } from 'antd';
+import { CheckOutlined, CloseOutlined, EyeOutlined, CalendarOutlined } from '@ant-design/icons';
+
+const { Search } = Input;
 import { useTranslation } from 'react-i18next';
-import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
+import { PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
 import EmptyState from '../EmptyState';
 import PromptDrawer from '../PromptDrawer';
@@ -12,22 +14,21 @@ const { Text, Title } = Typography;
 const ReviewPromptsList = ({
   searchValue = '',
   onSearchChange,
+  onSearchSubmit, // Thêm prop mới cho search submit
   onMenuClick,
   prompts = [],
   loading = false,
   onApprovePrompt,
   onRejectPrompt,
-  currentUser
+  currentUser,
+  pagination = null // Thêm prop pagination
 }) => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
 
-  const filteredPrompts = prompts.filter(prompt =>
-    prompt.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
-    prompt.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
-    prompt.user?.full_name?.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  // Sử dụng prompts trực tiếp từ API, không filter client-side
+  const displayPrompts = prompts;
 
   const handleQuickView = (prompt) => {
     setSelectedPrompt(prompt);
@@ -50,13 +51,14 @@ const ReviewPromptsList = ({
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="relative flex-1 max-w-md">
-            <Input
+            <Search
               placeholder="Tìm kiếm prompts, tác giả..."
-              prefix={<SearchOutlined className="text-gray-400" />}
               value={searchValue}
               onChange={onSearchChange}
+              onSearch={onSearchSubmit}
               className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
               size="large"
+              allowClear
             />
           </div>
         </div>
@@ -69,7 +71,7 @@ const ReviewPromptsList = ({
               <Spin size="large" />
               <Text className="mt-4 text-gray-600">{t('common.loading', 'Đang tải...')}</Text>
             </div>
-          ) : filteredPrompts.length === 0 ? (
+          ) : displayPrompts.length === 0 ? (
             <div className="py-12">
               <EmptyState
                 icon={CheckOutlined}
@@ -79,7 +81,7 @@ const ReviewPromptsList = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              {filteredPrompts.map((prompt) => (
+              {displayPrompts.map((prompt) => (
                 <div
                   key={prompt.id}
                   className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
@@ -108,7 +110,7 @@ const ReviewPromptsList = ({
                     {/* Description */}
                     <Text 
                       type="secondary" 
-                      className="text-sm leading-relaxed line-clamp-3 mb-4 block"
+                      className="text-sm leading-relaxed line-clamp-2 mb-4 block"
                     >
                       {prompt.description}
                     </Text>
@@ -196,6 +198,21 @@ const ReviewPromptsList = ({
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-50/0 group-hover:from-blue-50/30 group-hover:to-purple-50/20 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination && displayPrompts.length > 0 && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                current={pagination.current}
+                total={pagination.total}
+                pageSize={pagination.pageSize}
+                onChange={pagination.onChange}
+                showSizeChanger={pagination.showSizeChanger}
+                showQuickJumper={pagination.showQuickJumper}
+                className="text-sm"
+              />
             </div>
           )}
         </div>

@@ -25,28 +25,31 @@ async def create_prompt(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/pending", response_model=list[PromptWithDetails])
+@router.get("/pending", response_model=PaginatedResponse[PromptWithDetails])
 async def get_pending_prompts(
     session: DbSession,
     current_user: User = Depends(get_current_user),
-    limit: int = 100
+    page: int = 1,
+    limit: int = 12,
+    search: str | None = None
 ):
     """Get pending prompts for review (admin only)"""
     if current_user.user_type != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    prompts = await PromptService.get_pending_prompts(session, limit)
-    return prompts
+    result = await PromptService.get_pending_prompts_paginated(session, page, limit, search)
+    return result
 
 @router.get("/my", response_model=PaginatedResponse[PromptWithDetails])
 async def get_my_prompts(
     session: DbSession,
     current_user: User = Depends(get_current_user),
     page: int = 1,
-    limit: int = 9
+    limit: int = 9,
+    search: str | None = None
 ):
     """Get current user's prompts (requires authentication)"""
-    result = await PromptService.get_user_prompts_with_details_paginated(session, current_user.id, page, limit)
+    result = await PromptService.get_user_prompts_with_details_paginated(session, current_user.id, page, limit, search)
     return result
 
 @router.get("/featured", response_model=list[PromptWithDetails])

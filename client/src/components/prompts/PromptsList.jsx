@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Button, Input, Typography, Tag, Spin, Modal } from 'antd';
+import { Button, Input, Typography, Tag, Spin, Modal, Pagination } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { Search } = Input;
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PageHeader from '../shared/PageHeader';
@@ -13,6 +15,7 @@ const { Text, Title } = Typography;
 const PromptsList = ({
   searchValue = '',
   onSearchChange,
+  onSearchSubmit, // Thêm prop mới cho search submit
   onCreatePrompt,
   onMenuClick,
   prompts = [],
@@ -20,16 +23,15 @@ const PromptsList = ({
   onSubmitPrompt,
   onEditPrompt,
   onDeletePrompt,
-  currentUser
+  currentUser,
+  pagination = null
 }) => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
 
-  const filteredPrompts = prompts.filter(prompt =>
-    prompt.title?.toLowerCase().includes(searchValue.toLowerCase()) ||
-    prompt.description?.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  // Use prompts directly from API, no client-side filtering
+  const displayPrompts = prompts;
 
   const handleQuickView = async (prompt) => {
     try {
@@ -79,13 +81,14 @@ const PromptsList = ({
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="relative flex-1 max-w-md">
-            <Input
+            <Search
               placeholder={t('myPrompts.searchPlaceholder')}
-              prefix={<SearchOutlined className="text-gray-400" />}
               value={searchValue}
               onChange={onSearchChange}
+              onSearch={onSearchSubmit}
               className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
               size="large"
+              allowClear
             />
           </div>
           <Button
@@ -107,7 +110,7 @@ const PromptsList = ({
               <Spin size="large" />
               <Text className="mt-4 text-gray-600">{t('common.loading', 'Đang tải...')}</Text>
             </div>
-          ) : filteredPrompts.length === 0 ? (
+          ) : displayPrompts.length === 0 ? (
             <div className="py-12">
               <EmptyState
                 icon={FileTextOutlined}
@@ -119,7 +122,7 @@ const PromptsList = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              {filteredPrompts.map((prompt, index) => (
+              {displayPrompts.map((prompt, index) => (
                 <div
                   key={prompt.id}
                   className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 flex flex-col h-full"
@@ -241,6 +244,21 @@ const PromptsList = ({
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-50/0 group-hover:from-blue-50/30 group-hover:to-purple-50/20 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination && displayPrompts.length > 0 && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                current={pagination.current}
+                total={pagination.total}
+                pageSize={pagination.pageSize}
+                onChange={pagination.onChange}
+                showSizeChanger={pagination.showSizeChanger}
+                showQuickJumper={pagination.showQuickJumper}
+                className="text-sm"
+              />
             </div>
           )}
         </div>

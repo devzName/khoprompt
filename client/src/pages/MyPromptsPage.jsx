@@ -20,22 +20,35 @@ const MyPromptsPage = () => {
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [pendingPrompts, setPendingPrompts] = useState([]);
-  const [hasLoadedPrompts, setHasLoadedPrompts] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [reviewCurrentPage, setReviewCurrentPage] = useState(1); // Thêm state cho review pagination
+  const [totalPrompts, setTotalPrompts] = useState(0);
+  const [totalPendingPrompts, setTotalPendingPrompts] = useState(0); // Thêm state cho total pending prompts
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id && activeTab === 'list' && !hasLoadedPrompts) {
-      fetchMyPrompts();
-    } else if (user?.user_type === 'admin' && activeTab === 'review' && !hasLoadedPrompts) {
-      fetchPendingPrompts();
+    if (user?.id && activeTab === 'list') {
+      setCurrentPage(1);
+      setInitialLoading(true);
+      fetchMyPrompts(1);
+    } else if (user?.user_type === 'admin' && activeTab === 'review') {
+      setReviewCurrentPage(1);
+      fetchPendingPrompts(1);
     }
-  }, [user?.id, user?.user_type, activeTab, hasLoadedPrompts]);
+  }, [user?.id, user?.user_type, activeTab]);
 
-  const fetchMyPrompts = async () => {
+  const fetchMyPrompts = async (page = currentPage, search = searchValue) => {
     try {
-      setLoading(true);
-      const data = await promptService.getMyPrompts();
-      setPrompts(data);
-      setHasLoadedPrompts(true);
+      const params = {
+        page: page,
+        limit: 12
+      };
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+      const response = await promptService.getMyPrompts(params);
+      setPrompts(response.data || response);
+      setTotalPrompts(response.pagination?.total || response.length);
     } catch (error) {
       console.error('Error fetching prompts:', error);
       notification.error({
@@ -44,16 +57,23 @@ const MyPromptsPage = () => {
         placement: 'topRight'
       });
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
-  const fetchPendingPrompts = async () => {
+  const fetchPendingPrompts = async (page = reviewCurrentPage, search = '') => {
     try {
       setLoading(true);
-      const data = await promptService.getPendingPrompts();
-      setPendingPrompts(data);
-      setHasLoadedPrompts(true);
+      const params = {
+        page: page,
+        limit: 12
+      };
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+      const response = await promptService.getPendingPrompts(params);
+      setPendingPrompts(response.data || response);
+      setTotalPendingPrompts(response.pagination?.total || response.length);
     } catch (error) {
       console.error('Error fetching pending prompts:', error);
       notification.error({
@@ -111,8 +131,7 @@ const MyPromptsPage = () => {
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
-      setHasLoadedPrompts(false);
-      fetchMyPrompts();
+      fetchMyPrompts(1);
     } catch (error) {
       console.error('Error saving prompt:', error);
       notification.error({
@@ -135,8 +154,7 @@ const MyPromptsPage = () => {
         description: t('myPrompts.submitSuccess'),
         placement: 'topRight'
       });
-      setHasLoadedPrompts(false);
-      fetchMyPrompts();
+      fetchMyPrompts(1);
     } catch (error) {
       console.error('Error submitting prompt:', error);
       notification.error({
@@ -159,8 +177,7 @@ const MyPromptsPage = () => {
         description: t('myPrompts.deleteSuccess', 'Prompt deleted successfully'),
         placement: 'topRight'
       });
-      setHasLoadedPrompts(false);
-      fetchMyPrompts();
+      fetchMyPrompts(1);
     } catch (error) {
       console.error('Error deleting prompt:', error);
       notification.error({
@@ -183,8 +200,7 @@ const MyPromptsPage = () => {
         description: t('reviewPrompts.approveSuccess', 'Prompt approved successfully'),
         placement: 'topRight'
       });
-      setHasLoadedPrompts(false);
-      fetchPendingPrompts();
+      fetchPendingPrompts(reviewCurrentPage);
     } catch (error) {
       console.error('Error approving prompt:', error);
       notification.error({
@@ -207,8 +223,7 @@ const MyPromptsPage = () => {
         description: t('reviewPrompts.rejectSuccess', 'Prompt rejected successfully'),
         placement: 'topRight'
       });
-      setHasLoadedPrompts(false);
-      fetchPendingPrompts();
+      fetchPendingPrompts(reviewCurrentPage);
     } catch (error) {
       console.error('Error rejecting prompt:', error);
       notification.error({
@@ -221,12 +236,36 @@ const MyPromptsPage = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchMyPrompts(page);
+  };
+
+  const handleReviewPageChange = (page) => {
+    setReviewCurrentPage(page);
+    fetchPendingPrompts(page);
+  };
+
   const handleLogout = () => {
     logout(() => setMobileMenuOpen(false));
   };
 
+  // Search function - chỉ gọi khi nhấn Enter hoặc click search button
+  const handleSearchSubmit = (value) => {
+    setSearchValue(value);
+    setCurrentPage(1);
+    fetchMyPrompts(1, value);
+  };
+
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
+  };
+
+  // Search function cho review prompts
+  const handleReviewSearchSubmit = (value) => {
+    setSearchValue(value);
+    setReviewCurrentPage(1);
+    fetchPendingPrompts(1, value);
   };
 
   const menuItems = [
@@ -236,9 +275,9 @@ const MyPromptsPage = () => {
       label: t('sidebar.myPrompts'), 
       action: () => {
         setActiveTab('list');
-        if (activeTab !== 'list') {
-          setHasLoadedPrompts(false);
-        }
+        setCurrentPage(1);
+        setSearchValue(''); // Reset search khi chuyển tab
+        setInitialLoading(true);
       }
     },
     { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => handleCreatePrompt() },
@@ -249,7 +288,9 @@ const MyPromptsPage = () => {
       label: t('sidebar.reviewPrompts'),
       action: () => {
         setActiveTab('review');
-        setHasLoadedPrompts(false);
+        setReviewCurrentPage(1);
+        setSearchValue(''); // Reset search khi chuyển tab
+        fetchPendingPrompts(1);
       }
     }] : [])
   ];
@@ -285,25 +326,43 @@ const MyPromptsPage = () => {
           <PromptsList
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
+            onSearchSubmit={handleSearchSubmit}
             onCreatePrompt={handleCreatePrompt}
             onMenuClick={() => setMobileMenuOpen(true)}
             prompts={prompts}
-            loading={loading}
+            loading={initialLoading}
             onSubmitPrompt={handleSubmitForReview}
             onEditPrompt={handleEditPrompt}
             onDeletePrompt={handleDeletePrompt}
             currentUser={user}
+            pagination={{
+              current: currentPage,
+              total: totalPrompts,
+              pageSize: 12,
+              onChange: handlePageChange,
+              showSizeChanger: false,
+              showQuickJumper: false,
+            }}
           />
         ) : activeTab === 'review' && user?.user_type === 'admin' ? (
           <ReviewPromptsList
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
+            onSearchSubmit={handleReviewSearchSubmit}
             onMenuClick={() => setMobileMenuOpen(true)}
             prompts={pendingPrompts}
             loading={loading}
             onApprovePrompt={handleApprovePrompt}
             onRejectPrompt={handleRejectPrompt}
             currentUser={user}
+            pagination={{
+              current: reviewCurrentPage,
+              total: totalPendingPrompts,
+              pageSize: 12,
+              onChange: handleReviewPageChange,
+              showSizeChanger: false,
+              showQuickJumper: false,
+            }}
           />
         ) : (
           <CreatePromptForm

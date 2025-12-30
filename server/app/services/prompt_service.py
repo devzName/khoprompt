@@ -248,12 +248,12 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_user_prompts_with_details_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9) -> PaginatedResponse:
+    async def get_user_prompts_with_details_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9, search: str | None = None) -> PaginatedResponse:
         # Get total count
-        total_count = await PromptRepository.get_user_prompts_count(session, user_id)
+        total_count = await PromptRepository.get_user_prompts_count(session, user_id, search)
         
         # Get paginated data
-        prompts = await PromptRepository.get_user_prompts_paginated(session, user_id, page, limit)
+        prompts = await PromptRepository.get_user_prompts_paginated(session, user_id, page, limit, search)
         
         # Calculate pagination metadata
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
@@ -308,49 +308,22 @@ class PromptService:
                 has_prev=has_prev
             )
         )
-        prompts = await PromptRepository.get_by_user(session, user_id)
-        
-        return [
-            {
-                "id": prompt.id,
-                "title": prompt.title,
-                "slug": prompt.slug,
-                "description": prompt.description,
-                "content": prompt.content,
-                "full_description": prompt.full_description,
-                "status": prompt.status,
-                "category_id": prompt.category_id,
-                "user_id": str(prompt.user_id),
-                "view_count": prompt.view_count,
-                "like_count": prompt.like_count,
-                "dislike_count": prompt.dislike_count,
-                "created_at": prompt.created_at,
-                "updated_at": prompt.updated_at,
-                "user": {
-                    "id": str(prompt.user.id),
-                    "full_name": prompt.user.full_name,
-                    "email": prompt.user.email,
-                    "avatar_url": prompt.user.avatar_url,
-                    "user_type": prompt.user.user_type
-                } if prompt.user else None,
-                "category": {
-                    "id": prompt.category.id,
-                    "name": prompt.category.name,
-                    "slug": prompt.category.slug
-                } if prompt.category else None,
-                "tags": [
-                    {"id": tag.id, "name": tag.name} 
-                    for tag in prompt.tags
-                ]
-            }
-            for prompt in prompts
-        ]
 
     @staticmethod
-    async def get_pending_prompts(session: AsyncSession, limit: int = 100) -> list[dict]:
-        prompts = await PromptRepository.get_pending_prompts(session, limit)
+    async def get_pending_prompts_paginated(session: AsyncSession, page: int = 1, limit: int = 12, search: str | None = None) -> PaginatedResponse:
+        # Get total count
+        total_count = await PromptRepository.get_pending_prompts_count(session, search)
         
-        return [
+        # Get paginated data
+        prompts = await PromptRepository.get_pending_prompts_paginated(session, page, limit, search)
+        
+        # Calculate pagination metadata
+        total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        # Format prompts data
+        prompts_data = [
             {
                 "id": prompt.id,
                 "title": prompt.title,
@@ -384,6 +357,18 @@ class PromptService:
             }
             for prompt in prompts
         ]
+        
+        return PaginatedResponse(
+            data=prompts_data,
+            pagination=PaginationMeta(
+                current_page=page,
+                per_page=limit,
+                total=total_count,
+                total_pages=total_pages,
+                has_next=has_next,
+                has_prev=has_prev
+            )
+        )
 
     @staticmethod
     async def update_prompt(session: AsyncSession, prompt_id: int, prompt_data: PromptUpdate, user_id: UUID, user_type: str = None) -> dict | None:

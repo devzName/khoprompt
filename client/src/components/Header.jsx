@@ -34,10 +34,7 @@ const Header = () => {
     setSearchValue(e.target.value);
   };
 
-  const handleSearchClick = () => {
-    handleSearch(searchValue);
-  };
-
+  // Chỉ search khi nhấn Enter hoặc click nút search
   const handleSearchSubmit = (value) => {
     handleSearch(value);
   };
