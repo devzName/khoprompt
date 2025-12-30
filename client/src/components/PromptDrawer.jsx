@@ -28,7 +28,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
   };
 
   const handleViewDetail = () => {
-    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.id));
+    navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.slug));
     onClose();
   };
 
