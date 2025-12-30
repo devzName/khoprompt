@@ -36,8 +36,8 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
   // Show approve/reject buttons only for admin and pending prompts
   const showApprovalButtons = currentUser?.user_type === 'admin' && prompt?.status === 'pending';
-  // Show like/dislike buttons for regular users (not admin review mode)
-  const showVoteButtons = !showApprovalButtons && (!currentUser || currentUser.id !== prompt?.user_id);
+  // Show like/dislike buttons for regular users (not admin review mode and not own prompt)
+  const showVoteButtons = !showApprovalButtons && currentUser && String(currentUser.id) !== String(prompt?.user_id);
 
   return (
     <Drawer
