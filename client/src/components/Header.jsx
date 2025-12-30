@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button, Avatar, Dropdown } from 'antd';
 import { SearchOutlined, PlusOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useLanguage } from '../hooks/useLanguage';
@@ -9,10 +9,38 @@ import LoginModal from './LoginModal';
 // import NotificationBell from './shared/NotificationBell';
 import { ROUTES } from '../constants/routes';
 
+const { Search } = Input;
+
 const Header = () => {
   const { t, getLanguageMenuItems, currentLanguageLabel } = useLanguage();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Đồng bộ search input với URL query parameter
+  useEffect(() => {
+    const queryFromUrl = searchParams.get('q') || '';
+    setSearchValue(queryFromUrl);
+  }, [searchParams]);
+
+  const handleSearch = (value) => {
+    if (value.trim()) {
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(value.trim())}`);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchClick = () => {
+    handleSearch(searchValue);
+  };
+
+  const handleSearchSubmit = (value) => {
+    handleSearch(value);
+  };
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -42,13 +70,16 @@ const Header = () => {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:block">
-              <Input
+              <Search
                 size="large"
-                placeholder={t('header.search')}
-                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t('header.search', 'Tìm kiếm prompts...')}
                 value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-80 rounded-xl border-gray-300 hover:border-blue-400 focus:border-blue-500 transition-colors shadow-sm"
+                onChange={handleSearchInputChange}
+                onSearch={handleSearchSubmit}
+                className="w-[450px]"
+                style={{
+                  borderRadius: '12px',
+                }}
                 allowClear
               />
             </div>
@@ -105,13 +136,15 @@ const Header = () => {
         </div>
 
         <div className="md:hidden pb-4 pt-2">
-          <Input
+          <Search
             size="middle"
-            placeholder={t('header.search')}
-            prefix={<SearchOutlined className="text-gray-400" />}
+            placeholder={t('header.search', 'Tìm kiếm prompts...')}
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="rounded-xl border-gray-300 shadow-sm"
+            onChange={handleSearchInputChange}
+            onSearch={handleSearchSubmit}
+            style={{
+              borderRadius: '12px',
+            }}
             allowClear
           />
         </div>

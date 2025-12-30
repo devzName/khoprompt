@@ -143,8 +143,8 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None) -> list[dict]:
-        prompts = await PromptRepository.get_approved_prompts(session, category_id)
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> list[dict]:
+        prompts = await PromptRepository.get_approved_prompts(session, category_id, search)
         
         return [
             {

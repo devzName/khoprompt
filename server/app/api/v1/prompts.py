@@ -77,10 +77,11 @@ async def get_prompt_by_slug(slug: str, session: DbSession):
 @router.get("/", response_model=list[PromptWithDetails])
 async def get_approved_prompts(
     session: DbSession,
-    category_id: int | None = None
+    category_id: int | None = None,
+    search: str | None = None
 ):
     """Get approved prompts (public access)"""
-    prompts = await PromptService.get_approved_prompts(session, category_id)
+    prompts = await PromptService.get_approved_prompts(session, category_id, search)
     return prompts
 
 @router.patch("/{prompt_id}", response_model=PromptOut)

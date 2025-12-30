@@ -1,7 +1,6 @@
 export const ROUTES = {
   HOME: '/',
-  CATEGORY: '/category/:category',
-  CATEGORY_PATH: (category) => `/category/${category}`,
+  SEARCH: '/search',
   PROMPT_DETAIL: '/prompt/:slug',
   PROMPT_DETAIL_PATH: (slug) => `/prompt/${slug}`,
   MY_PROMPTS: '/my-prompts',

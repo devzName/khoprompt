@@ -73,7 +73,7 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> list[Prompt]:
         stmt = (
             select(Prompt)
             .options(
@@ -86,6 +86,9 @@ class PromptRepository:
         
         if category_id is not None:
             stmt = stmt.where(Prompt.category_id == category_id)
+            
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
             
         stmt = stmt.order_by(Prompt.created_at.desc())
         result = await session.execute(stmt)
