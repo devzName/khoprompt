@@ -48,8 +48,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
   // Show approve/reject buttons only for admin and pending prompts
   const showApprovalButtons = currentUser?.user_type === 'admin' && prompt?.status === 'pending';
-  // Show like/dislike buttons for regular users (not admin review mode and not own prompt)
-  const showVoteButtons = !showApprovalButtons && currentUser && String(currentUser.id) !== String(prompt?.user_id);
 
   return (
     <Drawer
@@ -88,35 +86,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               size="large"
             >
               {t('reviewPrompts.reject', 'Từ chối')}
-            </Button>
-          </div>
-        ) : showVoteButtons ? (
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <Button 
-                type="primary" 
-                icon={<LikeOutlined />}
-                className="flex-1"
-                size="large"
-              >
-                {t('drawer.helpful', 'Hữu ích')}
-              </Button>
-              <Button 
-                icon={<DislikeOutlined />}
-                className="flex-1"
-                size="large"
-              >
-                {t('drawer.notHelpful', 'Không hữu ích')}
-              </Button>
-            </div>
-            <Button 
-              type="primary" 
-              icon={<LinkOutlined />}
-              className="w-full"
-              size="large"
-              onClick={handleViewDetail}
-            >
-              {t('drawer.viewDetail', 'Xem chi tiết')}
             </Button>
           </div>
         ) : (
