@@ -3,8 +3,6 @@ import HomePage from './pages/HomePage';
 import PromptDetailPage from './pages/PromptDetailPage';
 import SearchPage from './pages/SearchPage';
 import MyPromptsPage from './pages/MyPromptsPage';
-import ReviewPromptsPage from './pages/ReviewPromptsPage';
-import ManagePromptsPage from './pages/ManagePromptsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
@@ -21,22 +19,6 @@ function App() {
           element={
             <ProtectedRoute>
               <MyPromptsPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path={ROUTES.REVIEW_PROMPTS} 
-          element={
-            <ProtectedRoute>
-              <ReviewPromptsPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path={ROUTES.MANAGE_PROMPTS} 
-          element={
-            <ProtectedRoute>
-              <ManagePromptsPage />
             </ProtectedRoute>
           } 
         />
