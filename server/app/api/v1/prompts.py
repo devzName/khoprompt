@@ -91,7 +91,7 @@ async def update_prompt(
     current_user: User = Depends(get_current_user)
 ):
     """Update a prompt (requires authentication and ownership, draft and approved prompts can be updated)"""
-    result = await PromptService.update_prompt(session, prompt_id, prompt_data, current_user.id)
+    result = await PromptService.update_prompt(session, prompt_id, prompt_data, current_user.id, current_user.user_type)
     if not result:
         # Check if prompt exists and belongs to user
         prompt = await PromptService.get_prompt_by_id(session, prompt_id)

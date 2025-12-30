@@ -303,7 +303,7 @@ class PromptService:
         ]
 
     @staticmethod
-    async def update_prompt(session: AsyncSession, prompt_id: int, prompt_data: PromptUpdate, user_id: UUID) -> dict | None:
+    async def update_prompt(session: AsyncSession, prompt_id: int, prompt_data: PromptUpdate, user_id: UUID, user_type: str = None) -> dict | None:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt or prompt.user_id != user_id:
             return None
@@ -313,7 +313,8 @@ class PromptService:
         
         update_data = prompt_data.model_dump(exclude_unset=True)
         
-        if prompt.status == PromptStatus.APPROVED:
+        # If updating an approved prompt, change status to PENDING unless user is admin
+        if prompt.status == PromptStatus.APPROVED and user_type != 'admin':
             update_data["status"] = PromptStatus.PENDING
             
         updated_prompt = await PromptRepository.update(
