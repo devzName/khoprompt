@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Input, Typography, Tag, Spin, Modal, Pagination } from 'antd';
-import { PlusOutlined, SearchOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, CalendarOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 import { useTranslation } from 'react-i18next';
@@ -57,7 +57,7 @@ const PromptsList = ({
     }
   };
 
-  const handleDeletePrompt = (promptId, promptTitle) => {
+  const handleDeletePrompt = (promptId) => {
     Modal.confirm({
       title: t('myPrompts.deleteConfirmTitle'),
       icon: <ExclamationCircleOutlined />,
@@ -122,7 +122,7 @@ const PromptsList = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              {displayPrompts.map((prompt, index) => (
+              {displayPrompts.map((prompt) => (
                 <div
                   key={prompt.id}
                   className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 flex flex-col h-full"
@@ -231,7 +231,7 @@ const PromptsList = ({
                         <Button
                           danger
                           icon={<DeleteOutlined />}
-                          onClick={() => handleDeletePrompt(prompt.id, prompt.title)}
+                          onClick={() => handleDeletePrompt(prompt.id)}
                           className="flex-1 rounded-xl border-red-200 text-red-600 hover:border-red-400 hover:text-red-700 transition-all duration-200 hover:shadow-sm"
                           size="middle"
                         >
