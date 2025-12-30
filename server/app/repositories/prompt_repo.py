@@ -73,7 +73,25 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> list[Prompt]:
+    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> int:
+        stmt = (
+            select(func.count(Prompt.id))
+            .where(Prompt.status == PromptStatus.APPROVED)
+        )
+        
+        if category_id is not None:
+            stmt = stmt.where(Prompt.category_id == category_id)
+            
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
+        offset = (page - 1) * limit
+        
         stmt = (
             select(Prompt)
             .options(
@@ -90,7 +108,7 @@ class PromptRepository:
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
             
-        stmt = stmt.order_by(Prompt.created_at.desc())
+        stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
         result = await session.execute(stmt)
         return result.scalars().all()
 

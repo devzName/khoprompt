@@ -27,7 +27,7 @@ const SearchPage = () => {
         setLoading(true);
         // Gọi API để search prompts theo title
         const response = await promptService.getPrompts({ search: query });
-        setPrompts(response);
+        setPrompts(response.data || response); // Handle both paginated and non-paginated response
       } catch (error) {
         console.error('Failed to search prompts:', error);
         setPrompts([]);

@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+import math
 
 from app.repositories.prompt_repo import PromptRepository
 from app.schemas.prompt import PromptCreate, PromptUpdate
+from app.schemas.pagination import PaginatedResponse, PaginationMeta
 from app.constants.prompt_status import PromptStatus
 
 
@@ -143,10 +145,20 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> list[dict]:
-        prompts = await PromptRepository.get_approved_prompts(session, category_id, search)
+    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
+        # Get total count
+        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search)
         
-        return [
+        # Get paginated data
+        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, page, limit)
+        
+        # Calculate pagination metadata
+        total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        # Format prompts data
+        prompts_data = [
             {
                 "id": prompt.id,
                 "title": prompt.title,
@@ -180,6 +192,18 @@ class PromptService:
             }
             for prompt in prompts
         ]
+        
+        return PaginatedResponse(
+            data=prompts_data,
+            pagination=PaginationMeta(
+                current_page=page,
+                per_page=limit,
+                total=total_count,
+                total_pages=total_pages,
+                has_next=has_next,
+                has_prev=has_prev
+            )
+        )
 
     @staticmethod
     async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None) -> list[dict]:
@@ -224,7 +248,66 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_user_prompts_with_details(session: AsyncSession, user_id: UUID) -> list[dict]:
+    async def get_user_prompts_with_details_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9) -> PaginatedResponse:
+        # Get total count
+        total_count = await PromptRepository.get_user_prompts_count(session, user_id)
+        
+        # Get paginated data
+        prompts = await PromptRepository.get_user_prompts_paginated(session, user_id, page, limit)
+        
+        # Calculate pagination metadata
+        total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        # Format prompts data
+        prompts_data = [
+            {
+                "id": prompt.id,
+                "title": prompt.title,
+                "slug": prompt.slug,
+                "description": prompt.description,
+                "content": prompt.content,
+                "full_description": prompt.full_description,
+                "status": prompt.status,
+                "category_id": prompt.category_id,
+                "user_id": str(prompt.user_id),
+                "view_count": prompt.view_count,
+                "like_count": prompt.like_count,
+                "dislike_count": prompt.dislike_count,
+                "created_at": prompt.created_at,
+                "updated_at": prompt.updated_at,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url,
+                    "user_type": prompt.user.user_type
+                } if prompt.user else None,
+                "category": {
+                    "id": prompt.category.id,
+                    "name": prompt.category.name,
+                    "slug": prompt.category.slug
+                } if prompt.category else None,
+                "tags": [
+                    {"id": tag.id, "name": tag.name} 
+                    for tag in prompt.tags
+                ]
+            }
+            for prompt in prompts
+        ]
+        
+        return PaginatedResponse(
+            data=prompts_data,
+            pagination=PaginationMeta(
+                current_page=page,
+                per_page=limit,
+                total=total_count,
+                total_pages=total_pages,
+                has_next=has_next,
+                has_prev=has_prev
+            )
+        )
         prompts = await PromptRepository.get_by_user(session, user_id)
         
         return [

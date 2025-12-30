@@ -16,7 +16,8 @@ const LatestPrompts = ({
   showPagination = true,
   pageSize = 8,
   columns = 4,
-  loading = false
+  loading = false,
+  pagination = null
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -36,10 +37,11 @@ const LatestPrompts = ({
     filteredPrompts = filteredPrompts.filter(prompt => prompt.id !== currentPrompt.id);
   }
 
-  const totalItems = filteredPrompts.length;
+  const totalItems = pagination ? pagination.total : filteredPrompts.length;
   let paginatedPrompts = filteredPrompts;
 
-  if (showPagination && !maxItems) {
+  // If using external pagination (from API), don't slice here
+  if (!pagination && showPagination && !maxItems) {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     paginatedPrompts = filteredPrompts.slice(startIndex, endIndex);
@@ -79,11 +81,14 @@ const LatestPrompts = ({
   }
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    document.querySelector('.latest-prompts-section')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    // Don't scroll here if using external pagination
+    if (!pagination) {
+      setCurrentPage(page);
+      document.querySelector('.latest-prompts-section')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   const handleQuickView = async (e, prompt) => {
@@ -182,18 +187,15 @@ const LatestPrompts = ({
             ))}
           </div>
 
-          {showPagination && !maxItems && totalItems > pageSize && (
+          {(showPagination || pagination) && !maxItems && totalItems > (pagination?.pageSize || pageSize) && (
             <div className="flex justify-center">
               <Pagination
-                current={currentPage}
+                current={pagination?.current || currentPage}
                 total={totalItems}
-                pageSize={pageSize}
-                onChange={handlePageChange}
-                showSizeChanger={false}
-                showQuickJumper={false}
-                showTotal={(total, range) =>
-                  `${range[0]}-${range[1]} ${t('latest.pagination')} ${total} prompts`
-                }
+                pageSize={pagination?.pageSize || pageSize}
+                onChange={pagination?.onChange || handlePageChange}
+                showSizeChanger={pagination?.showSizeChanger ?? false}
+                showQuickJumper={pagination?.showQuickJumper ?? false}
                 className="text-sm"
               />
             </div>

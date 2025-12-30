@@ -14,24 +14,41 @@ const HomePage = () => {
   const [loadingLatest, setLoadingLatest] = useState(true);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null); // null means "all"
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPrompts, setTotalPrompts] = useState(0);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Reset to page 1 when category changes
+    setCurrentPage(1);
+    setInitialLoading(true); // Show loading when category changes
+  }, [selectedCategory]);
 
   useEffect(() => {
     const fetchLatestPrompts = async () => {
       try {
-        setLoadingLatest(true);
-        const params = {};
+        const params = {
+          page: currentPage,
+          limit: 9
+        };
         if (selectedCategory) {
           params.category_id = selectedCategory.id;
         }
         const response = await promptService.getPrompts(params);
-        setLatestPrompts(response);
+        setLatestPrompts(response.data || response); // Handle both paginated and non-paginated response
+        setTotalPrompts(response.pagination?.total || response.length);
       } catch (error) {
         console.error('Failed to fetch latest prompts:', error);
       } finally {
-        setLoadingLatest(false);
+        setInitialLoading(false); // Only turn off loading after first successful fetch
       }
     };
 
+    fetchLatestPrompts();
+  }, [selectedCategory, currentPage]);
+
+  useEffect(() => {
     const fetchFeaturedPrompts = async () => {
       try {
         setLoadingFeatured(true);
@@ -45,9 +62,12 @@ const HomePage = () => {
       }
     };
 
-    fetchLatestPrompts();
     fetchFeaturedPrompts();
-  }, [selectedCategory]);
+  }, [selectedCategory]); // Only fetch when category changes, not when page changes
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   return (
     <div className="min-h-screen">
       <Header />
@@ -59,9 +79,17 @@ const HomePage = () => {
       <FeaturedPrompts prompts={featuredPrompts} loading={loadingFeatured} />
       <LatestPrompts
         prompts={latestPrompts}
-        maxItems={16}
+        maxItems={null}
         columns={3}
-        loading={loadingLatest}
+        loading={initialLoading}
+        pagination={{
+          current: currentPage,
+          total: totalPrompts,
+          pageSize: 9,
+          onChange: handlePageChange,
+          showSizeChanger: false,
+          showQuickJumper: false,
+        }}
       />
       <TagsSection />
       <Footer />

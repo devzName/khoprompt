@@ -7,6 +7,7 @@ from app.api.deps import DbSession
 from app.api.auth_deps import get_current_user
 from app.services.prompt_service import PromptService
 from app.schemas.prompt import PromptCreate, PromptUpdate, PromptOut, PromptWithDetails
+from app.schemas.pagination import PaginatedResponse
 from app.models.user import User
 
 router = APIRouter()
@@ -37,14 +38,16 @@ async def get_pending_prompts(
     prompts = await PromptService.get_pending_prompts(session, limit)
     return prompts
 
-@router.get("/my", response_model=list[PromptWithDetails])
+@router.get("/my", response_model=PaginatedResponse[PromptWithDetails])
 async def get_my_prompts(
     session: DbSession,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    page: int = 1,
+    limit: int = 9
 ):
     """Get current user's prompts (requires authentication)"""
-    prompts = await PromptService.get_user_prompts_with_details(session, current_user.id)
-    return prompts
+    result = await PromptService.get_user_prompts_with_details_paginated(session, current_user.id, page, limit)
+    return result
 
 @router.get("/featured", response_model=list[PromptWithDetails])
 async def get_featured_prompts(
@@ -74,15 +77,17 @@ async def get_prompt_by_slug(slug: str, session: DbSession):
         raise HTTPException(status_code=404, detail="Prompt not found")
     return prompt
 
-@router.get("/", response_model=list[PromptWithDetails])
+@router.get("/", response_model=PaginatedResponse[PromptWithDetails])
 async def get_approved_prompts(
     session: DbSession,
     category_id: int | None = None,
-    search: str | None = None
+    search: str | None = None,
+    page: int = 1,
+    limit: int = 9
 ):
     """Get approved prompts (public access)"""
-    prompts = await PromptService.get_approved_prompts(session, category_id, search)
-    return prompts
+    result = await PromptService.get_approved_prompts_paginated(session, category_id, search, page, limit)
+    return result
 
 @router.patch("/{prompt_id}", response_model=PromptOut)
 async def update_prompt(
