@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GithubOutlined, TwitterOutlined, LinkedinOutlined } from '@ant-design/icons';
 import { statisticsService } from '../services/statisticsService';
 
 const Footer = () => {
@@ -39,20 +38,6 @@ const Footer = () => {
             <p className="text-gray-400 text-sm leading-relaxed mb-4 max-w-md">
               {t('footer.description')}
             </p>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-500 text-sm">{t('footer.connectWithUs')}:</span>
-              <div className="flex gap-3">
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <TwitterOutlined className="text-lg" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-                  <LinkedinOutlined className="text-lg" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <GithubOutlined className="text-lg" />
-                </a>
-              </div>
-            </div>
           </div>
 
           {/* Thống kê nhanh */}
