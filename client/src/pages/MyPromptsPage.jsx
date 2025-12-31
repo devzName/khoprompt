@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
 import { FileTextOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
 import Sidebar from '../components/Sidebar';
@@ -12,6 +13,8 @@ import ReviewPromptsList from '../components/prompts/ReviewPromptsList';
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
@@ -25,6 +28,20 @@ const MyPromptsPage = () => {
   const [totalPrompts, setTotalPrompts] = useState(0);
   const [totalPendingPrompts, setTotalPendingPrompts] = useState(0); // Thêm state cho total pending prompts
   const [initialLoading, setInitialLoading] = useState(true);
+
+  // Kiểm tra query parameter để set activeTab
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl === 'create') {
+      setActiveTab('create');
+      setEditingPrompt(null);
+      form.resetFields();
+    } else if (tabFromUrl === 'review' && user?.user_type === 'admin') {
+      setActiveTab('review');
+    } else {
+      setActiveTab('list');
+    }
+  }, [searchParams, form, user?.user_type]);
 
   useEffect(() => {
     if (user?.id && activeTab === 'list') {
@@ -131,6 +148,7 @@ const MyPromptsPage = () => {
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
+      navigate('/my-prompts'); // Cập nhật URL
       fetchMyPrompts(1);
     } catch (error) {
       console.error('Error saving prompt:', error);
@@ -278,9 +296,18 @@ const MyPromptsPage = () => {
         setCurrentPage(1);
         setSearchValue(''); // Reset search khi chuyển tab
         setInitialLoading(true);
+        navigate('/my-prompts'); // Cập nhật URL
       }
     },
-    { key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'), action: () => handleCreatePrompt() },
+    { 
+      key: 'create-prompt', 
+      icon: <PlusOutlined />, 
+      label: t('myPrompts.createPrompt.title'), 
+      action: () => {
+        handleCreatePrompt();
+        navigate('/my-prompts?tab=create'); // Cập nhật URL
+      }
+    },
     // Admin only menu
     ...(user?.user_type === 'admin' ? [{
       key: 'review-prompts',
@@ -291,6 +318,7 @@ const MyPromptsPage = () => {
         setReviewCurrentPage(1);
         setSearchValue(''); // Reset search khi chuyển tab
         fetchPendingPrompts(1);
+        navigate('/my-prompts?tab=review'); // Cập nhật URL
       }
     }] : [])
   ];
@@ -369,7 +397,10 @@ const MyPromptsPage = () => {
             form={form}
             loading={loading}
             onSubmit={handleSubmitPrompt}
-            onCancel={() => setActiveTab('list')}
+            onCancel={() => {
+              setActiveTab('list');
+              navigate('/my-prompts'); // Cập nhật URL
+            }}
             onMenuClick={() => setMobileMenuOpen(true)}
             isEditing={!!editingPrompt}
           />

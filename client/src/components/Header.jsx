@@ -114,7 +114,7 @@ const Header = () => {
                   type="primary"
                   size="middle"
                   icon={<PlusOutlined />}
-                  onClick={() => navigate(ROUTES.CREATE_PROMPT)}
+                  onClick={() => navigate('/my-prompts?tab=create')}
                   className="bg-gray-900 hover:bg-gray-800 border-0 shadow-md hover:shadow-lg transition-all rounded-xl font-medium text-white"
                 >
                   <span className="hidden sm:inline ml-1">{t('header.createPrompt')}</span>
