@@ -1,9 +1,30 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { GithubOutlined, TwitterOutlined, LinkedinOutlined } from '@ant-design/icons';
+import { statisticsService } from '../services/statisticsService';
 
 const Footer = () => {
   const { t } = useTranslation();
+  const [stats, setStats] = useState({
+    approved_prompts: 0,
+    categories: 0,
+    total_views: 0,
+    total_votes: 0
+  });
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const data = await statisticsService.getStatistics();
+        setStats(data);
+      } catch (error) {
+        console.error('Error loading statistics:', error);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
 
   return (
     <footer className="bg-gray-900 text-white py-12">
@@ -40,15 +61,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400 text-sm">{t('footer.approvedPrompts')}</span>
-                <span className="text-white font-semibold">1,200+</span>
+                <span className="text-white font-semibold">{stats.approved_prompts.toLocaleString()}+</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400 text-sm">{t('footer.positiveRatings')}</span>
-                <span className="text-white font-semibold">98%</span>
+                <span className="text-gray-400 text-sm">{t('footer.totalViews')}</span>
+                <span className="text-white font-semibold">{stats.total_views.toLocaleString()}+</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400 text-sm">{t('footer.categories')}</span>
-                <span className="text-white font-semibold">8</span>
+                <span className="text-white font-semibold">{stats.categories}</span>
               </div>
             </div>
           </div>
