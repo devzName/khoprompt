@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     log_file_path: str = Field(default="logs/app.log", validation_alias="LOG_FILE_PATH")
     detailed_error_logs: bool = Field(default=False, validation_alias="DETAILED_ERROR_LOGS")
     secret_key: str = Field(default="change-me", validation_alias="SECRET_KEY")
-    access_token_expire_minutes: int = Field(default=60, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    access_token_expire_minutes: int = Field(default=1440, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     algorithm: str = Field(default="HS256", validation_alias="ALGORITHM")
     google_client_id: str | None = Field(default=None, validation_alias="GOOGLE_CLIENT_ID")
 
