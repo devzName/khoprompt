@@ -13,9 +13,6 @@ const UserProfile = ({ user, menuItems, placement = 'topRight', size = 40 }) => 
           <div className="text-sm font-medium text-gray-900 truncate">
             {user?.name || 'User'}
           </div>
-          <div className="text-xs text-gray-500 truncate">
-            {user?.email || 'user@example.com'}
-          </div>
         </div>
       </div>
     </Dropdown>

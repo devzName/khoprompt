@@ -65,7 +65,7 @@ const Header = () => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="hidden md:block">
               <Search
                 size="large"
@@ -73,63 +73,65 @@ const Header = () => {
                 value={searchValue}
                 onChange={handleSearchInputChange}
                 onSearch={handleSearchSubmit}
-                className="w-[450px]"
                 style={{
                   borderRadius: '12px',
+                  width: '400px'
                 }}
                 allowClear
               />
             </div>
-
-            <div className="flex items-center gap-3">
-              {!user && (
-                <>
-                  <Dropdown
-                    menu={{ items: getLanguageMenuItems() }}
-                    placement="bottomRight"
-                    trigger={['click']}
-                  >
-                    <Button
-                      size="large"
-                      icon={<GlobalOutlined />}
-                      className="rounded-xl border-gray-300 hover:border-blue-400 transition-colors"
-                    >
-                      <span className="hidden sm:inline ml-1">{currentLanguageLabel}</span>
-                    </Button>
-                  </Dropdown>
-
+            {!user && (
+              <>
+                <Dropdown
+                  menu={{ items: getLanguageMenuItems() }}
+                  placement="bottomRight"
+                  trigger={['click']}
+                >
                   <Button
-                    type="primary"
                     size="large"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsLoginModalOpen(true)}
-                    className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-md hover:shadow-lg transition-all rounded-xl font-medium"
+                    icon={<GlobalOutlined />}
+                    className="rounded-xl border-gray-300 hover:border-blue-400 transition-colors"
                   >
-                    <span className="hidden sm:inline ml-1">{t('header.createPrompt')}</span>
+                    <span className="hidden sm:inline ml-1">{currentLanguageLabel}</span>
                   </Button>
-                </>
-              )}
+                </Dropdown>
 
-              {user && (
-                <>
-                  {/* <NotificationBell /> */}
-                  <Dropdown
-                    menu={{ items: userMenuItems }}
-                    placement="bottomRight"
-                    arrow={{ pointAtCenter: true }}
-                    trigger={['click']}
-                  >
-                    <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
-                      <Avatar size={36} src={user.picture} className="border-2 border-gray-200" />
-                      <div className="hidden sm:block text-left">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-xs text-gray-500">{user.email}</div>
-                      </div>
-                    </div>
-                  </Dropdown>
-                </>
-              )}
-            </div>
+                <Button
+                  type="primary"
+                  size="middle"
+                  icon={<PlusOutlined />}
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-md hover:shadow-lg transition-all rounded-xl font-medium"
+                >
+                  <span className="hidden sm:inline ml-1">{t('header.createPrompt')}</span>
+                </Button>
+              </>
+            )}
+
+            {user && (
+              <>
+                <Button
+                  type="primary"
+                  size="middle"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate(ROUTES.CREATE_PROMPT)}
+                  className="bg-gray-900 hover:bg-gray-800 border-0 shadow-md hover:shadow-lg transition-all rounded-xl font-medium text-white"
+                >
+                  <span className="hidden sm:inline ml-1">{t('header.createPrompt')}</span>
+                </Button>
+                
+                <Dropdown
+                  menu={{ items: userMenuItems }}
+                  placement="bottomRight"
+                  arrow={{ pointAtCenter: true }}
+                  trigger={['click']}
+                >
+                  <div className="cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
+                    <Avatar size={36} src={user.picture} className="border-2 border-gray-200" />
+                  </div>
+                </Dropdown>
+              </>
+            )}
           </div>
         </div>
 

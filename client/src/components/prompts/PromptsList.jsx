@@ -125,7 +125,7 @@ const PromptsList = ({
               {displayPrompts.map((prompt) => (
                 <div
                   key={prompt.id}
-                  className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 flex flex-col h-full"
+                  className="group relative bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
                 >
                   <div className="absolute top-4 right-4 z-10">
                     <Tag 
