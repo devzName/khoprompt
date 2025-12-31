@@ -85,11 +85,12 @@ async def get_approved_prompts(
     session: DbSession,
     category_id: int | None = None,
     search: str | None = None,
+    tag: str | None = None,
     page: int = 1,
     limit: int = 9
 ):
     """Get approved prompts (public access)"""
-    result = await PromptService.get_approved_prompts_paginated(session, category_id, search, page, limit)
+    result = await PromptService.get_approved_prompts_paginated(session, category_id, search, tag, page, limit)
     return result
 
 @router.patch("/{prompt_id}", response_model=PromptOut)

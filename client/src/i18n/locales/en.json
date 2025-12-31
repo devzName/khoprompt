@@ -242,6 +242,15 @@
     "votedHelpful": "Voted as helpful!",
     "votedNotHelpful": "Voted as not helpful!"
   },
+  "search": {
+    "enterKeyword": "Enter search keyword",
+    "enterKeywordDesc": "Use the search bar above to find prompts",
+    "noResults": "No results found",
+    "noResultsDesc": "No prompts match the keyword \"{{query}}\". Try searching with different keywords.",
+    "loadingPage": "Loading page {{page}}...",
+    "searchResults": "Search results for \"{{query}}\"",
+    "tagResults": "Prompts with tag \"#{{query}}\""
+  },
   "tags": {
     "title": "Explore by Tags",
     "subtitle": "Find prompts based on your favorite tags",
@@ -253,7 +262,8 @@
     "art": "Art",
     "creative": "Creative",
     "writing": "Writing",
-    "shortStory": "Short Story"
+    "shortStory": "Short Story",
+    "noTagsAvailable": "No tags available"
   },
   "drawer": {
     "categoryTags": "Category & Tags",

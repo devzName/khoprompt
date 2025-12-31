@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TagOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { promptTagsService } from '../services/promptTagsService';
 
 const TagsSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleTagClick = (tagName) => {
+    // Chuyển đến SearchPage với tag đã chọn và type=tag để phân biệt
+    navigate(`/search?q=${encodeURIComponent(tagName)}&type=tag`);
+  };
   
   useEffect(() => {
     const fetchTags = async () => {
@@ -15,15 +22,7 @@ const TagsSection = () => {
         setTags(response);
       } catch (error) {
         console.error('Failed to fetch tags:', error);
-        // Fallback to static tags if API fails
-        setTags([
-          'Claude', 'GPT-4', 'Code', 'ChatGPT', 'SEO', 'React',
-          'Laravel', 'Marketing', 'Programming', 'Gemini', 'Development', 'Content',
-          'PHP', 'Social Media', t('tags.learning'), t('tags.education'), 'Email', t('tags.office'),
-          t('tags.professional'), 'Debug', 'Midjourney', t('tags.landscape'), t('tags.art'), 'Facebook',
-          t('tags.creative'), t('tags.writing'), t('tags.shortStory'), 'Blog', 'Content Marketing', 'Email Marketing',
-          'Conversion', 'AIDA'
-        ]);
+        setTags([]);
       } finally {
         setLoading(false);
       }
@@ -77,14 +76,23 @@ const TagsSection = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-3">
-          {tags.map((tag, index) => (
-            <button
-              key={tag.id || index}
-              className="text-left text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm"
-            >
-              {typeof tag === 'object' ? tag.name : tag}
-            </button>
-          ))}
+          {tags.length > 0 ? (
+            tags.map((tag, index) => (
+              <button
+                key={tag.id || index}
+                onClick={() => handleTagClick(typeof tag === 'object' ? tag.name : tag)}
+                className="text-left text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm py-1 cursor-pointer"
+              >
+                {typeof tag === 'object' ? tag.name : tag}
+              </button>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-500 text-sm">
+                {t('tags.noTagsAvailable', 'Không có tags nào khả dụng')}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>

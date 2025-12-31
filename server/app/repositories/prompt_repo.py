@@ -73,7 +73,7 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None) -> int:
+    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None) -> int:
         stmt = (
             select(func.count(Prompt.id))
             .where(Prompt.status == PromptStatus.APPROVED)
@@ -85,11 +85,15 @@ class PromptRepository:
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
             
+        if tag is not None:
+            # Join with prompt_tags_association and PromptTag to filter by tag name
+            stmt = stmt.join(Prompt.tags).where(PromptTag.name.ilike(f"%{tag}%"))
+            
         result = await session.execute(stmt)
         return result.scalar() or 0
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
         offset = (page - 1) * limit
         
         stmt = (
@@ -107,6 +111,10 @@ class PromptRepository:
             
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+            
+        if tag is not None:
+            # Join with prompt_tags_association and PromptTag to filter by tag name
+            stmt = stmt.join(Prompt.tags).where(PromptTag.name.ilike(f"%{tag}%"))
             
         stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
         result = await session.execute(stmt)

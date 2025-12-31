@@ -242,6 +242,15 @@
     "votedHelpful": "Đã đánh giá prompt là hữu ích!",
     "votedNotHelpful": "Đã đánh giá prompt là không hữu ích!"
   },
+  "search": {
+    "enterKeyword": "Nhập từ khóa tìm kiếm",
+    "enterKeywordDesc": "Sử dụng thanh tìm kiếm ở trên để tìm prompts",
+    "noResults": "Không tìm thấy kết quả",
+    "noResultsDesc": "Không có prompt nào phù hợp với từ khóa \"{{query}}\". Thử tìm kiếm với từ khóa khác.",
+    "loadingPage": "Đang tải trang {{page}}...",
+    "searchResults": "Kết quả tìm kiếm cho \"{{query}}\"",
+    "tagResults": "Prompts với tag \"#{{query}}\""
+  },
   "tags": {
     "title": "Khám phá theo Tags",
     "subtitle": "Tìm prompts bằng cách dựa vào các tag yêu thích của bạn",
@@ -253,7 +262,8 @@
     "art": "Nghệ thuật",
     "creative": "Sáng tạo",
     "writing": "Viết lách",
-    "shortStory": "Truyện ngắn"
+    "shortStory": "Truyện ngắn",
+    "noTagsAvailable": "Không có tags nào khả dụng"
   },
   "drawer": {
     "categoryTags": "Danh mục & Tags",

@@ -146,12 +146,12 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
+    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
         # Get total count
-        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search)
+        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search, tag)
         
         # Get paginated data
-        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, page, limit)
+        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, tag, page, limit)
         
         # Calculate pagination metadata
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
