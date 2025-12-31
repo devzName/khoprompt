@@ -196,7 +196,12 @@
     "contact": "Contact",
     "reportBug": "Report Bug",
     "terms": "Terms of Service",
-    "builtWith": "Built with ❤️ AI Champions"
+    "developedBy": "Developed by AI Champions",
+    "connectWithUs": "Connect with us",
+    "statistics": "Statistics",
+    "approvedPrompts": "Approved Prompts",
+    "positiveRatings": "Positive Ratings",
+    "categories": "Categories"
   },
   "categoryPage": {
     "home": "Home",

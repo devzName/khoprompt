@@ -196,7 +196,12 @@
     "contact": "Liên hệ",
     "reportBug": "Báo lỗi",
     "terms": "Điều khoản sử dụng",
-    "builtWith": "Được xây dựng với ❤️ AI Champions"
+    "developedBy": "Được phát triển bởi AI Champions",
+    "connectWithUs": "Kết nối với chúng tôi",
+    "statistics": "Thống kê",
+    "approvedPrompts": "Prompts đã duyệt",
+    "positiveRatings": "Đánh giá tích cực",
+    "categories": "Danh mục"
   },
   "categoryPage": {
     "home": "Trang chủ",

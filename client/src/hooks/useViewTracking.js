@@ -55,10 +55,6 @@ export const useViewTracking = (promptId, isEnabled = true, onViewTracked = null
         hasTracked.current = true;
         try {
           await promptService.registerView(promptId);
-          console.log('View tracked successfully');
-          if (onViewTracked) {
-            onViewTracked();
-          }
         } catch (error) {
           console.error('Error tracking view:', error);
         }

@@ -97,7 +97,7 @@ const PromptDetailPage = () => {
       } catch (error) {
         console.error('Error fetching prompt:', error);
         notification.error({
-          message: t('common.error', 'Error'),
+          title: t('common.error', 'Error'),
           description: t('promptDetail.notFound'),
           placement: 'topRight'
         });
@@ -121,7 +121,7 @@ const PromptDetailPage = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       notification.success({
-        message: t('common.success', 'Success'),
+        title: t('common.success', 'Success'),
         description: t('promptDetail.copied'),
         placement: 'topRight'
       });
@@ -132,7 +132,7 @@ const PromptDetailPage = () => {
     try {
       if (!user) {
         notification.warning({
-          message: t('common.warning', 'Warning'),
+          title: t('common.warning', 'Warning'),
           description: t('login.required'),
           placement: 'topRight'
         });
@@ -141,7 +141,7 @@ const PromptDetailPage = () => {
 
       if (user && prompt && user.id === prompt.user_id) {
         notification.warning({
-          message: t('common.warning', 'Warning'),
+          title: t('common.warning', 'Warning'),
           description: t('promptDetail.cannotVoteOwn'),
           placement: 'topRight'
         });
@@ -179,14 +179,14 @@ const PromptDetailPage = () => {
       }));
       
       notification.success({
-        message: t('common.success', 'Success'),
+        title: t('common.success', 'Success'),
         description: isHelpful ? t('promptDetail.votedHelpful') : t('promptDetail.votedNotHelpful'),
         placement: 'topRight'
       });
     } catch (error) {
       console.error('Error voting:', error);
       notification.error({
-        message: t('common.error', 'Error'),
+        title: t('common.error', 'Error'),
         description: error.response?.data?.detail || t('common.error'),
         placement: 'topRight'
       });
