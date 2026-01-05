@@ -23,7 +23,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(true); // Mặc định hiển thị tất cả
+  const [isExpanded, setIsExpanded] = useState(false); // Mặc định thu gọn giống TagsSection
   
   const INITIAL_DISPLAY_COUNT = 4; // Chỉ hiển thị 1 hàng (4 danh mục) khi thu gọn
 
@@ -93,23 +93,11 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
     <section className="py-4 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <FolderOutlined className="text-2xl text-blue-600" />
-              <h2 className="text-3xl font-bold text-gray-900">
-                {t('categories.title', 'Danh mục Prompts')}
-              </h2>
-            </div>
-            {hasMoreCategories && (
-              <Button
-                type="text"
-                shape="circle"
-                icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="w-10 h-10 flex items-center justify-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
-                title={isExpanded ? 'Thu gọn' : 'Xem thêm'}
-              />
-            )}
+          <div className="flex items-center gap-3 mb-4">
+            <FolderOutlined className="text-2xl text-blue-600" />
+            <h2 className="text-3xl font-bold text-gray-900">
+              {t('categories.title', 'Danh mục Prompts')}
+            </h2>
           </div>
         </div>
 
@@ -154,6 +142,27 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
             );
           })}
         </div>
+
+        {hasMoreCategories && (
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors duration-200"
+            >
+              {isExpanded ? (
+                <>
+                  <UpOutlined className="text-xs" />
+                  {t('categories.showLess', 'Ẩn bớt')}
+                </>
+              ) : (
+                <>
+                  <DownOutlined className="text-xs" />
+                  {t('categories.showMore', 'Xem thêm')} ({categories.length - INITIAL_DISPLAY_COUNT})
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
