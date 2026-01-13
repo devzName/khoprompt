@@ -12,3 +12,4 @@ server/logs/
 .DS_Store
 .idea/
 client/.env
+deploy.txt
