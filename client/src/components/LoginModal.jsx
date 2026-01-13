@@ -173,7 +173,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       <div className="py-4 px-2 sm:py-6 sm:px-4">
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-            {t('login.welcome')}1
+            {t('login.welcome')}
           </h2>
           <p className="text-sm sm:text-base text-gray-600">
             {t('login.subtitle')}
