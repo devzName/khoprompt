@@ -61,7 +61,6 @@ def upgrade() -> None:
         {'name': 'Văn phòng'},
         {'name': 'Document'},
         {'name': 'Tài liệu'},
-        {'name': 'Process'},
         {'name': 'Quy trình'},
         {'name': 'Management'},
         {'name': 'Quản lý'},
