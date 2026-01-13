@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:prod": "vite build && rm -rf /var/www/prompt-library/* && cp -r dist/* /var/www/prompt-library/ && systemctl reload nginx",
     "preview": "vite preview"
   },
   "keywords": [],
