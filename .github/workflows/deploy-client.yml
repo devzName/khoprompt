@@ -2,7 +2,9 @@ name: Auto Deploy Frontend
 
 on:
   push:
-    branches: [dev]
+    branches:
+      - main
+      - dev
 
 jobs:
   deploy:
