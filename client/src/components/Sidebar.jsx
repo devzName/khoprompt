@@ -22,7 +22,8 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
   };
 
   const getActiveClass = (itemKey) => {
-    const isActive = (itemKey === 'my-prompts' && activeTab === 'list') ||
+    const isActive = (itemKey === 'dashboard' && activeTab === 'dashboard') ||
+      (itemKey === 'my-prompts' && activeTab === 'list') ||
       (itemKey === 'create-prompt' && activeTab === 'create') ||
       (itemKey === 'review-prompts' && activeTab === 'review');
     return isActive

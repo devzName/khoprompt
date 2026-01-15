@@ -4,6 +4,9 @@ export const ROUTES = {
   PROMPT_DETAIL: '/prompt/:slug',
   PROMPT_DETAIL_PATH: (slug) => `/prompt/${slug}`,
   MY_PROMPTS: '/my-prompts',
+  MY_PROMPTS_DASHBOARD: '/my-prompts?tab=dashboard',
+  MY_PROMPTS_CREATE: '/my-prompts?tab=create',
+  MY_PROMPTS_REVIEW: '/my-prompts?tab=review',
   CREATE_PROMPT: '/my-prompts',
 };
 

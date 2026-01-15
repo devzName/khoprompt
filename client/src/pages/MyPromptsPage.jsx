@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
-import { FileTextOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { FileTextOutlined, PlusOutlined, CheckCircleOutlined, DashboardOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
+import { ROUTES } from '../constants/routes';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
+import DashboardOverview from '../components/DashboardOverview';
 import PromptsList from '../components/prompts/PromptsList';
 import ReviewPromptsList from '../components/prompts/ReviewPromptsList';
+import PromptDrawer from '../components/PromptDrawer';
 
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
@@ -23,19 +26,25 @@ const MyPromptsPage = () => {
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [pendingPrompts, setPendingPrompts] = useState([]);
+  const [allPrompts, setAllPrompts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [reviewCurrentPage, setReviewCurrentPage] = useState(1); // Thêm state cho review pagination
+  const [reviewCurrentPage, setReviewCurrentPage] = useState(1);
+  const [dashboardCurrentPage, setDashboardCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
-  const [totalPendingPrompts, setTotalPendingPrompts] = useState(0); // Thêm state cho total pending prompts
+  const [totalPendingPrompts, setTotalPendingPrompts] = useState(0);
+  const [totalAllPrompts, setTotalAllPrompts] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(null);
 
-  // Kiểm tra query parameter để set activeTab
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
     if (tabFromUrl === 'create') {
       setActiveTab('create');
       setEditingPrompt(null);
       form.resetFields();
+    } else if (tabFromUrl === 'dashboard' && user?.user_type === 'admin') {
+      setActiveTab('dashboard');
     } else if (tabFromUrl === 'review' && user?.user_type === 'admin') {
       setActiveTab('review');
     } else {
@@ -48,6 +57,10 @@ const MyPromptsPage = () => {
       setCurrentPage(1);
       setInitialLoading(true);
       fetchMyPrompts(1);
+    } else if (user?.user_type === 'admin' && activeTab === 'dashboard') {
+      setDashboardCurrentPage(1);
+      setInitialLoading(true);
+      fetchAllPrompts(1);
     } else if (user?.user_type === 'admin' && activeTab === 'review') {
       setReviewCurrentPage(1);
       fetchPendingPrompts(1);
@@ -103,6 +116,32 @@ const MyPromptsPage = () => {
     }
   };
 
+  const fetchAllPrompts = async (page = dashboardCurrentPage, search = '') => {
+    try {
+      setLoading(true);
+      const params = {
+        page: page,
+        limit: 12
+      };
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+      const response = await promptService.getAllPrompts(params);
+      setAllPrompts(response.data || response);
+      setTotalAllPrompts(response.pagination?.total || response.length);
+    } catch (error) {
+      console.error('Error fetching all prompts:', error);
+      notification.error({
+        message: t('common.error', 'Error'),
+        description: t('dashboard.errorFetching', 'Error fetching prompts'),
+        placement: 'topRight'
+      });
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
   const handleCreatePrompt = () => {
     setEditingPrompt(null);
     form.resetFields();
@@ -148,7 +187,7 @@ const MyPromptsPage = () => {
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
-      navigate('/my-prompts'); // Cập nhật URL
+      navigate(ROUTES.MY_PROMPTS);
       fetchMyPrompts(1);
     } catch (error) {
       console.error('Error saving prompt:', error);
@@ -259,16 +298,21 @@ const MyPromptsPage = () => {
     fetchMyPrompts(page);
   };
 
-  const handleReviewPageChange = (page) => {
-    setReviewCurrentPage(page);
-    fetchPendingPrompts(page);
+  const handleDashboardPageChange = (page) => {
+    setDashboardCurrentPage(page);
+    fetchAllPrompts(page);
+  };
+
+  const handleDashboardSearchSubmit = (value) => {
+    setSearchValue(value);
+    setDashboardCurrentPage(1);
+    fetchAllPrompts(1, value);
   };
 
   const handleLogout = () => {
     logout(() => setMobileMenuOpen(false));
   };
 
-  // Search function - chỉ gọi khi nhấn Enter hoặc click search button
   const handleSearchSubmit = (value) => {
     setSearchValue(value);
     setCurrentPage(1);
@@ -279,24 +323,45 @@ const MyPromptsPage = () => {
     setSearchValue(e.target.value);
   };
 
-  // Search function cho review prompts
   const handleReviewSearchSubmit = (value) => {
     setSearchValue(value);
     setReviewCurrentPage(1);
     fetchPendingPrompts(1, value);
   };
 
+  const handleReviewPageChange = (page) => {
+    setReviewCurrentPage(page);
+    fetchPendingPrompts(page);
+  };
+
+  const handleViewPrompt = (prompt) => {
+    setSelectedPrompt(prompt);
+    setDrawerOpen(true);
+  };
+
   const menuItems = [
+    ...(user?.user_type === 'admin' ? [{
+      key: 'dashboard', 
+      icon: <DashboardOutlined />, 
+      label: t('sidebar.dashboard', 'Dashboard'), 
+      action: () => {
+        setActiveTab('dashboard');
+        setCurrentPage(1);
+        setSearchValue('');
+        setInitialLoading(true);
+        navigate(ROUTES.MY_PROMPTS_DASHBOARD);
+      }
+    }] : []),
     { 
       key: 'my-prompts', 
       icon: <FileTextOutlined />, 
-      label: t('sidebar.myPrompts'), 
+      label: t('sidebar.myPrompts', 'Prompts của tôi'), 
       action: () => {
         setActiveTab('list');
         setCurrentPage(1);
-        setSearchValue(''); // Reset search khi chuyển tab
+        setSearchValue('');
         setInitialLoading(true);
-        navigate('/my-prompts'); // Cập nhật URL
+        navigate(ROUTES.MY_PROMPTS);
       }
     },
     { 
@@ -305,10 +370,9 @@ const MyPromptsPage = () => {
       label: t('myPrompts.createPrompt.title'), 
       action: () => {
         handleCreatePrompt();
-        navigate('/my-prompts?tab=create'); // Cập nhật URL
+        navigate(ROUTES.MY_PROMPTS_CREATE);
       }
     },
-    // Admin only menu
     ...(user?.user_type === 'admin' ? [{
       key: 'review-prompts',
       icon: <CheckCircleOutlined />,
@@ -316,9 +380,9 @@ const MyPromptsPage = () => {
       action: () => {
         setActiveTab('review');
         setReviewCurrentPage(1);
-        setSearchValue(''); // Reset search khi chuyển tab
+        setSearchValue('');
         fetchPendingPrompts(1);
-        navigate('/my-prompts?tab=review'); // Cập nhật URL
+        navigate(ROUTES.MY_PROMPTS_REVIEW);
       }
     }] : [])
   ];
@@ -350,7 +414,25 @@ const MyPromptsPage = () => {
       </Drawer>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {activeTab === 'list' ? (
+        {activeTab === 'dashboard' && user?.user_type === 'admin' ? (
+          <DashboardOverview
+            prompts={allPrompts}
+            loading={initialLoading}
+            searchValue={searchValue}
+            onSearchChange={handleSearchChange}
+            onSearchSubmit={handleDashboardSearchSubmit}
+            onEditPrompt={handleEditPrompt}
+            onDeletePrompt={handleDeletePrompt}
+            onSubmitPrompt={handleSubmitForReview}
+            onViewPrompt={handleViewPrompt}
+            pagination={{
+              current: dashboardCurrentPage,
+              total: totalAllPrompts,
+              pageSize: 12,
+              onChange: handleDashboardPageChange,
+            }}
+          />
+        ) : activeTab === 'list' ? (
           <PromptsList
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
@@ -399,13 +481,20 @@ const MyPromptsPage = () => {
             onSubmit={handleSubmitPrompt}
             onCancel={() => {
               setActiveTab('list');
-              navigate('/my-prompts'); // Cập nhật URL
+              navigate(ROUTES.MY_PROMPTS);
             }}
             onMenuClick={() => setMobileMenuOpen(true)}
             isEditing={!!editingPrompt}
           />
         )}
       </div>
+
+      <PromptDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        prompt={selectedPrompt}
+        currentUser={user}
+      />
     </div>
   );
 };

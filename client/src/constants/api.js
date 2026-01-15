@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     BASE: '/prompts',
     MY: '/prompts/my',
     PENDING: '/prompts/pending',
+    ALL: '/prompts/all',
     FEATURED: '/prompts/featured',
     BY_ID: (id) => `/prompts/${id}`,
     BY_SLUG: (slug) => `/prompts/slug/${slug}`,
@@ -19,6 +20,7 @@ export const API_ENDPOINTS = {
     LIKE: (id) => `/prompts/${id}/like`,
     DISLIKE: (id) => `/prompts/${id}/dislike`,
     FEED_LATEST: '/prompts/feed/latest',
+    VOTE: (id) => `/prompts/${id}/vote`,
   },
 
   VOTES: {
