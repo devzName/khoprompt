@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Table, Tag, Button, Space, Input } from 'antd';
 import { 
-  FileTextOutlined, 
   CheckCircleOutlined, 
-  ClockCircleOutlined, 
-  CloseCircleOutlined,
+  ClockCircleOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  SendOutlined
+  SendOutlined,
+  FolderOutlined,
+  FormOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
@@ -130,7 +130,7 @@ const DashboardOverview = ({
             onClick={() => onViewPrompt && onViewPrompt(record)}
             className="text-blue-600 hover:text-blue-700"
           >
-            Xem
+            {t('dashboard.actions.view', 'Xem')}
           </Button>
           
           <Button
@@ -141,7 +141,7 @@ const DashboardOverview = ({
             disabled={record.status === PROMPT_STATUS.PENDING || record.status === PROMPT_STATUS.REJECTED}
             className="text-green-600 hover:text-green-700"
           >
-            Sửa
+            {t('dashboard.actions.edit', 'Sửa')}
           </Button>
           
           {record.status === PROMPT_STATUS.DRAFT && (
@@ -152,7 +152,7 @@ const DashboardOverview = ({
               onClick={() => onSubmitPrompt && onSubmitPrompt(record.id)}
               className="text-purple-600 hover:text-purple-700"
             >
-              Gửi
+              {t('dashboard.actions.submit', 'Gửi')}
             </Button>
           )}
           
@@ -163,7 +163,7 @@ const DashboardOverview = ({
             icon={<DeleteOutlined />}
             onClick={() => onDeletePrompt && onDeletePrompt(record.id)}
           >
-            Xóa
+            {t('dashboard.actions.delete', 'Xóa')}
           </Button>
         </Space>
       ),
@@ -190,8 +190,8 @@ const DashboardOverview = ({
               <Statistic
                 title={t('dashboard.stats.total', 'Tổng số prompts')}
                 value={stats.total}
-                prefix={<FileTextOutlined className="text-blue-600" />}
-                valueStyle={{ color: '#1890ff' }}
+                prefix={<FolderOutlined style={{ color: '#1890ff' }} />}
+                styles={{ value: { color: '#1890ff' } }}
               />
             </Card>
           </Col>
@@ -201,8 +201,8 @@ const DashboardOverview = ({
               <Statistic
                 title={t('dashboard.stats.approved', 'Đã duyệt')}
                 value={stats.approved}
-                prefix={<CheckCircleOutlined className="text-green-600" />}
-                valueStyle={{ color: '#52c41a' }}
+                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                styles={{ value: { color: '#52c41a' } }}
               />
             </Card>
           </Col>
@@ -212,8 +212,8 @@ const DashboardOverview = ({
               <Statistic
                 title={t('dashboard.stats.pending', 'Chờ duyệt')}
                 value={stats.pending}
-                prefix={<ClockCircleOutlined className="text-orange-600" />}
-                valueStyle={{ color: '#fa8c16' }}
+                prefix={<ClockCircleOutlined style={{ color: '#fa8c16' }} />}
+                styles={{ value: { color: '#fa8c16' } }}
               />
             </Card>
           </Col>
@@ -223,8 +223,8 @@ const DashboardOverview = ({
               <Statistic
                 title={t('dashboard.stats.draft', 'Bản nháp')}
                 value={stats.draft}
-                prefix={<FileTextOutlined className="text-gray-600" />}
-                valueStyle={{ color: '#8c8c8c' }}
+                prefix={<FormOutlined style={{ color: '#8c8c8c' }} />}
+                styles={{ value: { color: '#8c8c8c' } }}
               />
             </Card>
           </Col>
@@ -252,7 +252,7 @@ const DashboardOverview = ({
             loading={loading}
             pagination={{
               ...pagination,
-              showTotal: (total) => `Tổng ${total} prompts`,
+              showTotal: (total) => t('dashboard.table.total', `Tổng ${total} prompts`, { total }),
               showSizeChanger: false,
             }}
             scroll={{ x: 1000 }}

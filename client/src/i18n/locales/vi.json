@@ -296,5 +296,31 @@
       "promptApproved": "Prompt đã được duyệt",
       "promptRejected": "Prompt bị từ chối"
     }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Quản lý và theo dõi prompts của bạn",
+    "searchPlaceholder": "Tìm kiếm prompts...",
+    "stats": {
+      "total": "Tổng số prompts",
+      "approved": "Đã duyệt",
+      "pending": "Chờ duyệt",
+      "draft": "Bản nháp"
+    },
+    "table": {
+      "title": "Tiêu đề",
+      "category": "Danh mục",
+      "status": "Trạng thái",
+      "views": "Lượt xem",
+      "created": "Ngày tạo",
+      "actions": "Thao tác",
+      "total": "Tổng {{total}} prompts"
+    },
+    "actions": {
+      "view": "Xem",
+      "edit": "Sửa",
+      "submit": "Gửi",
+      "delete": "Xóa"
+    }
   }
 }
