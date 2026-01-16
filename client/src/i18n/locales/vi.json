@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "view": "Xem",
     "edit": "Sửa",
@@ -198,7 +198,12 @@
   "categories": {
     "title": "Danh mục Prompts",
     "subtitle": "Khám phá prompts theo từng lĩnh vực chuyên môn",
-    "all": "Tất cả"
+    "all": "Tất cả",
+    "viewGrid": "Lưới",
+    "viewTree": "Cây",
+    "showMore": "Xem thêm",
+    "showLess": "Ẩn bớt",
+    "treeHint": "Click danh mục để xem tất cả, click tag (#) để lọc theo tag"
   },
   "footer": {
     "description": "Thư viện prompt AI chất lượng cao cho ChatGPT, Claude, Gemini và các AI tools khác. Tối ưu hóa công việc với prompt chuyên nghiệp.",

@@ -12,6 +12,10 @@ router = APIRouter()
 async def get_categories_stats(session: DbSession):
     return await PromptCategoryService.get_categories_with_stats(session)
 
+@router.get("/tree")
+async def get_categories_tree(session: DbSession):
+    return await PromptCategoryService.get_categories_with_tags(session)
+
 @router.get("/", response_model=list[PromptCategoryOut])
 async def get_all_categories(session: DbSession):
     return await PromptCategoryService.get_all_categories(session)

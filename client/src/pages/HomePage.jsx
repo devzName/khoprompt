@@ -11,7 +11,6 @@ import { promptService } from '../services/promptService';
 const HomePage = () => {
   const [latestPrompts, setLatestPrompts] = useState([]);
   const [featuredPrompts, setFeaturedPrompts] = useState([]);
-  const [loadingLatest, setLoadingLatest] = useState(true);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null); // null means "all"
   const [currentPage, setCurrentPage] = useState(1);

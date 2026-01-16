@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     BASE: '/prompt-categories',
     STATS: '/prompt-categories/stats',
+    TREE: '/prompt-categories/tree',
   },
 
   TAGS: '/prompt-tags',

@@ -336,5 +336,14 @@
       "submit": "Submit",
       "delete": "Delete"
     }
+  },
+  "categories": {
+    "title": "Prompt Categories",
+    "all": "All",
+    "viewGrid": "Grid",
+    "viewTree": "Tree",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "treeHint": "Click category to view all, click tag (#) to filter by tag"
   }
 }

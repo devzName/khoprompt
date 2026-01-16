@@ -19,3 +19,6 @@ class PromptCategory(AuditMixin, Base):
     
     # Relationship with prompts
     prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='category')
+    
+    # Relationship with tags
+    tags: Mapped[list['PromptTag']] = relationship('PromptTag', back_populates='category', cascade='all, delete-orphan')

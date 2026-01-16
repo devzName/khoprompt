@@ -20,23 +20,45 @@ cd server
 poetry run alembic upgrade head
 ```
 
+## Seed Data
+
+### Seed Tags (after migrations)
+```bash
+cd server
+poetry run python -m app.scripts.seed_tags
+```
+
+### Seed Mock Prompts
+```bash
+cd server
+poetry run python -m app.scripts.seed_mock_prompts
+```
+
+
 ## Run API
 
 ```bash
 cd server
 
-Bước 1: Stop & xoá volume
+# Bước 1: Stop & xoá volume
 docker compose down -v
 
-Bước 2: Start lại
+# Bước 2: Start lại
 docker compose up -d
 
+# Bước 3: Run server
 poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Seed from `client/src/data/mockPrompts.js`
+## Reset Database (if needed)
 
 ```bash
 cd server
-poetry run python -m app.scripts.seed_mock_prompts
+
+# Drop all tables and recreate
+poetry run alembic downgrade base
+poetry run alembic upgrade head
+
+# Seed data
+poetry run python -m app.scripts.seed_tags
 ```

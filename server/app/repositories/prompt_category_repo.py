@@ -1,5 +1,6 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.prompt_category import PromptCategory
 from app.models.prompt import Prompt
@@ -10,7 +11,6 @@ class PromptCategoryRepository:
 
     @staticmethod
     async def get_categories_with_counts(session: AsyncSession) -> list[dict]:
-        # Query to get categories with their approved prompt counts
         stmt = (
             select(
                 PromptCategory.id,
@@ -52,6 +52,16 @@ class PromptCategoryRepository:
     async def get_all(session: AsyncSession) -> list[PromptCategory]:
         stmt = (
             select(PromptCategory)
+            .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_categories_with_tags(session: AsyncSession) -> list[PromptCategory]:
+        stmt = (
+            select(PromptCategory)
+            .options(selectinload(PromptCategory.tags))
             .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
         )
         result = await session.execute(stmt)
