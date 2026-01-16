@@ -13,7 +13,6 @@ const PromptsTable = ({
   onSubmitPrompt,
   onEditPrompt,
   onDeletePrompt,
-  onViewPrompt,
   onApprovePrompt,
   onRejectPrompt,
   currentUser,
@@ -62,10 +61,6 @@ const PromptsTable = ({
           drawerBody.scrollTop = 0;
         }
       }, 100);
-    }
-
-    if (onViewPrompt) {
-      onViewPrompt(prompt);
     }
   };
 

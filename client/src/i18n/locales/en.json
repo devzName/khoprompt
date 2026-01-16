@@ -313,7 +313,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Manage and track your prompts",
+    "subtitle": "Manage and monitor all prompts in the system",
     "searchPlaceholder": "Search prompt...",
     "stats": {
       "total": "Total Prompts",

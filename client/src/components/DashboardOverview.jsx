@@ -19,13 +19,15 @@ const DashboardOverview = ({
   onEditPrompt,
   onDeletePrompt,
   onSubmitPrompt,
-  onViewPrompt,
+  onApprovePrompt,
+  onRejectPrompt,
   searchValue,
   onSearchChange,
   onSearchSubmit,
   pagination,
   onMenuClick,
-  onTableChange
+  onTableChange,
+  currentUser
 }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState({
@@ -52,7 +54,7 @@ const DashboardOverview = ({
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
         title={t('dashboard.title', 'Dashboard')}
-        description={t('dashboard.subtitle', 'Quản lý và theo dõi prompts của bạn')}
+        description={t('dashboard.subtitle', 'Quản lý và giám sát tất cả prompts trong hệ thống')}
         breadcrumb={t('dashboard.title', 'Dashboard')}
         onMenuClick={onMenuClick}
       >
@@ -125,7 +127,9 @@ const DashboardOverview = ({
             onSubmitPrompt={onSubmitPrompt}
             onEditPrompt={onEditPrompt}
             onDeletePrompt={onDeletePrompt}
-            onViewPrompt={onViewPrompt}
+            onApprovePrompt={onApprovePrompt}
+            onRejectPrompt={onRejectPrompt}
+            currentUser={currentUser}
             pagination={pagination}
             searchValue={searchValue}
             onTableChange={onTableChange}

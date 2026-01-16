@@ -313,7 +313,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Quản lý và theo dõi prompts của bạn",
+    "subtitle": "Quản lý và giám sát tất cả prompts trong hệ thống",
     "searchPlaceholder": "Tìm kiếm prompt...",
     "stats": {
       "total": "Tổng số prompts",

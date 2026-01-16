@@ -11,7 +11,6 @@ import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import DashboardOverview from '../components/DashboardOverview';
 import PromptsList from '../components/prompts/PromptsList';
-import ReviewPromptsList from '../components/prompts/ReviewPromptsList';
 import PromptDrawer from '../components/PromptDrawer';
 
 const MyPromptsPage = () => {
@@ -26,13 +25,10 @@ const MyPromptsPage = () => {
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [prompts, setPrompts] = useState([]);
-  const [pendingPrompts, setPendingPrompts] = useState([]);
   const [allPrompts, setAllPrompts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [reviewCurrentPage, setReviewCurrentPage] = useState(1);
   const [dashboardCurrentPage, setDashboardCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
-  const [totalPendingPrompts, setTotalPendingPrompts] = useState(0);
   const [totalAllPrompts, setTotalAllPrompts] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -55,8 +51,6 @@ const MyPromptsPage = () => {
       form.resetFields();
     } else if (tabFromUrl === 'dashboard' && user?.user_type === 'admin') {
       setActiveTab('dashboard');
-    } else if (tabFromUrl === 'review' && user?.user_type === 'admin') {
-      setActiveTab('review');
     } else {
       setActiveTab('list');
     }
@@ -77,9 +71,6 @@ const MyPromptsPage = () => {
       setDashboardFilters({ category: null, status: null });
       setDashboardSorter({ sortBy: 'created_at', sortOrder: 'desc' });
       fetchAllPrompts(1, '', { category: null, status: null }, { sortBy: 'created_at', sortOrder: 'desc' });
-    } else if (user?.user_type === 'admin' && activeTab === 'review') {
-      setReviewCurrentPage(1);
-      fetchPendingPrompts(1);
     }
   }, [user?.id, user?.user_type, activeTab]);
 
@@ -114,31 +105,6 @@ const MyPromptsPage = () => {
       });
     } finally {
       setInitialLoading(false);
-    }
-  };
-
-  const fetchPendingPrompts = async (page = reviewCurrentPage, search = '') => {
-    try {
-      setLoading(true);
-      const params = {
-        page: page,
-        limit: PAGINATION.PAGE_SIZE
-      };
-      if (search && search.trim()) {
-        params.search = search.trim();
-      }
-      const response = await promptService.getPendingPrompts(params);
-      setPendingPrompts(response.data || response);
-      setTotalPendingPrompts(response.pagination?.total || response.length);
-    } catch (error) {
-      console.error('Error fetching pending prompts:', error);
-      notification.error({
-        message: t('common.error', 'Error'),
-        description: t('reviewPrompts.errorFetching', 'Error fetching pending prompts'),
-        placement: 'topRight'
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -293,7 +259,7 @@ const MyPromptsPage = () => {
         description: t('reviewPrompts.approveSuccess', 'Prompt approved successfully'),
         placement: 'topRight'
       });
-      fetchPendingPrompts(reviewCurrentPage);
+      fetchAllPrompts(dashboardCurrentPage);
     } catch (error) {
       console.error('Error approving prompt:', error);
       notification.error({
@@ -316,7 +282,7 @@ const MyPromptsPage = () => {
         description: t('reviewPrompts.rejectSuccess', 'Prompt rejected successfully'),
         placement: 'topRight'
       });
-      fetchPendingPrompts(reviewCurrentPage);
+      fetchAllPrompts(dashboardCurrentPage);
     } catch (error) {
       console.error('Error rejecting prompt:', error);
       notification.error({
@@ -393,23 +359,6 @@ const MyPromptsPage = () => {
     setSearchValue(e.target.value);
   };
 
-  const handleReviewSearchSubmit = (value) => {
-    setSearchValue(value);
-    setReviewCurrentPage(1);
-    fetchPendingPrompts(1, value);
-  };
-
-  const handleReviewPageChange = (page) => {
-    setReviewCurrentPage(page);
-    fetchPendingPrompts(page);
-  };
-
-  const handleReviewTableChange = (tableFilters) => {
-    const newPage = tableFilters.page || 1;
-    setReviewCurrentPage(newPage);
-    fetchPendingPrompts(newPage, searchValue);
-  };
-
   const handleViewPrompt = (prompt) => {
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
@@ -448,19 +397,7 @@ const MyPromptsPage = () => {
         handleCreatePrompt();
         navigate(ROUTES.MY_PROMPTS_CREATE);
       }
-    },
-    ...(user?.user_type === 'admin' ? [{
-      key: 'review-prompts',
-      icon: <CheckCircleOutlined />,
-      label: t('sidebar.reviewPrompts'),
-      action: () => {
-        setActiveTab('review');
-        setReviewCurrentPage(1);
-        setSearchValue('');
-        fetchPendingPrompts(1);
-        navigate(ROUTES.MY_PROMPTS_REVIEW);
-      }
-    }] : [])
+    }
   ];
 
   return (
@@ -500,7 +437,9 @@ const MyPromptsPage = () => {
             onEditPrompt={handleEditPrompt}
             onDeletePrompt={handleDeletePrompt}
             onSubmitPrompt={handleSubmitForReview}
-            onViewPrompt={handleViewPrompt}
+            onApprovePrompt={handleApprovePrompt}
+            onRejectPrompt={handleRejectPrompt}
+            currentUser={user}
             onMenuClick={() => setMobileMenuOpen(true)}
             onTableChange={handleDashboardTableChange}
             pagination={{
@@ -526,26 +465,6 @@ const MyPromptsPage = () => {
             pagination={{
               current: currentPage,
               total: totalPrompts,
-              pageSize: PAGINATION.PAGE_SIZE,
-              showSizeChanger: false,
-              showQuickJumper: false,
-            }}
-          />
-        ) : activeTab === 'review' && user?.user_type === 'admin' ? (
-          <ReviewPromptsList
-            searchValue={searchValue}
-            onSearchChange={handleSearchChange}
-            onSearchSubmit={handleReviewSearchSubmit}
-            onMenuClick={() => setMobileMenuOpen(true)}
-            prompts={pendingPrompts}
-            loading={loading}
-            onApprovePrompt={handleApprovePrompt}
-            onRejectPrompt={handleRejectPrompt}
-            currentUser={user}
-            onTableChange={handleReviewTableChange}
-            pagination={{
-              current: reviewCurrentPage,
-              total: totalPendingPrompts,
               pageSize: PAGINATION.PAGE_SIZE,
               showSizeChanger: false,
               showQuickJumper: false,
