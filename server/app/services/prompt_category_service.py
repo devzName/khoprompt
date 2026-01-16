@@ -28,6 +28,8 @@ class PromptCategoryService:
     async def get_categories_with_tags(session: AsyncSession) -> list[dict]:
         categories = await PromptCategoryRepository.get_categories_with_tags(session)
         stats = await PromptCategoryRepository.get_categories_with_counts(session)
+        tag_counts = await PromptCategoryRepository.get_tag_prompt_counts(session)
+        
         stats_map = {stat['id']: stat['prompt_count'] for stat in stats}
         
         return [
@@ -41,7 +43,7 @@ class PromptCategoryService:
                         "id": tag.id,
                         "name": tag.name,
                         "slug": tag.name.lower().replace(' ', '-'),
-                        "count": 0
+                        "count": tag_counts.get(tag.id, 0)
                     }
                     for tag in cat.tags
                 ]

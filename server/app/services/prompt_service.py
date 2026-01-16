@@ -146,12 +146,12 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
+    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
         # Get total count
-        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search, tag)
+        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search, tag, tag_id)
         
         # Get paginated data
-        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, tag, page, limit)
+        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, tag, tag_id, page, limit)
         
         # Calculate pagination metadata
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
@@ -207,9 +207,9 @@ class PromptService:
         )
 
     @staticmethod
-    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None) -> list[dict]:
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None, tag_id: int | None = None) -> list[dict]:
         """Get featured prompts based on engagement metrics"""
-        prompts = await PromptRepository.get_featured_prompts(session, limit, category_id)
+        prompts = await PromptRepository.get_featured_prompts(session, limit, category_id, tag_id)
         
         return [
             {

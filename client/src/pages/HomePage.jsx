@@ -13,16 +13,33 @@ const HomePage = () => {
   const [featuredPrompts, setFeaturedPrompts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null); // null means "all"
+  const [selectedTag, setSelectedTag] = useState(null); // Track selected tag
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
 
   const [initialLoading, setInitialLoading] = useState(true);
 
+  const handleCategorySelect = (selection) => {
+    if (!selection) {
+      // "All" selected
+      setSelectedCategory(null);
+      setSelectedTag(null);
+    } else if (selection.isTag) {
+      // Tag selected
+      setSelectedTag(selection);
+      setSelectedCategory({ id: selection.categoryId }); // Keep category for context
+    } else {
+      // Category selected
+      setSelectedCategory(selection);
+      setSelectedTag(null);
+    }
+  };
+
   useEffect(() => {
-    // Reset to page 1 when category changes
+    // Reset to page 1 when category or tag changes
     setCurrentPage(1);
-    setInitialLoading(true); // Show loading when category changes
-  }, [selectedCategory]);
+    setInitialLoading(true); // Show loading when category/tag changes
+  }, [selectedCategory, selectedTag]);
 
   useEffect(() => {
     const fetchLatestPrompts = async () => {
@@ -33,6 +50,9 @@ const HomePage = () => {
         };
         if (selectedCategory) {
           params.category_id = selectedCategory.id;
+        }
+        if (selectedTag) {
+          params.tag_id = selectedTag.id;
         }
         const response = await promptService.getPrompts(params);
         setLatestPrompts(response.data || response); // Handle both paginated and non-paginated response
@@ -45,14 +65,20 @@ const HomePage = () => {
     };
 
     fetchLatestPrompts();
-  }, [selectedCategory, currentPage]);
+  }, [selectedCategory, selectedTag, currentPage]);
 
   useEffect(() => {
     const fetchFeaturedPrompts = async () => {
       try {
         setLoadingFeatured(true);
-        const categoryId = selectedCategory ? selectedCategory.id : null;
-        const response = await promptService.getFeaturedPrompts(6, categoryId);
+        const params = { limit: 6 };
+        if (selectedCategory) {
+          params.category_id = selectedCategory.id;
+        }
+        if (selectedTag) {
+          params.tag_id = selectedTag.id;
+        }
+        const response = await promptService.getFeaturedPrompts(params.limit, params.category_id, params.tag_id);
         setFeaturedPrompts(response);
       } catch (error) {
         console.error('Failed to fetch featured prompts:', error);
@@ -62,7 +88,7 @@ const HomePage = () => {
     };
 
     fetchFeaturedPrompts();
-  }, [selectedCategory]); // Only fetch when category changes, not when page changes
+  }, [selectedCategory, selectedTag]); // Fetch when category or tag changes
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -73,7 +99,7 @@ const HomePage = () => {
       <Hero />
       <Categories 
         selectedCategory={selectedCategory}
-        onCategorySelect={setSelectedCategory}
+        onCategorySelect={handleCategorySelect}
       />
       <FeaturedPrompts prompts={featuredPrompts} loading={loadingFeatured} />
       <LatestPrompts

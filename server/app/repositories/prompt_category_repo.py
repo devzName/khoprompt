@@ -80,6 +80,28 @@ class PromptCategoryRepository:
         return result.scalars().all()
 
     @staticmethod
+    async def get_tag_prompt_counts(session: AsyncSession) -> dict[int, int]:
+        """Get count of approved prompts for each tag"""
+        from app.models.prompt import prompt_tags_association
+        from app.models.prompt_tag import PromptTag
+        
+        stmt = (
+            select(
+                prompt_tags_association.c.tag_id,
+                func.count(prompt_tags_association.c.prompt_id).label('prompt_count')
+            )
+            .select_from(prompt_tags_association)
+            .join(Prompt, prompt_tags_association.c.prompt_id == Prompt.id)
+            .where(Prompt.status == PromptStatus.APPROVED)
+            .group_by(prompt_tags_association.c.tag_id)
+        )
+        
+        result = await session.execute(stmt)
+        rows = result.all()
+        
+        return {row.tag_id: row.prompt_count for row in rows}
+
+    @staticmethod
     async def get_by_id(session: AsyncSession, category_id: int) -> PromptCategory | None:
         stmt = select(PromptCategory).where(PromptCategory.id == category_id)
         result = await session.execute(stmt)

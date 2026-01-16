@@ -36,6 +36,27 @@ def slugify(text: str) -> str:
 create_slug = slugify
 
 
+def ensure_unique_slug(base_slug: str, existing_slugs: list[str]) -> str:
+    """
+    Generate a unique slug by appending numbers if slug already exists in the list
+    
+    Args:
+        base_slug: The base slug to start with
+        existing_slugs: List of existing slugs to check against
+    
+    Returns:
+        A unique slug
+    """
+    slug = base_slug
+    counter = 1
+    
+    while slug in existing_slugs:
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    
+    return slug
+
+
 async def generate_unique_slug(base_slug: str, check_exists_func, max_attempts: int = 100) -> str:
     """
     Generate a unique slug by appending numbers if slug already exists
@@ -56,7 +77,3 @@ async def generate_unique_slug(base_slug: str, check_exists_func, max_attempts: 
         counter += 1
     
     return slug
-
-
-# Alias for backward compatibility
-ensure_unique_slug = generate_unique_slug

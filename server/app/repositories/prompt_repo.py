@@ -74,7 +74,7 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None) -> int:
+    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None) -> int:
         stmt = (
             select(func.count(Prompt.id))
             .where(Prompt.status == PromptStatus.APPROVED)
@@ -89,12 +89,16 @@ class PromptRepository:
         if tag is not None:
             # Join with prompt_tags_association and PromptTag to filter by tag name
             stmt = stmt.join(Prompt.tags).where(PromptTag.name.ilike(f"%{tag}%"))
+        
+        if tag_id is not None:
+            # Join with prompt_tags_association and PromptTag to filter by tag id
+            stmt = stmt.join(Prompt.tags).where(PromptTag.id == tag_id)
             
         result = await session.execute(stmt)
         return result.scalar() or 0
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
         offset = (page - 1) * limit
         
         stmt = (
@@ -116,6 +120,10 @@ class PromptRepository:
         if tag is not None:
             # Join with prompt_tags_association and PromptTag to filter by tag name
             stmt = stmt.join(Prompt.tags).where(PromptTag.name.ilike(f"%{tag}%"))
+        
+        if tag_id is not None:
+            # Join with prompt_tags_association and PromptTag to filter by tag id
+            stmt = stmt.join(Prompt.tags).where(PromptTag.id == tag_id)
             
         stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
         result = await session.execute(stmt)
@@ -249,7 +257,7 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
-    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None) -> list[Prompt]:
+    async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None, tag_id: int | None = None) -> list[Prompt]:
         """Get featured prompts based on engagement metrics (likes, views) and recency"""
         stmt = (
             select(Prompt)
@@ -263,6 +271,10 @@ class PromptRepository:
         
         if category_id is not None:
             stmt = stmt.where(Prompt.category_id == category_id)
+        
+        if tag_id is not None:
+            # Join with prompt_tags_association and PromptTag to filter by tag id
+            stmt = stmt.join(Prompt.tags).where(PromptTag.id == tag_id)
             
         stmt = stmt.order_by(
             # Order by engagement score: (like_count * 2 + view_count) descending
