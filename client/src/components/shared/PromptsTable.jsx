@@ -344,6 +344,8 @@ const PromptsTable = ({
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}
         currentUser={currentUser}
+        onApprove={onApprovePrompt}
+        onReject={onRejectPrompt}
       />
     </>
   );
