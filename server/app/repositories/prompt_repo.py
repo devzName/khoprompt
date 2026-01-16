@@ -5,6 +5,7 @@ from uuid import UUID
 
 from app.models.prompt import Prompt
 from app.models.prompt_tag import PromptTag
+from app.models.prompt_category import PromptCategory
 from app.constants.prompt_status import PromptStatus
 from app.utils.slug import create_slug, ensure_unique_slug
 
@@ -121,17 +122,39 @@ class PromptRepository:
         return result.scalars().all()
 
     @staticmethod
-    async def get_user_prompts_count(session: AsyncSession, user_id: UUID, search: str | None = None) -> int:
+    async def get_user_prompts_count(
+        session: AsyncSession, 
+        user_id: UUID, 
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None
+    ) -> int:
         stmt = select(func.count(Prompt.id)).where(Prompt.user_id == user_id)
         
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+        
+        if category is not None:
+            stmt = stmt.join(Prompt.category).where(PromptCategory.name == category)
+        
+        if status is not None:
+            stmt = stmt.where(Prompt.status == status)
             
         result = await session.execute(stmt)
         return result.scalar() or 0
 
     @staticmethod
-    async def get_user_prompts_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9, search: str | None = None) -> list[Prompt]:
+    async def get_user_prompts_paginated(
+        session: AsyncSession, 
+        user_id: UUID, 
+        page: int = 1, 
+        limit: int = 9, 
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str = "desc"
+    ) -> list[Prompt]:
         offset = (page - 1) * limit
         
         stmt = (
@@ -144,10 +167,34 @@ class PromptRepository:
             .where(Prompt.user_id == user_id)
         )
         
+        # Search filter
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+        
+        # Category filter
+        if category is not None:
+            stmt = stmt.join(Prompt.category).where(PromptCategory.name == category)
+        
+        # Status filter
+        if status is not None:
+            stmt = stmt.where(Prompt.status == status)
+        
+        # Sorting
+        if sort_by == "title":
+            order_col = Prompt.title
+        elif sort_by == "view_count":
+            order_col = Prompt.view_count
+        elif sort_by == "created_at":
+            order_col = Prompt.created_at
+        else:
+            order_col = Prompt.created_at  # default
+        
+        if sort_order == "asc":
+            stmt = stmt.order_by(order_col.asc())
+        else:
+            stmt = stmt.order_by(order_col.desc())
             
-        stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
+        stmt = stmt.offset(offset).limit(limit)
         result = await session.execute(stmt)
         return result.scalars().all()
 
@@ -265,3 +312,77 @@ class PromptRepository:
     async def delete(session: AsyncSession, prompt: Prompt) -> None:
         await session.delete(prompt)
         await session.commit()
+
+    @staticmethod
+    async def get_all_prompts_count(
+        session: AsyncSession,
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None
+    ) -> int:
+        stmt = select(func.count(Prompt.id))
+        
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+        
+        if category is not None:
+            stmt = stmt.join(Prompt.category).where(PromptCategory.name == category)
+        
+        if status is not None:
+            stmt = stmt.where(Prompt.status == status)
+            
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
+    async def get_all_prompts_paginated(
+        session: AsyncSession,
+        page: int = 1,
+        limit: int = 25,
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str = "desc"
+    ) -> list[Prompt]:
+        offset = (page - 1) * limit
+        
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+        )
+        
+        # Search filter
+        if search is not None:
+            stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
+        
+        # Category filter
+        if category is not None:
+            stmt = stmt.join(Prompt.category).where(PromptCategory.name == category)
+        
+        # Status filter
+        if status is not None:
+            stmt = stmt.where(Prompt.status == status)
+        
+        # Sorting
+        if sort_by == "title":
+            order_col = Prompt.title
+        elif sort_by == "view_count":
+            order_col = Prompt.view_count
+        elif sort_by == "created_at":
+            order_col = Prompt.created_at
+        else:
+            order_col = Prompt.created_at  # default
+        
+        if sort_order == "asc":
+            stmt = stmt.order_by(order_col.asc())
+        else:
+            stmt = stmt.order_by(order_col.desc())
+            
+        stmt = stmt.offset(offset).limit(limit)
+        result = await session.execute(stmt)
+        return result.scalars().all()

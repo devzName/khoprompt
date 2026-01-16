@@ -90,8 +90,22 @@
       "DRAFT": "Draft",
       "SUBMITTED": "Pending",
       "APPROVED": "Approved",
-      "REJECTED": "Rejected",
-      "ARCHIVED": "Archived"
+      "REJECTED": "Rejected"
+    },
+    "table": {
+      "title": "Title",
+      "category": "Category",
+      "status": "Status",
+      "views": "Views",
+      "created": "Created",
+      "actions": "Actions",
+      "total": "Total {{total}} prompts"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "submit": "Submit",
+      "delete": "Delete"
     },
     "createPrompt": {
       "title": "Create new prompt",
@@ -300,7 +314,7 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Manage and track your prompts",
-    "searchPlaceholder": "Search prompts...",
+    "searchPlaceholder": "Search prompt...",
     "stats": {
       "total": "Total Prompts",
       "approved": "Approved",

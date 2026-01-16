@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Button, Space, Input } from 'antd';
+import { Card, Row, Col, Statistic, Input } from 'antd';
 import { 
   CheckCircleOutlined, 
   ClockCircleOutlined,
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SendOutlined,
   FolderOutlined,
   FormOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
+import { PROMPT_STATUS } from '../constants/promptStatus';
+import PromptsTable from './shared/PromptsTable';
+import PageHeader from './shared/PageHeader';
 
 const { Search } = Input;
 
@@ -25,7 +23,9 @@ const DashboardOverview = ({
   searchValue,
   onSearchChange,
   onSearchSubmit,
-  pagination
+  pagination,
+  onMenuClick,
+  onTableChange
 }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState({
@@ -48,218 +48,89 @@ const DashboardOverview = ({
     setStats(newStats);
   }, [prompts]);
 
-  const columns = [
-    {
-      title: t('dashboard.table.title', 'Tiêu đề'),
-      dataIndex: 'title',
-      key: 'title',
-      width: '30%',
-      render: (text, record) => (
-        <div>
-          <div className="font-semibold text-gray-900 text-sm mb-1">
-            {text}
-          </div>
-          <div className="text-gray-500 text-xs line-clamp-1">
-            {record.description}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: t('dashboard.table.category', 'Danh mục'),
-      dataIndex: 'category',
-      key: 'category',
-      width: '15%',
-      render: (category) => (
-        <span className="text-sm text-gray-700">
-          {category?.name || '-'}
-        </span>
-      ),
-    },
-    {
-      title: t('dashboard.table.status', 'Trạng thái'),
-      dataIndex: 'status',
-      key: 'status',
-      width: '12%',
-      align: 'center',
-      render: (status) => (
-        <Tag 
-          color={PROMPT_STATUS_COLORS[status] || 'default'}
-          className="rounded-full px-3 py-1 text-xs font-medium"
-        >
-          {getStatusLabel(status, t)}
-        </Tag>
-      ),
-    },
-    {
-      title: t('dashboard.table.views', 'Lượt xem'),
-      dataIndex: 'view_count',
-      key: 'view_count',
-      width: '10%',
-      align: 'center',
-      render: (count) => (
-        <div className="flex items-center justify-center gap-1 text-gray-600 text-sm">
-          <EyeOutlined className="text-gray-400" />
-          <span>{count || 0}</span>
-        </div>
-      ),
-    },
-    {
-      title: t('dashboard.table.created', 'Ngày tạo'),
-      dataIndex: 'created_at',
-      key: 'created_at',
-      width: '13%',
-      align: 'center',
-      render: (date) => (
-        <div className="text-xs text-gray-600">
-          {new Date(date).toLocaleDateString('vi-VN')}
-        </div>
-      ),
-    },
-    {
-      title: t('dashboard.table.actions', 'Thao tác'),
-      key: 'actions',
-      width: '20%',
-      align: 'center',
-      render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="link"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => onViewPrompt && onViewPrompt(record)}
-            className="text-blue-600 hover:text-blue-700"
-          >
-            {t('dashboard.actions.view', 'Xem')}
-          </Button>
-          
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onEditPrompt && onEditPrompt(record)}
-            disabled={record.status === PROMPT_STATUS.PENDING || record.status === PROMPT_STATUS.REJECTED}
-            className="text-green-600 hover:text-green-700"
-          >
-            {t('dashboard.actions.edit', 'Sửa')}
-          </Button>
-          
-          {record.status === PROMPT_STATUS.DRAFT && (
-            <Button
-              type="link"
-              size="small"
-              icon={<SendOutlined />}
-              onClick={() => onSubmitPrompt && onSubmitPrompt(record.id)}
-              className="text-purple-600 hover:text-purple-700"
-            >
-              {t('dashboard.actions.submit', 'Gửi')}
-            </Button>
-          )}
-          
-          <Button
-            type="link"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => onDeletePrompt && onDeletePrompt(record.id)}
-          >
-            {t('dashboard.actions.delete', 'Xóa')}
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('dashboard.title', 'Dashboard')}
-          </h1>
-          <p className="text-gray-600">
-            {t('dashboard.subtitle', 'Quản lý và theo dõi prompts của bạn')}
-          </p>
-        </div>
-
-        {/* Statistics Cards */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <Statistic
-                title={t('dashboard.stats.total', 'Tổng số prompts')}
-                value={stats.total}
-                prefix={<FolderOutlined style={{ color: '#1890ff' }} />}
-                styles={{ value: { color: '#1890ff' } }}
-              />
-            </Card>
-          </Col>
-          
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <Statistic
-                title={t('dashboard.stats.approved', 'Đã duyệt')}
-                value={stats.approved}
-                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-                styles={{ value: { color: '#52c41a' } }}
-              />
-            </Card>
-          </Col>
-          
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <Statistic
-                title={t('dashboard.stats.pending', 'Chờ duyệt')}
-                value={stats.pending}
-                prefix={<ClockCircleOutlined style={{ color: '#fa8c16' }} />}
-                styles={{ value: { color: '#fa8c16' } }}
-              />
-            </Card>
-          </Col>
-          
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <Statistic
-                title={t('dashboard.stats.draft', 'Bản nháp')}
-                value={stats.draft}
-                prefix={<FormOutlined style={{ color: '#8c8c8c' }} />}
-                styles={{ value: { color: '#8c8c8c' } }}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Search Bar */}
-        <div className="mb-4">
+    <div className="flex-1 flex flex-col h-full">
+      <PageHeader
+        title={t('dashboard.title', 'Dashboard')}
+        description={t('dashboard.subtitle', 'Quản lý và theo dõi prompts của bạn')}
+        breadcrumb={t('dashboard.title', 'Dashboard')}
+        onMenuClick={onMenuClick}
+      >
+        <div className="relative flex-1 max-w-md">
           <Search
-            placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompts...')}
+            placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompt...')}
             value={searchValue}
             onChange={onSearchChange}
             onSearch={onSearchSubmit}
+            className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
             size="large"
             allowClear
-            className="max-w-md"
           />
         </div>
+      </PageHeader>
 
-        {/* Prompts Table */}
-        <Card className="shadow-sm">
-          <Table
-            columns={columns}
-            dataSource={prompts}
-            rowKey="id"
+      <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="w-full p-4 sm:p-6">
+          {/* Statistics Cards */}
+          <Row gutter={[16, 16]} className="mb-6">
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <Statistic
+                  title={t('dashboard.stats.total', 'Tổng số prompts')}
+                  value={stats.total}
+                  prefix={<FolderOutlined style={{ color: '#1890ff' }} />}
+                  styles={{ value: { color: '#1890ff' } }}
+                />
+              </Card>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <Statistic
+                  title={t('dashboard.stats.approved', 'Đã duyệt')}
+                  value={stats.approved}
+                  prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                  styles={{ value: { color: '#52c41a' } }}
+                />
+              </Card>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <Statistic
+                  title={t('dashboard.stats.pending', 'Chờ duyệt')}
+                  value={stats.pending}
+                  prefix={<ClockCircleOutlined style={{ color: '#fa8c16' }} />}
+                  styles={{ value: { color: '#fa8c16' } }}
+                />
+              </Card>
+            </Col>
+            
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <Statistic
+                  title={t('dashboard.stats.draft', 'Bản nháp')}
+                  value={stats.draft}
+                  prefix={<FormOutlined style={{ color: '#8c8c8c' }} />}
+                  styles={{ value: { color: '#8c8c8c' } }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Prompts Table */}
+          <PromptsTable
+            prompts={prompts}
             loading={loading}
-            pagination={{
-              ...pagination,
-              showTotal: (total) => t('dashboard.table.total', `Tổng ${total} prompts`, { total }),
-              showSizeChanger: false,
-            }}
-            scroll={{ x: 1000 }}
-            className="dashboard-table"
-            rowClassName="hover:bg-gray-50 transition-colors"
+            onSubmitPrompt={onSubmitPrompt}
+            onEditPrompt={onEditPrompt}
+            onDeletePrompt={onDeletePrompt}
+            onViewPrompt={onViewPrompt}
+            pagination={pagination}
+            searchValue={searchValue}
+            onTableChange={onTableChange}
           />
-        </Card>
+        </div>
       </div>
     </div>
   );

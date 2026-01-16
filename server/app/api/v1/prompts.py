@@ -40,16 +40,58 @@ async def get_pending_prompts(
     result = await PromptService.get_pending_prompts_paginated(session, page, limit, search)
     return result
 
+@router.get("/all", response_model=PaginatedResponse[PromptWithDetails])
+async def get_all_prompts(
+    session: DbSession,
+    current_user: User = Depends(get_current_user),
+    page: int = 1,
+    limit: int = 25,
+    search: str | None = None,
+    category: str | None = None,
+    status: str | None = None,
+    sort_by: str | None = None,
+    sort_order: str = "desc"
+):
+    """Get all prompts for admin dashboard (admin only)"""
+    if current_user.user_type != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await PromptService.get_all_prompts_paginated(
+        session,
+        page,
+        limit,
+        search,
+        category,
+        status,
+        sort_by,
+        sort_order
+    )
+    return result
+
 @router.get("/my", response_model=PaginatedResponse[PromptWithDetails])
 async def get_my_prompts(
     session: DbSession,
     current_user: User = Depends(get_current_user),
     page: int = 1,
     limit: int = 9,
-    search: str | None = None
+    search: str | None = None,
+    category: str | None = None,
+    status: str | None = None,
+    sort_by: str | None = None,
+    sort_order: str = "desc"
 ):
     """Get current user's prompts (requires authentication)"""
-    result = await PromptService.get_user_prompts_with_details_paginated(session, current_user.id, page, limit, search)
+    result = await PromptService.get_user_prompts_with_details_paginated(
+        session, 
+        current_user.id, 
+        page, 
+        limit, 
+        search,
+        category,
+        status,
+        sort_by,
+        sort_order
+    )
     return result
 
 @router.get("/featured", response_model=list[PromptWithDetails])

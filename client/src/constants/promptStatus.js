@@ -2,24 +2,21 @@ export const PROMPT_STATUS = {
   PENDING: 'pending',
   APPROVED: 'approved', 
   REJECTED: 'rejected',
-  DRAFT: 'draft',
-  ARCHIVED: 'archived'
+  DRAFT: 'draft'
 };
 
 export const PROMPT_STATUS_TRANSLATION_MAP = {
   'pending': 'SUBMITTED',
   'approved': 'APPROVED',
   'rejected': 'REJECTED',
-  'draft': 'DRAFT',
-  'archived': 'ARCHIVED'
+  'draft': 'DRAFT'
 };
 
 export const PROMPT_STATUS_COLORS = {
   [PROMPT_STATUS.PENDING]: 'orange',
   [PROMPT_STATUS.APPROVED]: 'green',
   [PROMPT_STATUS.REJECTED]: 'red',
-  [PROMPT_STATUS.DRAFT]: 'default',
-  [PROMPT_STATUS.ARCHIVED]: 'gray'
+  [PROMPT_STATUS.DRAFT]: 'default'
 };
 
 export const getStatusLabel = (status, t) => {

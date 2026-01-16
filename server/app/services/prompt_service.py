@@ -249,12 +249,24 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_user_prompts_with_details_paginated(session: AsyncSession, user_id: UUID, page: int = 1, limit: int = 9, search: str | None = None) -> PaginatedResponse:
+    async def get_user_prompts_with_details_paginated(
+        session: AsyncSession, 
+        user_id: UUID, 
+        page: int = 1, 
+        limit: int = 9, 
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str = "desc"
+    ) -> PaginatedResponse:
         # Get total count
-        total_count = await PromptRepository.get_user_prompts_count(session, user_id, search)
+        total_count = await PromptRepository.get_user_prompts_count(session, user_id, search, category, status)
         
         # Get paginated data
-        prompts = await PromptRepository.get_user_prompts_paginated(session, user_id, page, limit, search)
+        prompts = await PromptRepository.get_user_prompts_paginated(
+            session, user_id, page, limit, search, category, status, sort_by, sort_order
+        )
         
         # Calculate pagination metadata
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
@@ -345,6 +357,79 @@ class PromptService:
                     "full_name": prompt.user.full_name,
                     "email": prompt.user.email,
                     "avatar_url": prompt.user.avatar_url
+                } if prompt.user else None,
+                "category": {
+                    "id": prompt.category.id,
+                    "name": prompt.category.name,
+                    "slug": prompt.category.slug
+                } if prompt.category else None,
+                "tags": [
+                    {"id": tag.id, "name": tag.name} 
+                    for tag in prompt.tags
+                ]
+            }
+            for prompt in prompts
+        ]
+        
+        return PaginatedResponse(
+            data=prompts_data,
+            pagination=PaginationMeta(
+                current_page=page,
+                per_page=limit,
+                total=total_count,
+                total_pages=total_pages,
+                has_next=has_next,
+                has_prev=has_prev
+            )
+        )
+
+    @staticmethod
+    async def get_all_prompts_paginated(
+        session: AsyncSession,
+        page: int = 1,
+        limit: int = 25,
+        search: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str = "desc"
+    ) -> PaginatedResponse:
+        # Get total count
+        total_count = await PromptRepository.get_all_prompts_count(session, search, category, status)
+        
+        # Get paginated data
+        prompts = await PromptRepository.get_all_prompts_paginated(
+            session, page, limit, search, category, status, sort_by, sort_order
+        )
+        
+        # Calculate pagination metadata
+        total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        # Format prompts data
+        prompts_data = [
+            {
+                "id": prompt.id,
+                "title": prompt.title,
+                "slug": prompt.slug,
+                "description": prompt.description,
+                "content": prompt.content,
+                "full_description": prompt.full_description,
+                "status": prompt.status,
+                "category_id": prompt.category_id,
+                "user_id": str(prompt.user_id),
+                "view_count": prompt.view_count,
+                "like_count": prompt.like_count,
+                "dislike_count": prompt.dislike_count,
+                "created_at": prompt.created_at,
+                "updated_at": prompt.updated_at,
+                "user": {
+                    "id": str(prompt.user.id),
+                    "full_name": prompt.user.full_name,
+                    "email": prompt.user.email,
+                    "avatar_url": prompt.user.avatar_url,
+                    "user_type": prompt.user.user_type
                 } if prompt.user else None,
                 "category": {
                     "id": prompt.category.id,

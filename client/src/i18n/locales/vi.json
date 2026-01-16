@@ -81,8 +81,7 @@
       "DRAFT": "Nháp",
       "SUBMITTED": "Chờ duyệt",
       "APPROVED": "Đã duyệt",
-      "REJECTED": "Từ chối",
-      "ARCHIVED": "Lưu trữ"
+      "REJECTED": "Từ chối"
     },
     "submitSuccess": "Gửi duyệt thành công!",
     "submitError": "Gửi duyệt thất bại",
@@ -93,6 +92,21 @@
     "deleteConfirmOk": "Có, Xóa",
     "deleteConfirmCancel": "Hủy",
     "errorFetching": "Lỗi khi tải danh sách prompts",
+    "table": {
+      "title": "Tiêu đề",
+      "category": "Danh mục",
+      "status": "Trạng thái",
+      "views": "Lượt xem",
+      "created": "Ngày tạo",
+      "actions": "Thao tác",
+      "total": "Tổng {{total}} prompts"
+    },
+    "actions": {
+      "view": "Xem",
+      "edit": "Sửa",
+      "submit": "Gửi",
+      "delete": "Xóa"
+    },
     "createPrompt": {
       "title": "Tạo prompt mới",
       "description": "Tạo và chia sẻ prompt hữu ích đến mọi người trong cộng đồng",
@@ -300,7 +314,7 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Quản lý và theo dõi prompts của bạn",
-    "searchPlaceholder": "Tìm kiếm prompts...",
+    "searchPlaceholder": "Tìm kiếm prompt...",
     "stats": {
       "total": "Tổng số prompts",
       "approved": "Đã duyệt",

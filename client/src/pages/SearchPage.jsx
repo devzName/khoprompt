@@ -7,6 +7,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
 import { promptService } from '../services/promptService';
+import { PAGINATION } from '../constants/pagination';
 
 const SearchPage = () => {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ const SearchPage = () => {
           search: isTagSearch ? undefined : query,
           tag: isTagSearch ? query : undefined,
           page: currentPage, 
-          limit: 12 
+          limit: PAGINATION.PAGE_SIZE 
         });
         
         setPrompts(response.data || response);

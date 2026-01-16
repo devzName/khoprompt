@@ -6,6 +6,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
+import { PAGINATION } from '../constants/pagination';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import DashboardOverview from '../components/DashboardOverview';
@@ -36,6 +37,15 @@ const MyPromptsPage = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
+  
+  // Filter and sort states
+  const [filters, setFilters] = useState({ category: null, status: null });
+  const [sorter, setSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
+  const [dashboardFilters, setDashboardFilters] = useState({ category: null, status: null });
+  const [dashboardSorter, setDashboardSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
+  
+  // Flag to prevent double API calls on initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
@@ -56,25 +66,41 @@ const MyPromptsPage = () => {
     if (user?.id && activeTab === 'list') {
       setCurrentPage(1);
       setInitialLoading(true);
-      fetchMyPrompts(1);
+      // Reset filters and sorter to default when switching tabs
+      setFilters({ category: null, status: null });
+      setSorter({ sortBy: 'created_at', sortOrder: 'desc' });
+      fetchMyPrompts(1, '', { category: null, status: null }, { sortBy: 'created_at', sortOrder: 'desc' });
     } else if (user?.user_type === 'admin' && activeTab === 'dashboard') {
       setDashboardCurrentPage(1);
       setInitialLoading(true);
-      fetchAllPrompts(1);
+      // Reset filters and sorter to default when switching tabs
+      setDashboardFilters({ category: null, status: null });
+      setDashboardSorter({ sortBy: 'created_at', sortOrder: 'desc' });
+      fetchAllPrompts(1, '', { category: null, status: null }, { sortBy: 'created_at', sortOrder: 'desc' });
     } else if (user?.user_type === 'admin' && activeTab === 'review') {
       setReviewCurrentPage(1);
       fetchPendingPrompts(1);
     }
   }, [user?.id, user?.user_type, activeTab]);
 
-  const fetchMyPrompts = async (page = currentPage, search = searchValue) => {
+  const fetchMyPrompts = async (page = currentPage, search = searchValue, filterParams = filters, sortParams = sorter) => {
     try {
       const params = {
         page: page,
-        limit: 12
+        limit: PAGINATION.PAGE_SIZE
       };
       if (search && search.trim()) {
         params.search = search.trim();
+      }
+      if (filterParams.category) {
+        params.category = filterParams.category;
+      }
+      if (filterParams.status) {
+        params.status = filterParams.status;
+      }
+      if (sortParams.sortBy) {
+        params.sort_by = sortParams.sortBy;
+        params.sort_order = sortParams.sortOrder;
       }
       const response = await promptService.getMyPrompts(params);
       setPrompts(response.data || response);
@@ -96,7 +122,7 @@ const MyPromptsPage = () => {
       setLoading(true);
       const params = {
         page: page,
-        limit: 12
+        limit: PAGINATION.PAGE_SIZE
       };
       if (search && search.trim()) {
         params.search = search.trim();
@@ -116,15 +142,25 @@ const MyPromptsPage = () => {
     }
   };
 
-  const fetchAllPrompts = async (page = dashboardCurrentPage, search = '') => {
+  const fetchAllPrompts = async (page = dashboardCurrentPage, search = '', filterParams = dashboardFilters, sortParams = dashboardSorter) => {
     try {
       setLoading(true);
       const params = {
         page: page,
-        limit: 12
+        limit: PAGINATION.PAGE_SIZE
       };
       if (search && search.trim()) {
         params.search = search.trim();
+      }
+      if (filterParams.category) {
+        params.category = filterParams.category;
+      }
+      if (filterParams.status) {
+        params.status = filterParams.status;
+      }
+      if (sortParams.sortBy) {
+        params.sort_by = sortParams.sortBy;
+        params.sort_order = sortParams.sortOrder;
       }
       const response = await promptService.getAllPrompts(params);
       setAllPrompts(response.data || response);
@@ -295,12 +331,46 @@ const MyPromptsPage = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    fetchMyPrompts(page);
+    fetchMyPrompts(page, searchValue, filters, sorter);
+  };
+
+  const handleTableChange = (tableFilters) => {
+    const newPage = tableFilters.page || 1;
+    const newFilters = {
+      category: tableFilters.category,
+      status: tableFilters.status
+    };
+    const newSorter = {
+      sortBy: tableFilters.sortBy || 'created_at',
+      sortOrder: tableFilters.sortOrder || 'desc'
+    };
+    
+    setCurrentPage(newPage);
+    setFilters(newFilters);
+    setSorter(newSorter);
+    fetchMyPrompts(newPage, searchValue, newFilters, newSorter);
   };
 
   const handleDashboardPageChange = (page) => {
     setDashboardCurrentPage(page);
-    fetchAllPrompts(page);
+    fetchAllPrompts(page, searchValue, dashboardFilters, dashboardSorter);
+  };
+
+  const handleDashboardTableChange = (tableFilters) => {
+    const newPage = tableFilters.page || 1;
+    const newFilters = {
+      category: tableFilters.category,
+      status: tableFilters.status
+    };
+    const newSorter = {
+      sortBy: tableFilters.sortBy || 'created_at',
+      sortOrder: tableFilters.sortOrder || 'desc'
+    };
+    
+    setDashboardCurrentPage(newPage);
+    setDashboardFilters(newFilters);
+    setDashboardSorter(newSorter);
+    fetchAllPrompts(newPage, searchValue, newFilters, newSorter);
   };
 
   const handleDashboardSearchSubmit = (value) => {
@@ -425,11 +495,12 @@ const MyPromptsPage = () => {
             onDeletePrompt={handleDeletePrompt}
             onSubmitPrompt={handleSubmitForReview}
             onViewPrompt={handleViewPrompt}
+            onMenuClick={() => setMobileMenuOpen(true)}
+            onTableChange={handleDashboardTableChange}
             pagination={{
               current: dashboardCurrentPage,
               total: totalAllPrompts,
-              pageSize: 12,
-              onChange: handleDashboardPageChange,
+              pageSize: PAGINATION.PAGE_SIZE,
             }}
           />
         ) : activeTab === 'list' ? (
@@ -445,11 +516,11 @@ const MyPromptsPage = () => {
             onEditPrompt={handleEditPrompt}
             onDeletePrompt={handleDeletePrompt}
             currentUser={user}
+            onTableChange={handleTableChange}
             pagination={{
               current: currentPage,
               total: totalPrompts,
-              pageSize: 12,
-              onChange: handlePageChange,
+              pageSize: PAGINATION.PAGE_SIZE,
               showSizeChanger: false,
               showQuickJumper: false,
             }}
@@ -468,7 +539,7 @@ const MyPromptsPage = () => {
             pagination={{
               current: reviewCurrentPage,
               total: totalPendingPrompts,
-              pageSize: 12,
+              pageSize: PAGINATION.PAGE_SIZE,
               onChange: handleReviewPageChange,
               showSizeChanger: false,
               showQuickJumper: false,
