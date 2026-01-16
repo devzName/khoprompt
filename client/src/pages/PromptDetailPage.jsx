@@ -50,7 +50,7 @@ const PromptDetailPage = () => {
     }
   };
 
-  const hasTrackedView = useViewTracking(
+  useViewTracking(
     prompt?.id, 
     prompt?.status === 'approved',
     refreshStats

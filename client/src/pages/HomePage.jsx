@@ -80,7 +80,7 @@ const HomePage = () => {
       <LatestPrompts
         prompts={latestPrompts}
         maxItems={null}
-        columns={3}
+        columns={4}
         loading={initialLoading}
         pagination={{
           current: currentPage,

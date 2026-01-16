@@ -608,16 +608,24 @@ class PromptService:
         if not prompt or prompt.status != PromptStatus.APPROVED:
             return False
         
+        # Owner không tính view
         if user_id and prompt.user_id == user_id:
             return False
         
+        # Check anti-spam patterns
         if ip_address:
             if await ViewRateLimiter.is_suspicious_pattern(ip_address, user_agent):
                 return False
             
+            # Check rapid request rate limit (10 views/10 minutes)
             if not await ViewRateLimiter.check_ip_rate_limit(ip_address, max_views=10, window_minutes=10):
                 return False
+            
+            # Check device total view limit (50 views per device)
+            if not await ViewRateLimiter.check_device_view_limit(ip_address, max_total_views=50):
+                return False
         
+        # Check if already viewed this prompt (by user or IP)
         if user_id:
             user_view_query = select(PromptView).where(
                 PromptView.prompt_id == prompt_id,
@@ -626,16 +634,16 @@ class PromptService:
             result = await session.execute(user_view_query)
             if result.scalar_one_or_none():
                 return False
-        else:
-            if ip_address:
-                ip_view_query = select(PromptView).where(
-                    PromptView.prompt_id == prompt_id,
-                    PromptView.ip_address == ip_address
-                )
-                result = await session.execute(ip_view_query)
-                if result.scalar_one_or_none():
-                    return False
+        elif ip_address:
+            ip_view_query = select(PromptView).where(
+                PromptView.prompt_id == prompt_id,
+                PromptView.ip_address == ip_address
+            )
+            result = await session.execute(ip_view_query)
+            if result.scalar_one_or_none():
+                return False
         
+        # Create new view record
         new_view = PromptView(
             prompt_id=prompt_id,
             user_id=user_id,
@@ -644,9 +652,14 @@ class PromptService:
         )
         session.add(new_view)
         
+        # Increment prompt view count
         await PromptRepository.update(session, prompt, {
             "view_count": prompt.view_count + 1
         })
+        
+        # Increment device total views
+        if ip_address:
+            await ViewRateLimiter.increment_device_views(ip_address, ttl_days=30)
         
         await session.commit()
         return True

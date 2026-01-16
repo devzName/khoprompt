@@ -28,7 +28,13 @@ class ViewRateLimiter:
         return f"view_rate_limit:ip:{ip}"
     
     @staticmethod
+    def get_ip_total_views_key(ip: str) -> str:
+        """Key for tracking total views per device (IP)"""
+        return f"device_total_views:ip:{ip}"
+    
+    @staticmethod
     async def check_ip_rate_limit(ip: str, max_views: int = 10, window_minutes: int = 10) -> bool:
+        """Check rate limit for rapid requests (anti-spam)"""
         if not REDIS_AVAILABLE:
             return True
             
@@ -49,6 +55,46 @@ class ViewRateLimiter:
         except Exception as e:
             print(f"Redis error in rate limiting: {e}")
             return True
+    
+    @staticmethod
+    async def check_device_view_limit(ip: str, max_total_views: int = 50) -> bool:
+        """Check if device has reached maximum total views (50 views per device)"""
+        if not REDIS_AVAILABLE:
+            return True
+            
+        try:
+            key = ViewRateLimiter.get_ip_total_views_key(ip)
+            current_count = redis_client.get(key)
+            
+            if current_count is None:
+                return True
+            
+            if int(current_count) >= max_total_views:
+                return False
+            
+            return True
+            
+        except Exception as e:
+            print(f"Redis error in device view limit: {e}")
+            return True
+    
+    @staticmethod
+    async def increment_device_views(ip: str, ttl_days: int = 30) -> None:
+        """Increment total views for a device"""
+        if not REDIS_AVAILABLE:
+            return
+            
+        try:
+            key = ViewRateLimiter.get_ip_total_views_key(ip)
+            current_count = redis_client.get(key)
+            
+            if current_count is None:
+                redis_client.setex(key, ttl_days * 24 * 60 * 60, 1)
+            else:
+                redis_client.incr(key)
+            
+        except Exception as e:
+            print(f"Redis error in incrementing device views: {e}")
     
     @staticmethod
     async def is_suspicious_pattern(ip: str, user_agent: Optional[str] = None) -> bool:
