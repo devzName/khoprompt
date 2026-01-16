@@ -2,7 +2,7 @@ import { Form, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
 
-const CategorizationSection = ({ categories, predefinedTags }) => {
+const CategorizationSection = ({ categories, predefinedTags, onCategoryChange }) => {
   const { t } = useTranslation();
 
   return (
@@ -18,6 +18,7 @@ const CategorizationSection = ({ categories, predefinedTags }) => {
             placeholder={t('myPrompts.createPrompt.categoryPlaceholder')}
             size="large"
             options={categories}
+            onChange={onCategoryChange}
           />
         </Form.Item>
 
@@ -27,10 +28,12 @@ const CategorizationSection = ({ categories, predefinedTags }) => {
           className="mb-4 lg:mb-0 lg:col-span-2"
         >
           <Select
-            mode="tags"
+            mode="multiple"
             placeholder={t('myPrompts.createPrompt.tagsPlaceholder')}
             size="large"
             options={predefinedTags}
+            disabled={!predefinedTags || predefinedTags.length === 0}
+            maxTagCount="responsive"
           />
         </Form.Item>
       </div>

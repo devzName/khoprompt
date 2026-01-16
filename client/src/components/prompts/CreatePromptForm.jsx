@@ -20,30 +20,48 @@ const CreatePromptForm = ({
 }) => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
-  const [predefinedTags, setPredefinedTags] = useState([]);
+  const [allTags, setAllTags] = useState([]);
+  const [filteredTags, setFilteredTags] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const data = await promptCategoriesService.getCategories();
-        setCategories(data.map(cat => ({ label: cat.name, value: cat.id, slug: cat.slug })));
+        const [categoriesData, tagsData] = await Promise.all([
+          promptCategoriesService.getCategories(),
+          promptTagsService.getTags()
+        ]);
+        
+        setCategories(categoriesData.map(cat => ({ 
+          label: cat.name, 
+          value: cat.id, 
+          slug: cat.slug 
+        })));
+        
+        const mappedTags = tagsData.map(tag => ({ 
+          label: tag.name, 
+          value: tag.id.toString(),
+          categoryId: tag.category_id
+        }));
+        setAllTags(mappedTags);
+        
+        const initialCategory = form.getFieldValue('category');
+        if (initialCategory) {
+          const filtered = mappedTags.filter(tag => tag.categoryId === initialCategory);
+          setFilteredTags(filtered);
+        }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const fetchTags = async () => {
-      try {
-        const data = await promptTagsService.getTags();
-        setPredefinedTags(data.map(tag => ({ label: tag.name, value: tag.id.toString() })));
-      } catch (error) {
-        console.error('Error fetching tags:', error);
-      }
-    };
-
-    fetchCategories();
-    fetchTags();
+    fetchData();
   }, []);
+
+  const handleCategoryChange = (value) => {
+    const filtered = allTags.filter(tag => tag.categoryId === value);
+    setFilteredTags(filtered);
+    form.setFieldsValue({ tags: [] });
+  };
 
   const handleFormSubmit = (values) => {
     // Convert form values to API format
@@ -73,7 +91,11 @@ const CreatePromptForm = ({
           <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
             <BasicInfoSection />
             <ContentSection />
-            <CategorizationSection categories={categories} predefinedTags={predefinedTags} />
+            <CategorizationSection 
+              categories={categories} 
+              predefinedTags={filteredTags}
+              onCategoryChange={handleCategoryChange}
+            />
             <NotesSection />
             <FormActions loading={loading} onCancel={onCancel} />
           </Form>
