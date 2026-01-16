@@ -42,10 +42,13 @@ async def delete_tag(
     session: DbSession,
     admin: AdminUser
 ):
-    success = await PromptTagService.delete_tag(session, tag_id)
-    if not success:
+    """
+    Delete a tag and automatically remove it from all prompts that use it.
+    """
+    result = await PromptTagService.delete_tag(session, tag_id)
+    if not result["success"]:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tag not found"
+            detail=result["message"]
         )
-    return {"message": "Tag deleted successfully"}
+    return result

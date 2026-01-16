@@ -41,10 +41,39 @@ class PromptTagService:
         }
 
     @staticmethod
-    async def delete_tag(session: AsyncSession, tag_id: int) -> bool:
+    async def delete_tag(session: AsyncSession, tag_id: int) -> dict:
+        """
+        Delete a tag and remove it from all prompts that use it.
+        
+        Args:
+            session: Database session
+            tag_id: ID of tag to delete
+        
+        Returns:
+            dict with success status and info about affected prompts
+        """
         tag = await PromptTagRepository.get_by_id(session, tag_id)
         if not tag:
-            return False
+            return {"success": False, "message": "Tag not found"}
         
-        await PromptTagRepository.delete(session, tag)
-        return True
+        # Check if tag is being used by any prompts
+        prompt_count = await PromptTagRepository.count_prompts_using_tag(session, tag_id)
+        
+        if prompt_count > 0:
+            # Remove tag from all prompts first
+            removed_count = await PromptTagRepository.remove_tag_from_all_prompts(session, tag_id)
+            await PromptTagRepository.delete(session, tag)
+            
+            return {
+                "success": True,
+                "message": f"Tag deleted successfully. Removed from {removed_count} prompt(s).",
+                "prompts_affected": removed_count
+            }
+        else:
+            # No prompts using this tag, safe to delete
+            await PromptTagRepository.delete(session, tag)
+            return {
+                "success": True,
+                "message": "Tag deleted successfully",
+                "prompts_affected": 0
+            }

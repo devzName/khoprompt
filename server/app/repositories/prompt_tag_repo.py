@@ -19,6 +19,19 @@ class PromptTagRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
+    async def count_prompts_using_tag(session: AsyncSession, tag_id: int) -> int:
+        """Count how many prompts are using this tag"""
+        from app.models.prompt import prompt_tags_association
+        from sqlalchemy import func
+        
+        stmt = (
+            select(func.count(prompt_tags_association.c.prompt_id))
+            .where(prompt_tags_association.c.tag_id == tag_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
     async def create(session: AsyncSession, tag_data: dict) -> PromptTag:
         tag = PromptTag(**tag_data)
         session.add(tag)
@@ -38,3 +51,16 @@ class PromptTagRepository:
     async def delete(session: AsyncSession, tag: PromptTag) -> None:
         await session.delete(tag)
         await session.commit()
+
+    @staticmethod
+    async def remove_tag_from_all_prompts(session: AsyncSession, tag_id: int) -> int:
+        """Remove tag from all prompts that use it. Returns count of affected prompts."""
+        from app.models.prompt import prompt_tags_association
+        from sqlalchemy import delete
+        
+        stmt = delete(prompt_tags_association).where(
+            prompt_tags_association.c.tag_id == tag_id
+        )
+        result = await session.execute(stmt)
+        await session.commit()
+        return result.rowcount
