@@ -195,7 +195,7 @@ const PromptsTable = ({
       sorter: true,
       render: (date) => (
         <div className="text-xs text-gray-600">
-          {new Date(date).toLocaleDateString('vi-VN')}
+          {new Date(date).toLocaleDateString('vi-VN')} {new Date(date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
         </div>
       ),
     },

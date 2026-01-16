@@ -258,7 +258,8 @@ class PromptRepository:
 
     @staticmethod
     async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None, tag_id: int | None = None) -> list[Prompt]:
-        """Get featured prompts based on engagement metrics (likes, views) and recency"""
+        """Get featured prompts based on engagement metrics (likes, views) and recency.
+        Only includes prompts with at least 1 helpful vote (like_count >= 1)."""
         stmt = (
             select(Prompt)
             .options(
@@ -266,7 +267,10 @@ class PromptRepository:
                 selectinload(Prompt.category),
                 selectinload(Prompt.tags)
             )
-            .where(Prompt.status == PromptStatus.APPROVED)
+            .where(
+                Prompt.status == PromptStatus.APPROVED,
+                Prompt.like_count >= 1  # At least 1 helpful vote
+            )
         )
         
         if category_id is not None:

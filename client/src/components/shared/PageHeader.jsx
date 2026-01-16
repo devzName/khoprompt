@@ -20,13 +20,13 @@ const PageHeader = ({ title, description, breadcrumb, onMenuClick, children }) =
       </div>
 
       <div className="hidden lg:block">
-        {breadcrumb && (
+        {/* {breadcrumb && (
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
             <span>{t('myPrompts.breadcrumb')}</span>
             <span>/</span>
             <span className="text-gray-900 font-medium">{breadcrumb}</span>
           </div>
-        )}
+        )} */}
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
         {description && <p className="text-gray-600 mb-4">{description}</p>}
       </div>
