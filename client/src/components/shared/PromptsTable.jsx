@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button, Tag, Modal, Table, Space, Card } from 'antd';
-import { PlusOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Tag, Modal, Table, Space, Card, Tooltip } from 'antd';
+import { PlusOutlined, EditOutlined, SendOutlined, FileTextOutlined, EyeOutlined, DeleteOutlined, ExclamationCircleOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../constants/promptStatus';
 import PromptDrawer from '../PromptDrawer';
@@ -14,12 +14,15 @@ const PromptsTable = ({
   onEditPrompt,
   onDeletePrompt,
   onViewPrompt,
+  onApprovePrompt,
+  onRejectPrompt,
   currentUser,
   pagination = null,
   searchValue = '',
   onCreatePrompt,
   showCreateButton = false,
-  onTableChange
+  onTableChange,
+  mode = 'default' // 'default' or 'review'
 }) => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -206,44 +209,92 @@ const PromptsTable = ({
       key: 'actions',
       width: '20%',
       align: 'center',
-      render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="link"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleQuickView(record)}
-            className="text-blue-600 hover:text-blue-700"
-          />
-          
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onEditPrompt && onEditPrompt(record)}
-            disabled={record.status === PROMPT_STATUS.PENDING || record.status === PROMPT_STATUS.REJECTED}
-            className="text-green-600 hover:text-green-700"
-          />
-          
-          {record.status === PROMPT_STATUS.DRAFT && (
-            <Button
-              type="link"
-              size="small"
-              icon={<SendOutlined />}
-              onClick={() => onSubmitPrompt && onSubmitPrompt(record.id)}
-              className="text-purple-600 hover:text-purple-700"
-            />
-          )}
-          
-          <Button
-            type="link"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeletePrompt(record.id)}
-          />
-        </Space>
-      ),
+      render: (_, record) => {
+        if (mode === 'review') {
+          // Review mode actions
+          return (
+            <Space size="small">
+              <Tooltip title={t('common.view', 'Xem')}>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<EyeOutlined />}
+                  onClick={() => handleQuickView(record)}
+                  className="text-blue-600 hover:text-blue-700"
+                />
+              </Tooltip>
+              
+              <Tooltip title={t('reviewPrompts.approve', 'Duyệt')}>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<CheckOutlined />}
+                  onClick={() => onApprovePrompt && onApprovePrompt(record.id)}
+                  className="text-green-600 hover:text-green-700"
+                />
+              </Tooltip>
+              
+              <Tooltip title={t('reviewPrompts.reject', 'Từ chối')}>
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<CloseOutlined />}
+                  onClick={() => onRejectPrompt && onRejectPrompt(record.id)}
+                />
+              </Tooltip>
+            </Space>
+          );
+        }
+        
+        // Default mode actions
+        return (
+          <Space size="small">
+            <Tooltip title={t('common.view', 'Xem')}>
+              <Button
+                type="link"
+                size="small"
+                icon={<EyeOutlined />}
+                onClick={() => handleQuickView(record)}
+                className="text-blue-600 hover:text-blue-700"
+              />
+            </Tooltip>
+            
+            <Tooltip title={t('common.edit', 'Sửa')}>
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => onEditPrompt && onEditPrompt(record)}
+                disabled={record.status === PROMPT_STATUS.PENDING || record.status === PROMPT_STATUS.REJECTED}
+                className="text-green-600 hover:text-green-700"
+              />
+            </Tooltip>
+            
+            {record.status === PROMPT_STATUS.DRAFT && (
+              <Tooltip title={t('myPrompts.submitForReview', 'Gửi duyệt')}>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<SendOutlined />}
+                  onClick={() => onSubmitPrompt && onSubmitPrompt(record.id)}
+                  className="text-purple-600 hover:text-purple-700"
+                />
+              </Tooltip>
+            )}
+            
+            <Tooltip title={t('myPrompts.delete', 'Xóa')}>
+              <Button
+                type="link"
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeletePrompt(record.id)}
+              />
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 

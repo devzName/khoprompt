@@ -404,6 +404,12 @@ const MyPromptsPage = () => {
     fetchPendingPrompts(page);
   };
 
+  const handleReviewTableChange = (tableFilters) => {
+    const newPage = tableFilters.page || 1;
+    setReviewCurrentPage(newPage);
+    fetchPendingPrompts(newPage, searchValue);
+  };
+
   const handleViewPrompt = (prompt) => {
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
@@ -536,11 +542,11 @@ const MyPromptsPage = () => {
             onApprovePrompt={handleApprovePrompt}
             onRejectPrompt={handleRejectPrompt}
             currentUser={user}
+            onTableChange={handleReviewTableChange}
             pagination={{
               current: reviewCurrentPage,
               total: totalPendingPrompts,
               pageSize: PAGINATION.PAGE_SIZE,
-              onChange: handleReviewPageChange,
               showSizeChanger: false,
               showQuickJumper: false,
             }}
