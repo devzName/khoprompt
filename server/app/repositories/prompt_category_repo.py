@@ -141,3 +141,42 @@ class PromptCategoryRepository:
     async def delete(session: AsyncSession, category: PromptCategory) -> None:
         await session.delete(category)
         await session.commit()
+
+    @staticmethod
+    async def get_other_category(session: AsyncSession) -> PromptCategory | None:
+        """Get the 'other' category"""
+        return await PromptCategoryRepository.get_by_slug(session, 'other')
+
+    @staticmethod
+    async def count_prompts_in_category(session: AsyncSession, category_id: int) -> int:
+        """Count prompts in a category"""
+        stmt = select(func.count(Prompt.id)).where(Prompt.category_id == category_id)
+        result = await session.execute(stmt)
+        return result.scalar() or 0
+
+    @staticmethod
+    async def move_prompts_to_category(session: AsyncSession, from_category_id: int, to_category_id: int) -> int:
+        """Move all prompts from one category to another and remove their tags. Returns count of moved prompts."""
+        from app.models.prompt import prompt_tags_association
+        from sqlalchemy import update, delete
+        
+        # First, remove all tags from prompts in this category
+        delete_tags_stmt = (
+            delete(prompt_tags_association)
+            .where(
+                prompt_tags_association.c.prompt_id.in_(
+                    select(Prompt.id).where(Prompt.category_id == from_category_id)
+                )
+            )
+        )
+        await session.execute(delete_tags_stmt)
+        
+        # Then, move prompts to new category
+        update_stmt = (
+            update(Prompt)
+            .where(Prompt.category_id == from_category_id)
+            .values(category_id=to_category_id)
+        )
+        result = await session.execute(update_stmt)
+        await session.commit()
+        return result.rowcount

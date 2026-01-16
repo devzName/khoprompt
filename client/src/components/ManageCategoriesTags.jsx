@@ -37,82 +37,91 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       const categoriesData = response.data;
       setCategories(categoriesData);
       
-      const formattedTree = categoriesData.map(cat => ({
-        title: (
-          <div className="flex items-center justify-between group">
-            <span className="flex items-center gap-2">
-              <FolderOutlined className="text-blue-600" />
-              <strong>{cat.name}</strong>
-              <span className="text-gray-400 text-xs">({cat.count} prompts)</span>
-            </span>
-            <Space size="small" className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                type="text"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddTag(cat);
-                }}
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditCategory(cat);
-                }}
-              />
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteCategory(cat);
-                }}
-              />
-            </Space>
-          </div>
-        ),
-        key: `cat-${cat.id}`,
-        children: cat.tags?.map(tag => ({
+      const formattedTree = categoriesData.map(cat => {
+        const isOtherCategory = cat.slug === 'other';
+        
+        return {
           title: (
             <div className="flex items-center justify-between group">
               <span className="flex items-center gap-2">
-                <TagOutlined className="text-green-600" />
-                {tag.name}
-                <span className="text-gray-400 text-xs">({tag.count} prompts)</span>
+                <FolderOutlined className="text-blue-600" />
+                <strong>{cat.name}</strong>
+                <span className="text-gray-400 text-xs">({cat.count} prompts)</span>
+                {isOtherCategory && (
+                  <span className="text-xs text-gray-500 italic">(System)</span>
+                )}
               </span>
-              <Space size="small" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditTag(tag, cat);
-                  }}
-                />
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteTag(tag);
-                  }}
-                />
-              </Space>
+              {!isOtherCategory && (
+                <Space size="small" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddTag(cat);
+                    }}
+                  />
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditCategory(cat);
+                    }}
+                  />
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCategory(cat);
+                    }}
+                  />
+                </Space>
+              )}
             </div>
           ),
-          key: `tag-${tag.id}`,
-          isLeaf: true
-        }))
-      }));
+          key: `cat-${cat.id}`,
+          children: cat.tags?.map(tag => ({
+            title: (
+              <div className="flex items-center justify-between group">
+                <span className="flex items-center gap-2">
+                  <TagOutlined className="text-green-600" />
+                  {tag.name}
+                  <span className="text-gray-400 text-xs">({tag.count} prompts)</span>
+                </span>
+                <Space size="small" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditTag(tag, cat);
+                    }}
+                  />
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTag(tag);
+                    }}
+                  />
+                </Space>
+              </div>
+            ),
+            key: `tag-${tag.id}`,
+            isLeaf: true
+          }))
+        };
+      });
       
       const categoryKeys = categoriesData.map(cat => `cat-${cat.id}`);
       setAllKeys(categoryKeys);
@@ -381,11 +390,14 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
                 rules={[{ required: true, message: t('manageCategoriesTags.categoryRequired', 'Please select category') }]}
               >
                 <Select placeholder={t('manageCategoriesTags.selectCategory', 'Select category')} disabled={modalType === 'add-tag'}>
-                  {categories.map(cat => (
-                    <Select.Option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </Select.Option>
-                  ))}
+                  {categories
+                    .filter(cat => cat.slug !== 'other')
+                    .map(cat => (
+                      <Select.Option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </Select.Option>
+                    ))
+                  }
                 </Select>
               </Form.Item>
               <Form.Item

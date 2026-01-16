@@ -81,6 +81,10 @@ class PromptCategoryService:
         if not category:
             return None
         
+        # Prevent editing 'other' category
+        if category.slug == 'other':
+            raise ValueError("Cannot edit 'other' category. It is a system category.")
+        
         data = category_data.model_dump(exclude_unset=True)
         
         if 'name' in data and 'slug' not in data:
@@ -105,10 +109,51 @@ class PromptCategoryService:
         }
 
     @staticmethod
-    async def delete_category(session: AsyncSession, category_id: int) -> bool:
+    async def delete_category(session: AsyncSession, category_id: int) -> dict:
+        """
+        Delete a category and move all its prompts to 'other' category.
+        Also removes all tags from the moved prompts.
+        
+        Returns:
+            dict with success status and info about moved prompts
+        """
         category = await PromptCategoryRepository.get_by_id(session, category_id)
         if not category:
-            return False
+            return {"success": False, "message": "Category not found"}
         
-        await PromptCategoryRepository.delete(session, category)
-        return True
+        # Prevent deleting 'other' category
+        if category.slug == 'other':
+            raise ValueError("Cannot delete 'other' category. It is a system category.")
+        
+        # Get 'other' category
+        other_category = await PromptCategoryRepository.get_other_category(session)
+        if not other_category:
+            return {"success": False, "message": "'other' category not found. Please create it first."}
+        
+        # Count prompts in this category
+        prompt_count = await PromptCategoryRepository.count_prompts_in_category(session, category_id)
+        
+        if prompt_count > 0:
+            # Move prompts to 'other' category and remove their tags
+            moved_count = await PromptCategoryRepository.move_prompts_to_category(
+                session, 
+                category_id, 
+                other_category.id
+            )
+            
+            # Delete the category
+            await PromptCategoryRepository.delete(session, category)
+            
+            return {
+                "success": True,
+                "message": f"Category deleted successfully. {moved_count} prompt(s) moved to 'other' category and their tags removed.",
+                "prompts_moved": moved_count
+            }
+        else:
+            # No prompts in this category, safe to delete
+            await PromptCategoryRepository.delete(session, category)
+            return {
+                "success": True,
+                "message": "Category deleted successfully",
+                "prompts_moved": 0
+            }

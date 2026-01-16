@@ -62,11 +62,15 @@ async def delete_category(
     session: DbSession,
     admin: AdminUser
 ):
-    success = await PromptCategoryService.delete_category(session, category_id)
-    if not success:
+    """
+    Delete a category and automatically move all its prompts to 'other' category.
+    All tags will be removed from the moved prompts.
+    """
+    result = await PromptCategoryService.delete_category(session, category_id)
+    if not result["success"]:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
+            status_code=status.HTTP_404_NOT_FOUND if "not found" in result["message"].lower() else status.HTTP_400_BAD_REQUEST,
+            detail=result["message"]
         )
-    return {"message": "Category deleted successfully"}
+    return result
 

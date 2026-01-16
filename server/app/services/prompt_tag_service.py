@@ -15,6 +15,13 @@ class PromptTagService:
 
     @staticmethod
     async def create_tag(session: AsyncSession, tag_data: PromptTagCreate) -> dict:
+        # Check if category is 'other'
+        from app.repositories.prompt_category_repo import PromptCategoryRepository
+        category = await PromptCategoryRepository.get_by_id(session, tag_data.category_id)
+        
+        if category and category.slug == 'other':
+            raise ValueError("Cannot create tags for 'other' category. It is a system category without tags.")
+        
         tag = await PromptTagRepository.create(session, tag_data.model_dump())
         return {
             "id": tag.id,
@@ -27,6 +34,14 @@ class PromptTagService:
         tag = await PromptTagRepository.get_by_id(session, tag_id)
         if not tag:
             return None
+        
+        # Check if trying to move tag to 'other' category
+        if tag_data.category_id:
+            from app.repositories.prompt_category_repo import PromptCategoryRepository
+            category = await PromptCategoryRepository.get_by_id(session, tag_data.category_id)
+            
+            if category and category.slug == 'other':
+                raise ValueError("Cannot move tags to 'other' category. It is a system category without tags.")
         
         updated_tag = await PromptTagRepository.update(
             session, 
