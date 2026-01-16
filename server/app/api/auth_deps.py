@@ -54,6 +54,17 @@ async def get_current_active_user(
     return current_user
 
 
+async def get_admin_user(
+    current_user: Annotated[User, Depends(get_current_user)]
+) -> User:
+    if current_user.user_type != 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user
+
+
 async def get_current_user_optional(
     session: DbSession,
     credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(optional_security)] = None
@@ -81,3 +92,4 @@ async def get_current_user_optional(
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentActiveUser = Annotated[User, Depends(get_current_active_user)]
 OptionalCurrentUser = Annotated[Optional[User], Depends(get_current_user_optional)]
+AdminUser = Annotated[User, Depends(get_admin_user)]

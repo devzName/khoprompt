@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class PromptCategoryBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    slug: str = Field(min_length=1, max_length=100)
+    slug: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = None
     description_vi: str | None = None
     display_order: int | None = None

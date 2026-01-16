@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
-import { FileTextOutlined, PlusOutlined, CheckCircleOutlined, DashboardOutlined } from '@ant-design/icons';
+import { FileTextOutlined, PlusOutlined, DashboardOutlined, TagsOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -12,6 +12,7 @@ import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import DashboardOverview from '../components/DashboardOverview';
 import PromptsList from '../components/prompts/PromptsList';
 import PromptDrawer from '../components/PromptDrawer';
+import ManageCategoriesTags from '../components/ManageCategoriesTags';
 
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
@@ -39,9 +40,6 @@ const MyPromptsPage = () => {
   const [sorter, setSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
   const [dashboardFilters, setDashboardFilters] = useState({ category: null, status: null });
   const [dashboardSorter, setDashboardSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
-  
-  // Flag to prevent double API calls on initial load
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
@@ -51,6 +49,8 @@ const MyPromptsPage = () => {
       form.resetFields();
     } else if (tabFromUrl === 'dashboard' && user?.user_type === 'admin') {
       setActiveTab('dashboard');
+    } else if (tabFromUrl === 'manage' && user?.user_type === 'admin') {
+      setActiveTab('manage');
     } else {
       setActiveTab('list');
     }
@@ -397,7 +397,16 @@ const MyPromptsPage = () => {
         handleCreatePrompt();
         navigate(ROUTES.MY_PROMPTS_CREATE);
       }
-    }
+    },
+    ...(user?.user_type === 'admin' ? [{
+      key: 'manage', 
+      icon: <TagsOutlined />, 
+      label: t('manageCategoriesTags.title', 'Manage Categories & Tags'), 
+      action: () => {
+        setActiveTab('manage');
+        navigate(`${ROUTES.MY_PROMPTS}?tab=manage`);
+      }
+    }] : [])
   ];
 
   return (
@@ -427,7 +436,9 @@ const MyPromptsPage = () => {
       </Drawer>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {activeTab === 'dashboard' && user?.user_type === 'admin' ? (
+        {activeTab === 'manage' && user?.user_type === 'admin' ? (
+          <ManageCategoriesTags onMenuClick={() => setMobileMenuOpen(true)} />
+        ) : activeTab === 'dashboard' && user?.user_type === 'admin' ? (
           <DashboardOverview
             prompts={allPrompts}
             loading={initialLoading}

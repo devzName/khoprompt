@@ -3,6 +3,8 @@ from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.prompt_category_repo import PromptCategoryRepository
+from app.schemas.prompt_category import PromptCategoryCreate, PromptCategoryUpdate
+from app.utils.slug import slugify, generate_unique_slug
 
 
 class PromptCategoryService:
@@ -46,3 +48,65 @@ class PromptCategoryService:
             }
             for cat in categories
         ]
+
+    @staticmethod
+    async def create_category(session: AsyncSession, category_data: PromptCategoryCreate) -> dict:
+        data = category_data.model_dump()
+        
+        if not data.get('slug'):
+            base_slug = slugify(data['name'])
+            data['slug'] = await generate_unique_slug(
+                base_slug,
+                lambda s: PromptCategoryRepository.slug_exists(session, s)
+            )
+        else:
+            if await PromptCategoryRepository.slug_exists(session, data['slug']):
+                raise ValueError(f"Slug '{data['slug']}' already exists")
+        
+        category = await PromptCategoryRepository.create(session, data)
+        return {
+            "id": category.id,
+            "name": category.name,
+            "slug": category.slug,
+            "description": category.description,
+            "description_vi": category.description_vi,
+            "display_order": category.display_order
+        }
+
+    @staticmethod
+    async def update_category(session: AsyncSession, category_id: int, category_data: PromptCategoryUpdate) -> dict | None:
+        category = await PromptCategoryRepository.get_by_id(session, category_id)
+        if not category:
+            return None
+        
+        data = category_data.model_dump(exclude_unset=True)
+        
+        if 'name' in data and 'slug' not in data:
+            base_slug = slugify(data['name'])
+            data['slug'] = await generate_unique_slug(
+                base_slug,
+                lambda s: PromptCategoryRepository.slug_exists(session, s, exclude_id=category_id)
+            )
+        elif 'slug' in data and data['slug']:
+            if await PromptCategoryRepository.slug_exists(session, data['slug'], exclude_id=category_id):
+                raise ValueError(f"Slug '{data['slug']}' already exists")
+        
+        updated_category = await PromptCategoryRepository.update(session, category, data)
+        
+        return {
+            "id": updated_category.id,
+            "name": updated_category.name,
+            "slug": updated_category.slug,
+            "description": updated_category.description,
+            "description_vi": updated_category.description_vi,
+            "display_order": updated_category.display_order
+        }
+
+    @staticmethod
+    async def delete_category(session: AsyncSession, category_id: int) -> bool:
+        category = await PromptCategoryRepository.get_by_id(session, category_id)
+        if not category:
+            return False
+        
+        await PromptCategoryRepository.delete(session, category)
+        return True

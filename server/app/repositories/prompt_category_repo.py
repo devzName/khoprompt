@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -30,7 +30,11 @@ class PromptCategoryRepository:
                 PromptCategory.description_vi,
                 PromptCategory.display_order
             )
-            .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
+            .order_by(
+                case((PromptCategory.slug == 'other', 1), else_=0),
+                PromptCategory.display_order.nulls_last(),
+                PromptCategory.name
+            )
         )
         result = await session.execute(stmt)
         rows = result.all()
@@ -52,7 +56,11 @@ class PromptCategoryRepository:
     async def get_all(session: AsyncSession) -> list[PromptCategory]:
         stmt = (
             select(PromptCategory)
-            .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
+            .order_by(
+                case((PromptCategory.slug == 'other', 1), else_=0),
+                PromptCategory.display_order.nulls_last(),
+                PromptCategory.name
+            )
         )
         result = await session.execute(stmt)
         return result.scalars().all()
@@ -62,7 +70,52 @@ class PromptCategoryRepository:
         stmt = (
             select(PromptCategory)
             .options(selectinload(PromptCategory.tags))
-            .order_by(PromptCategory.display_order.nulls_last(), PromptCategory.name)
+            .order_by(
+                case((PromptCategory.slug == 'other', 1), else_=0),
+                PromptCategory.display_order.nulls_last(),
+                PromptCategory.name
+            )
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @staticmethod
+    async def get_by_id(session: AsyncSession, category_id: int) -> PromptCategory | None:
+        stmt = select(PromptCategory).where(PromptCategory.id == category_id)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def get_by_slug(session: AsyncSession, slug: str) -> PromptCategory | None:
+        stmt = select(PromptCategory).where(PromptCategory.slug == slug)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def slug_exists(session: AsyncSession, slug: str, exclude_id: int | None = None) -> bool:
+        stmt = select(PromptCategory).where(PromptCategory.slug == slug)
+        if exclude_id:
+            stmt = stmt.where(PromptCategory.id != exclude_id)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none() is not None
+
+    @staticmethod
+    async def create(session: AsyncSession, category_data: dict) -> PromptCategory:
+        category = PromptCategory(**category_data)
+        session.add(category)
+        await session.commit()
+        await session.refresh(category)
+        return category
+
+    @staticmethod
+    async def update(session: AsyncSession, category: PromptCategory, update_data: dict) -> PromptCategory:
+        for key, value in update_data.items():
+            setattr(category, key, value)
+        await session.commit()
+        await session.refresh(category)
+        return category
+
+    @staticmethod
+    async def delete(session: AsyncSession, category: PromptCategory) -> None:
+        await session.delete(category)
+        await session.commit()
