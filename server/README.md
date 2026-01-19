@@ -62,3 +62,10 @@ poetry run alembic upgrade head
 # Seed data
 poetry run python -m app.scripts.seed_tags
 ```
+
+
+## Docker
+```bash
+(docker compose exec api poetry run alembic upgrade head)
+(docker compose exec api poetry run python -m app.scripts.create_admin)
+```

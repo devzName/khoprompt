@@ -13,7 +13,6 @@ from sqlalchemy.orm import sessionmaker
 
 from app.models.prompt_category import PromptCategory
 from app.models.prompt_tag import PromptTag
-from app.core.config import get_settings
 
 
 # Tags organized by category slug
@@ -80,11 +79,10 @@ TAGS_BY_CATEGORY = {
 
 async def seed_tags():
     """Seed tags with correct category_id from database"""
-    settings = get_settings()
-    db_url = settings.database_url
+    db_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:Tinhvan123@localhost:5432/app")
     
     # If running from host but .env has 'db' (container name)
-    if 'db:5432' in db_url:
+    if 'db:5432' in db_url and not os.getenv("IS_IN_DOCKER"):
         db_url = db_url.replace('db:5432', 'localhost:5432')
         print(f"Swapped DB host to localhost: {db_url}")
     
