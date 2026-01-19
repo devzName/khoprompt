@@ -17,11 +17,11 @@ async def get_categories_stats(session: DbSession):
 async def get_categories_tree(session: DbSession):
     return await PromptCategoryService.get_categories_with_tags(session)
 
-@router.get("/", response_model=list[PromptCategoryOut])
+@router.get("", response_model=list[PromptCategoryOut])
 async def get_all_categories(session: DbSession):
     return await PromptCategoryService.get_all_categories(session)
 
-@router.post("/", response_model=PromptCategoryOut)
+@router.post("", response_model=PromptCategoryOut)
 async def create_category(
     category_data: PromptCategoryCreate,
     session: DbSession,

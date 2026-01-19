@@ -10,7 +10,7 @@ from app.models.prompt_category import PromptCategory
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 async def get_statistics(session: DbSession):
     """Get general statistics for the application"""
     try:

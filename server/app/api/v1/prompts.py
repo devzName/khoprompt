@@ -12,7 +12,7 @@ from app.models.user import User
 
 router = APIRouter()
 
-@router.post("/", response_model=PromptOut)
+@router.post("", response_model=PromptOut)
 async def create_prompt(
     prompt_data: PromptCreate,
     session: DbSession,
@@ -123,7 +123,7 @@ async def get_prompt_by_slug(slug: str, session: DbSession):
         raise HTTPException(status_code=404, detail="Prompt not found")
     return prompt
 
-@router.get("/", response_model=PaginatedResponse[PromptWithDetails])
+@router.get("", response_model=PaginatedResponse[PromptWithDetails])
 async def get_approved_prompts(
     session: DbSession,
     category_id: int | None = None,

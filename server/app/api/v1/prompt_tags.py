@@ -9,11 +9,11 @@ from app.schemas.prompt_tag import PromptTagOut, PromptTagCreate, PromptTagUpdat
 
 router = APIRouter()
 
-@router.get("/", response_model=list[PromptTagOut])
+@router.get("", response_model=list[PromptTagOut])
 async def get_all_tags(session: DbSession):
     return await PromptTagService.get_all_tags(session)
 
-@router.post("/", response_model=PromptTagOut)
+@router.post("", response_model=PromptTagOut)
 async def create_tag(
     tag_data: PromptTagCreate,
     session: DbSession,
