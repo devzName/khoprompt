@@ -27,24 +27,15 @@
     "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "signIn": "Sign In",
-    "or": "Or",
-    "googleLogin": "Sign in with Google",
-    "loggingIn": "Signing in...",
     "footer": "Sign in to experience all features of Prompt Library",
     "success": "Login successful!",
     "error": "Login failed. Please try again!",
-    "invalidCredentials": "Invalid email or password!",
-    "invalidGoogleToken": "Invalid or expired Google token!",
+    "invalidCredentials": "Invalid username or password!",
     "networkError": "Network error. Please check your internet connection!",
     "serverError": "Server error. Please try again later!",
     "fillAllFields": "Please fill in all fields",
     "rememberMe": "Remember me",
     "required": "Please login to continue"
-  },
-  "googleLoginRequired": {
-    "title": "Google Login Required",
-    "subtitle": "This feature is only available for users who sign in with Google account",
-    "backHome": "Back to Home"
   },
   "sidebar": {
     "backToHome": "Back to home",

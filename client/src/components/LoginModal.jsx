@@ -1,6 +1,5 @@
-import { Modal, notification, Input, Button, Divider, Checkbox } from 'antd';
+import { Modal, notification, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { GoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,6 @@ import { ROUTES } from '../constants/routes';
 const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -106,59 +104,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     }
   };
 
-  const handleGoogleSuccess = async (idToken) => {
-    try {
-      setGoogleLoading(true);
-
-      const { access_token } = await authService.loginWithGoogle(idToken);
-
-      localStorage.setItem('access_token', access_token);
-
-      const userInfo = await authService.getCurrentUser();
-
-      const user = {
-        ...userInfo,
-        name: userInfo.full_name || userInfo.email.split('@')[0],
-        picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
-      };
-
-      localStorage.setItem('user', JSON.stringify(user));
-
-      notification.success({
-        message: t('common.success', 'Success'),
-        description: t('login.success'),
-        placement: 'topRight'
-      });
-      onLoginSuccess(user);
-      onClose();
-      navigate(ROUTES.HOME);
-    } catch (error) {
-      console.error('Google login error:', error);
-      
-      let errorMessage = t('login.error');
-      
-      if (error.response) {
-        const status = error.response.status;
-        
-        if (status === 401) {
-          errorMessage = t('login.invalidGoogleToken');
-        } else if (status >= 500) {
-          errorMessage = t('login.serverError');
-        }
-      } else if (error.request) {
-        errorMessage = t('login.networkError');
-      }
-      
-      notification.error({
-        message: t('common.error', 'Error'),
-        description: errorMessage,
-        placement: 'topRight'
-      });
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
 
   return (
     <Modal
@@ -180,7 +125,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
           </p>
         </div>
 
-        <form onSubmit={handleFormLogin} className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+        <form onSubmit={handleFormLogin} className="space-y-3 sm:space-y-4">
           <Input
             size="large"
             placeholder={t('login.usernamePlaceholder')}
@@ -219,43 +164,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
           </Button>
         </form>
 
-        <Divider className="text-gray-400 text-xs sm:text-sm">{t('login.or')}</Divider>
-
-        <div className="w-full flex justify-center mb-4 sm:mb-6">
-          <div className="w-full max-w-sm">
-            {googleLoading ? (
-              <Button
-                size="large"
-                loading={true}
-                className="w-full rounded-xl border-gray-300 font-medium"
-              >
-                {t('login.loggingIn')}
-              </Button>
-            ) : (
-              <GoogleLogin
-                onSuccess={credentialResponse => {
-                  handleGoogleSuccess(credentialResponse.credential);
-                }}
-                onError={() => {
-                  console.error('Login Failed');
-                  notification.error({
-                    message: t('common.error', 'Error'),
-                    description: t('login.error'),
-                    placement: 'topRight'
-                  });
-                }}
-                useOneTap={false}
-                width="100%"
-                theme="outline"
-                shape="pill"
-                size="large"
-                text="signin_with"
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="text-center text-xs text-gray-500 px-2">
+        <div className="text-center text-xs text-gray-500 px-2 mt-6">
           {t('login.footer')}
         </div>
       </div>

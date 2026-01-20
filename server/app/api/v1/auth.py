@@ -4,30 +4,14 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import DbSession
 from app.api.auth_deps import CurrentUser
-from app.schemas.auth import GoogleLoginRequest, AdminLoginRequest, TokenResponse, UserOut
+from app.schemas.auth import AdminLoginRequest, TokenResponse, UserOut
 from app.services.auth_service import AuthService
 from app.services.ldap_service import LDAPService
 
 router = APIRouter()
 
 
-@router.post("/login/google", response_model=TokenResponse)
-async def google_login(
-    request: GoogleLoginRequest,
-    session: DbSession
-):
-    result = await AuthService.google_login(session, request.id_token)
-    
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Google token or unverified email"
-        )
-        
-    return result
-
-
-@router.post("/login/admin", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse)
 async def admin_login(
     request: AdminLoginRequest,
     session: DbSession

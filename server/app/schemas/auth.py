@@ -5,10 +5,6 @@ from uuid import UUID
 from datetime import datetime
 
 
-class GoogleLoginRequest(BaseModel):
-    id_token: str = Field(min_length=1, description="Google ID token from frontend")
-
-
 class AdminLoginRequest(BaseModel):
     username: str = Field(min_length=1, description="Username or email")
     password: str = Field(min_length=1, description="Admin password")

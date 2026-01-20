@@ -47,7 +47,7 @@ alembic upgrade head
 }
 ```
 
-### POST /api/v1/auth/login/admin
+### POST /api/v1/auth/login
 Đăng nhập bằng email/password (chỉ admin)
 
 **Request Body:**
