@@ -6,6 +6,7 @@ from app.api.deps import DbSession
 from app.api.auth_deps import CurrentUser
 from app.schemas.auth import GoogleLoginRequest, AdminLoginRequest, TokenResponse, UserOut
 from app.services.auth_service import AuthService
+from app.services.ldap_service import LDAPService
 
 router = APIRouter()
 
@@ -45,3 +46,15 @@ async def admin_login(
 @router.get("/me", response_model=UserOut)
 async def get_current_user_info(current_user: CurrentUser):
     return UserOut.model_validate(current_user)
+
+
+@router.get("/ldap/test")
+async def test_ldap_connection():
+    """Test LDAP server connection"""
+    ldap_service = LDAPService()
+    is_connected = await ldap_service.test_connection()
+    
+    return {
+        "ldap_connection": "success" if is_connected else "failed",
+        "message": "LDAP server is reachable" if is_connected else "Cannot connect to LDAP server"
+    }
