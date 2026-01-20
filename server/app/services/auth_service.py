@@ -84,10 +84,10 @@ class AuthService:
         )
     
     @staticmethod
-    async def admin_login(session: AsyncSession, email: str, password: str) -> TokenResponse | None:
+    async def admin_login(session: AsyncSession, username: str, password: str) -> TokenResponse | None:
         # Handle admin@gmail.com with current logic
-        if email == "admin@gmail.com":
-            user = await UserRepository.get_admin_by_email(session, email)
+        if username == "admin":
+            user = await UserRepository.get_admin_by_email(session, username)
             if not user:
                 return None
             
@@ -113,17 +113,17 @@ class AuthService:
                 user=UserOut.model_validate(user)
             )
         else:
-            # Handle other emails - LDAP authentication
-            logger.info(f"Attempting LDAP authentication for email: {email}")
+            # Handle other usernames - LDAP authentication
+            logger.info(f"Attempting LDAP authentication for username: {username}")
             
             ldap_service = LDAPService()
-            ldap_user_info = await ldap_service.authenticate_user(email, password)
+            ldap_user_info = await ldap_service.authenticate_user(username, password)
             
             if not ldap_user_info:
-                logger.warning(f"LDAP authentication failed for email: {email}")
+                logger.warning(f"LDAP authentication failed for username: {username}")
                 return None
             
-            logger.info(f"LDAP authentication successful for email: {email}")
+            logger.info(f"LDAP authentication successful for username: {username}")
             
             # Tìm user trong database hoặc tạo mới
             user = await UserRepository.get_by_email(session, ldap_user_info['email'])

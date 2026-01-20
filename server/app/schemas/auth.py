@@ -10,7 +10,7 @@ class GoogleLoginRequest(BaseModel):
 
 
 class AdminLoginRequest(BaseModel):
-    email: str = Field(min_length=1, description="Admin email")
+    username: str = Field(min_length=1, description="Username or email")
     password: str = Field(min_length=1, description="Admin password")
 
 

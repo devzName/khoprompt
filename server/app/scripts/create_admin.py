@@ -22,7 +22,7 @@ async def create_admin_user():
     AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     
     async with AsyncSessionLocal() as session:
-        admin_email = "admin@gmail.com"
+        admin_email = "admin"
         admin_password = "admin123"
         
         from sqlalchemy import select

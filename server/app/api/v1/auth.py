@@ -32,7 +32,7 @@ async def admin_login(
     request: AdminLoginRequest,
     session: DbSession
 ):
-    result = await AuthService.admin_login(session, request.email, request.password)
+    result = await AuthService.admin_login(session, request.username, request.password)
     
     if not result:
         raise HTTPException(
