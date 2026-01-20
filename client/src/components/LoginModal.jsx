@@ -12,15 +12,15 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const navigate = useNavigate();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
     const savedCredentials = localStorage.getItem('rememberedCredentials');
     if (savedCredentials) {
-      const { email: savedEmail, password: savedPassword } = JSON.parse(savedCredentials);
-      setEmail(savedEmail || '');
+      const { username: savedUsername, password: savedPassword } = JSON.parse(savedCredentials);
+      setUsername(savedUsername || '');
       setPassword(savedPassword || '');
       setRememberMe(true);
     }
@@ -28,7 +28,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
   const handleFormLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!username || !password) {
       notification.error({
         message: t('common.error', 'Error'),
         description: t('login.fillAllFields'),
@@ -40,13 +40,13 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     try {
       setFormLoading(true);
 
-      const { access_token } = await authService.login(email, password);
+      const { access_token } = await authService.login(username, password);
 
       localStorage.setItem('access_token', access_token);
 
       if (rememberMe) {
         localStorage.setItem('rememberedCredentials', JSON.stringify({
-          email,
+          username,
           password
         }));
       } else {
@@ -71,7 +71,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       navigate(ROUTES.HOME);
 
       if (!rememberMe) {
-        setEmail('');
+        setUsername('');
         setPassword('');
       }
     } catch (error) {
@@ -183,10 +183,10 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
         <form onSubmit={handleFormLogin} className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
           <Input
             size="large"
-            placeholder={t('login.emailPlaceholder')}
+            placeholder={t('login.usernamePlaceholder')}
             prefix={<UserOutlined className="text-gray-400" />}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="rounded-xl"
           />
           <Input.Password

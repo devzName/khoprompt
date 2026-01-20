@@ -24,6 +24,7 @@
     "welcome": "Welcome back",
     "subtitle": "Sign in to your account",
     "emailPlaceholder": "Your email",
+    "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "signIn": "Sign In",
     "or": "Or",
