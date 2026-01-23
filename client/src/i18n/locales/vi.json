@@ -112,6 +112,7 @@
       "descriptionLabel": "Mô tả ngắn",
       "descriptionPlaceholder": "Mô tả ngắn gọn về prompt này",
       "descriptionRequired": "Vui lòng nhập mô tả ngắn",
+      "aiFormat": "AI Format",
       "content": "Nội dung",
       "contentLabel": "Nội dung prompt",
       "contentPlaceholder": "Nhập nội dung chi tiết của prompt...",

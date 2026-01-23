@@ -1,11 +1,35 @@
-import { Form, Input } from 'antd';
+import { Form, Input, Button } from 'antd';
+import { ThunderboltOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
+import aiService from '../../services/aiService';
 
 const { TextArea } = Input;
 
 const BasicInfoSection = () => {
   const { t } = useTranslation();
+  const [isFormatting, setIsFormatting] = useState(false);
+  const form = Form.useFormInstance();
+
+  const handleAIFormat = async () => {
+    const description = form.getFieldValue('description');
+    
+    if (!description || description.trim() === '') {
+      return;
+    }
+
+    setIsFormatting(true);
+    
+    try {
+      const result = await aiService.formatText(description, 'description');
+      form.setFieldValue('description', result.formattedText);
+    } catch (error) {
+      console.error('AI formatting error:', error);
+    } finally {
+      setIsFormatting(false);
+    }
+  };
 
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.basicInfo')}>
@@ -22,7 +46,21 @@ const BasicInfoSection = () => {
       </Form.Item>
 
       <Form.Item
-        label={t('myPrompts.createPrompt.descriptionLabel')}
+        label={
+          <div className="flex items-center gap-2">
+            <span>{t('myPrompts.createPrompt.descriptionLabel')}</span>
+            <Button
+              type="text"
+              size="small"
+              icon={<ThunderboltOutlined />}
+              loading={isFormatting}
+              onClick={handleAIFormat}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              {t('myPrompts.createPrompt.aiFormat')}
+            </Button>
+          </div>
+        }
         name="description"
         rules={[{ required: true, message: t('myPrompts.createPrompt.descriptionRequired') }]}
         className="mb-0"

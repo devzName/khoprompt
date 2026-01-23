@@ -7,7 +7,6 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-# SSL config for development only
 connect_args = {}
 if os.getenv("IS_IN_DOCKER") == "true" or os.getenv("ENV") == "development":
     connect_args = {"ssl": False}

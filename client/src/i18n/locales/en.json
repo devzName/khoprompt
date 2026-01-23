@@ -112,6 +112,7 @@
       "descriptionLabel": "Short description",
       "descriptionPlaceholder": "Brief description of this prompt",
       "descriptionRequired": "Please enter short description",
+      "aiFormat": "AI Format",
       "content": "Content",
       "contentLabel": "Prompt content",
       "contentPlaceholder": "Enter detailed prompt content...",
