@@ -1,6 +1,7 @@
 import { Modal, notification, Input, Button, Divider, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { GoogleLogin } from '@react-oauth/google';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../config/msalConfig';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,8 @@ import { ROUTES } from '../constants/routes';
 const LoginModal = ({ open, onClose, onLoginSuccess }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const { instance } = useMsal();
+  const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -106,34 +108,48 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
     }
   };
 
-  const handleGoogleSuccess = async (idToken) => {
+  const handleMicrosoftLogin = async () => {
     try {
-      setGoogleLoading(true);
+      setMicrosoftLoading(true);
 
-      const { access_token } = await authService.loginWithGoogle(idToken);
+      // Trigger Microsoft login popup
+      const loginResponse = await instance.loginPopup(loginRequest);
+      
+      if (loginResponse.accessToken) {
+        // Validate organization domain (optional client-side check)
+        const account = loginResponse.account;
+        if (account && account.username) {
+          const domain = account.username.split('@')[1];
+          // You can add domain validation here if needed
+          console.log('User domain:', domain);
+        }
 
-      localStorage.setItem('access_token', access_token);
+        // Send access token to backend
+        const { access_token } = await authService.loginWithMicrosoft(loginResponse.accessToken);
 
-      const userInfo = await authService.getCurrentUser();
+        localStorage.setItem('access_token', access_token);
 
-      const user = {
-        ...userInfo,
-        name: userInfo.full_name || userInfo.email.split('@')[0],
-        picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
-      };
+        const userInfo = await authService.getCurrentUser();
 
-      localStorage.setItem('user', JSON.stringify(user));
+        const user = {
+          ...userInfo,
+          name: userInfo.full_name || userInfo.email.split('@')[0],
+          picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
+        };
 
-      notification.success({
-        message: t('common.success', 'Success'),
-        description: t('login.success'),
-        placement: 'topRight'
-      });
-      onLoginSuccess(user);
-      onClose();
-      navigate(ROUTES.HOME);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        notification.success({
+          message: t('common.success', 'Success'),
+          description: t('login.success'),
+          placement: 'topRight'
+        });
+        onLoginSuccess(user);
+        onClose();
+        navigate(ROUTES.HOME);
+      }
     } catch (error) {
-      console.error('Google login error:', error);
+      console.error('Microsoft login error:', error);
       
       let errorMessage = t('login.error');
       
@@ -141,12 +157,20 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
         const status = error.response.status;
         
         if (status === 401) {
-          errorMessage = t('login.invalidGoogleToken');
+          errorMessage = t('login.invalidMicrosoftToken');
+        } else if (status === 403) {
+          errorMessage = t('login.organizationNotAllowed', 'Tài khoản không thuộc tổ chức được phép');
         } else if (status >= 500) {
           errorMessage = t('login.serverError');
         }
       } else if (error.request) {
         errorMessage = t('login.networkError');
+      } else if (error.errorCode) {
+        // MSAL specific errors
+        if (error.errorCode === 'user_cancelled') {
+          return; // Don't show error for user cancellation
+        }
+        errorMessage = t('login.microsoftError');
       }
       
       notification.error({
@@ -155,7 +179,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
         placement: 'topRight'
       });
     } finally {
-      setGoogleLoading(false);
+      setMicrosoftLoading(false);
     }
   };
 
@@ -223,35 +247,24 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
 
         <div className="w-full flex justify-center mb-4 sm:mb-6">
           <div className="w-full max-w-sm">
-            {googleLoading ? (
-              <Button
-                size="large"
-                loading={true}
-                className="w-full rounded-xl border-gray-300 font-medium"
-              >
-                {t('login.loggingIn')}
-              </Button>
-            ) : (
-              <GoogleLogin
-                onSuccess={credentialResponse => {
-                  handleGoogleSuccess(credentialResponse.credential);
-                }}
-                onError={() => {
-                  console.error('Login Failed');
-                  notification.error({
-                    message: t('common.error', 'Error'),
-                    description: t('login.error'),
-                    placement: 'topRight'
-                  });
-                }}
-                useOneTap={false}
-                width="100%"
-                theme="outline"
-                shape="pill"
-                size="large"
-                text="signin_with"
-              />
-            )}
+            <Button
+              size="large"
+              loading={microsoftLoading}
+              onClick={handleMicrosoftLogin}
+              className="w-full rounded-xl border-gray-300 font-medium flex items-center justify-center gap-2 hover:border-blue-500 hover:text-blue-500"
+              icon={
+                !microsoftLoading && (
+                  <svg width="18" height="18" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1H11V11H1V1Z" fill="#F25022"/>
+                    <path d="M12 1H22V11H12V1Z" fill="#7FBA00"/>
+                    <path d="M1 12H11V22H1V12Z" fill="#00A4EF"/>
+                    <path d="M12 12H22V22H12V12Z" fill="#FFB900"/>
+                  </svg>
+                )
+              }
+            >
+              {microsoftLoading ? t('login.loggingIn') : t('login.signInWithMicrosoft', 'Sign in with Microsoft')}
+            </Button>
           </div>
         </div>
 

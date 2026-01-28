@@ -10,9 +10,9 @@ export const authService = {
     return response.data;
   },
 
-  loginWithGoogle: async (idToken) => {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN_GOOGLE, {
-      id_token: idToken,
+  loginWithMicrosoft: async (accessToken) => {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN_MICROSOFT, {
+      access_token: accessToken,
     });
     return response.data;
   },
