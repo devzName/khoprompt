@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { ROUTES } from '../constants/routes';
-
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('access_token');
@@ -15,7 +13,6 @@ export const useAuth = () => {
         setLoading(false);
         return;
       }
-
       try {
         const userInfo = await authService.getCurrentUser();
         const user = {
@@ -34,10 +31,8 @@ export const useAuth = () => {
         setLoading(false);
       }
     };
-
     checkAuth();
   }, []);
-
   const logout = (closeMobileMenu) => {
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
@@ -47,7 +42,6 @@ export const useAuth = () => {
       closeMobileMenu();
     }
   };
-
   return {
     user,
     loading,

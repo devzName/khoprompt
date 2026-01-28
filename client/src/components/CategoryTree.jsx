@@ -17,7 +17,6 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { Spin } from 'antd';
-
 const getIcon = (name) => {
   switch (name) {
     case 'HR': return <TeamOutlined />;
@@ -32,27 +31,22 @@ const getIcon = (name) => {
     default: return <AppstoreOutlined />;
   }
 };
-
 const TreeNode = ({ node, level = 0, selectedId, selectedType, onSelect, expandedNodes, onToggle }) => {
   const hasTags = node.tags && node.tags.length > 0;
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedType === 'category' && selectedId === node.id;
-
   const handleToggle = (e) => {
     e.stopPropagation();
     if (hasTags) {
       onToggle(node.id);
     }
   };
-
   const handleSelect = () => {
     onSelect({ type: 'category', data: node });
   };
-
   const handleTagSelect = (tag) => {
     onSelect({ type: 'tag', data: tag, category: node });
   };
-
   return (
     <div className="select-none">
       <div
@@ -78,7 +72,6 @@ const TreeNode = ({ node, level = 0, selectedId, selectedType, onSelect, expande
         ) : (
           <span className="w-5" />
         )}
-
         <span className={`text-base ${isSelected ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-500'}`}>
           {hasTags ? (
             isExpanded ? <FolderOpenOutlined /> : <FolderOutlined />
@@ -86,9 +79,7 @@ const TreeNode = ({ node, level = 0, selectedId, selectedType, onSelect, expande
             getIcon(node.name)
           )}
         </span>
-
         <span className="flex-1 text-sm">{node.name}</span>
-
         <span
           className={`px-2 py-0.5 text-xs rounded-full ${
             isSelected
@@ -99,7 +90,6 @@ const TreeNode = ({ node, level = 0, selectedId, selectedType, onSelect, expande
           {node.count}
         </span>
       </div>
-
       {hasTags && isExpanded && (
         <div className="mt-1">
           {node.tags.map((tag) => {
@@ -137,12 +127,10 @@ const TreeNode = ({ node, level = 0, selectedId, selectedType, onSelect, expande
     </div>
   );
 };
-
 const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading }) => {
   const { t } = useTranslation();
   const [expandedNodes, setExpandedNodes] = useState(new Set());
   const [selectedItem, setSelectedItem] = useState({ type: null, id: null }); // Track type (category/tag) and id
-
   const handleToggle = (nodeId) => {
     setExpandedNodes((prev) => {
       const newSet = new Set(prev);
@@ -154,26 +142,19 @@ const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading })
       return newSet;
     });
   };
-
   const handleSelect = (selection) => {
-    // selection = { type: 'category' | 'tag', data: node/tag, category?: node }
     setSelectedItem({ type: selection.type, id: selection.data.id });
-    
     if (selection.type === 'category') {
       onCategorySelect(selection.data);
     } else if (selection.type === 'tag') {
-      // Pass tag with category info for filtering
       onCategorySelect({ ...selection.data, isTag: true, categoryId: selection.category.id });
     }
   };
-
   const handleSelectAll = () => {
     setSelectedItem({ type: null, id: null });
     onCategorySelect(null);
   };
-
   const totalCount = treeData.reduce((sum, cat) => sum + cat.count, 0);
-
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 flex items-center justify-center">
@@ -181,7 +162,6 @@ const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading })
       </div>
     );
   }
-
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
       <div className="p-4 border-b border-gray-200">
@@ -193,9 +173,7 @@ const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading })
           {t('categories.treeHint', 'Click category để xem tất cả, click tag (#) để lọc theo tag')}
         </p>
       </div>
-
       <div className="p-2 max-h-[600px] overflow-y-auto">
-        {/* All Categories Option */}
         <div
           className={`flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer transition-all duration-200 mb-2 ${
             selectedItem.type === null
@@ -219,8 +197,7 @@ const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading })
             {totalCount}
           </span>
         </div>
-
-        {/* Tree Nodes */}
+        {}
         {treeData.map((node) => (
           <TreeNode
             key={node.id}
@@ -237,5 +214,4 @@ const CategoryTree = ({ selectedCategory, onCategorySelect, treeData, loading })
     </div>
   );
 };
-
 export default CategoryTree;

@@ -4,21 +4,18 @@ export const PROMPT_STATUS = {
   REJECTED: 'rejected',
   DRAFT: 'draft'
 };
-
 export const PROMPT_STATUS_TRANSLATION_MAP = {
   'pending': 'SUBMITTED',
   'approved': 'APPROVED',
   'rejected': 'REJECTED',
   'draft': 'DRAFT'
 };
-
 export const PROMPT_STATUS_COLORS = {
   [PROMPT_STATUS.PENDING]: 'orange',
   [PROMPT_STATUS.APPROVED]: 'green',
   [PROMPT_STATUS.REJECTED]: 'red',
   [PROMPT_STATUS.DRAFT]: 'default'
 };
-
 export const getStatusLabel = (status, t) => {
   const translationKey = PROMPT_STATUS_TRANSLATION_MAP[status];
   if (translationKey && t) {

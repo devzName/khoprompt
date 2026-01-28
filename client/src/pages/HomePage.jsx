@@ -7,7 +7,6 @@ import LatestPrompts from '../components/LatestPrompts';
 import TagsSection from '../components/TagsSection';
 import Footer from '../components/Footer';
 import { promptService } from '../services/promptService';
-
 const HomePage = () => {
   const [latestPrompts, setLatestPrompts] = useState([]);
   const [featuredPrompts, setFeaturedPrompts] = useState([]);
@@ -16,31 +15,23 @@ const HomePage = () => {
   const [selectedTag, setSelectedTag] = useState(null); // Track selected tag
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
-
   const [initialLoading, setInitialLoading] = useState(true);
-
   const handleCategorySelect = (selection) => {
     if (!selection) {
-      // "All" selected
       setSelectedCategory(null);
       setSelectedTag(null);
     } else if (selection.isTag) {
-      // Tag selected
       setSelectedTag(selection);
-      setSelectedCategory({ id: selection.categoryId }); // Keep category for context
+      setSelectedCategory({ id: selection.categoryId });
     } else {
-      // Category selected
       setSelectedCategory(selection);
       setSelectedTag(null);
     }
   };
-
   useEffect(() => {
-    // Reset to page 1 when category or tag changes
     setCurrentPage(1);
-    setInitialLoading(true); // Show loading when category/tag changes
+    setInitialLoading(true);
   }, [selectedCategory, selectedTag]);
-
   useEffect(() => {
     const fetchLatestPrompts = async () => {
       try {
@@ -63,10 +54,8 @@ const HomePage = () => {
         setInitialLoading(false); // Only turn off loading after first successful fetch
       }
     };
-
     fetchLatestPrompts();
   }, [selectedCategory, selectedTag, currentPage]);
-
   useEffect(() => {
     const fetchFeaturedPrompts = async () => {
       try {
@@ -86,10 +75,8 @@ const HomePage = () => {
         setLoadingFeatured(false);
       }
     };
-
     fetchFeaturedPrompts();
   }, [selectedCategory, selectedTag]); // Fetch when category or tag changes
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -121,5 +108,4 @@ const HomePage = () => {
     </div>
   );
 };
-
 export default HomePage;

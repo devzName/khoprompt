@@ -4,23 +4,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
 import aiService from '../../services/aiService';
-
 const { TextArea } = Input;
-
 const BasicInfoSection = () => {
   const { t } = useTranslation();
   const [isFormatting, setIsFormatting] = useState(false);
   const form = Form.useFormInstance();
-
   const handleAIFormat = async () => {
     const description = form.getFieldValue('description');
-    
     if (!description || description.trim() === '') {
       return;
     }
-
     setIsFormatting(true);
-    
     try {
       const result = await aiService.formatText(description, 'description');
       form.setFieldValue('description', result.formattedText);
@@ -30,7 +24,6 @@ const BasicInfoSection = () => {
       setIsFormatting(false);
     }
   };
-
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.basicInfo')}>
       <Form.Item
@@ -44,7 +37,6 @@ const BasicInfoSection = () => {
           size="large"
         />
       </Form.Item>
-
       <Form.Item
         label={
           <div className="flex items-center gap-2">
@@ -74,5 +66,4 @@ const BasicInfoSection = () => {
     </PromptFormSection>
   );
 };
-
 export default BasicInfoSection;

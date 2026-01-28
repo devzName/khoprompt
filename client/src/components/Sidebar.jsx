@@ -6,12 +6,10 @@ import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
 import UserProfile from './shared/UserProfile';
 import { ROUTES } from '../constants/routes';
-
 const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClose = null }) => {
   const navigate = useNavigate();
   const { t, getLanguageMenuItems } = useLanguage();
   const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, onLogout, false, user);
-
   const handleMenuClick = (item) => {
     if (item.action) {
       item.action();
@@ -20,7 +18,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
     }
     if (isMobile && onClose) onClose();
   };
-
   const getActiveClass = (itemKey) => {
     const isActive = (itemKey === 'dashboard' && activeTab === 'dashboard') ||
       (itemKey === 'my-prompts' && activeTab === 'list') ||
@@ -31,7 +28,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
       ? 'bg-blue-50 text-blue-600 font-medium'
       : 'text-gray-700 hover:bg-gray-50';
   };
-
   if (isMobile) {
     return (
       <div className="flex flex-col h-full bg-white">
@@ -47,7 +43,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
             />
           </div>
         </div>
-
         <nav className="flex-1 px-4">
           <div className="space-y-2">
             {menuItems.map((item) => (
@@ -62,7 +57,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
             ))}
           </div>
         </nav>
-
         {user && (
           <div className="p-4 border-t border-gray-100">
             <UserProfile user={user} menuItems={userMenuItems} placement="top" size={40} />
@@ -71,13 +65,11 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
       </div>
     );
   }
-
   return (
     <div className="w-64 bg-white border-r h-screen flex flex-col">
       <div className="p-4 border-b">
         <Logo size="medium" onClick={() => navigate(ROUTES.HOME)} />
       </div>
-
       <nav className="flex-1 px-3 py-2 overflow-y-auto">
         <div className="space-y-1">
           {menuItems.map((item) => (
@@ -92,12 +84,10 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
           ))}
         </div>
       </nav>
-
       <div className="p-4 border-t">
         <UserProfile user={user} menuItems={userMenuItems} placement="topRight" size={40} />
       </div>
     </div>
   );
 };
-
 export default Sidebar;

@@ -17,9 +17,7 @@ class User(AuditMixin, Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    user_type: Mapped[str] = mapped_column(String(50), nullable=False, default="google")
-    
-    google_id: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True, index=True)
+    user_type: Mapped[str] = mapped_column(String(50), nullable=False, default="microsoft")
     
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     

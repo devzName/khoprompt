@@ -21,7 +21,6 @@ import { voteService } from '../services/voteService';
 import { useViewTracking } from '../hooks/useViewTracking';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
-
 const PromptDetailPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -33,8 +32,6 @@ const PromptDetailPage = () => {
   const [voteLoading, setVoteLoading] = useState(false);
   const [voteStats, setVoteStats] = useState({ helpful_count: 0, not_helpful_count: 0 });
   const [currentRating, setCurrentRating] = useState(null);
-
-  // Track view với điều kiện và callback để refresh stats
   const refreshStats = async () => {
     if (prompt?.id) {
       try {
@@ -49,33 +46,26 @@ const PromptDetailPage = () => {
       }
     }
   };
-
   useViewTracking(
     prompt?.id, 
     prompt?.status === 'approved',
     refreshStats
   );
-
   useEffect(() => {
     const fetchPromptDetail = async () => {
       try {
         setLoading(true);
         const response = await promptService.getPromptBySlug(slug);
         setPrompt(response);
-        
-        // Fetch vote stats
         if (response.id) {
           try {
             const stats = await voteService.getPromptVoteStats(response.id);
             setVoteStats(stats);
-            // Cập nhật rating dựa trên vote stats mới
             setCurrentRating(calculateSimpleRating({
               rating: response.rating,
               like_count: stats.helpful_count || 0,
               dislike_count: stats.not_helpful_count || 0
             }));
-            
-            // Cập nhật view count từ stats
             setPrompt(prev => ({
               ...prev,
               view_count: stats.view_count || 0
@@ -83,8 +73,6 @@ const PromptDetailPage = () => {
           } catch (error) {
             console.error('Error fetching vote stats:', error);
           }
-          
-          // Fetch user's vote if logged in
           if (user) {
             try {
               const vote = await voteService.getUserVote(response.id);
@@ -105,15 +93,12 @@ const PromptDetailPage = () => {
         setLoading(false);
       }
     };
-
     if (slug) {
       fetchPromptDetail();
     }
   }, [slug, t, user]);
-
   const handleCopyPrompt = () => {
     if (prompt) {
-      // Convert HTML to plain text for copying
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = prompt.content;
       const plainText = tempDiv.textContent || tempDiv.innerText || '';
@@ -127,7 +112,6 @@ const PromptDetailPage = () => {
       });
     }
   };
-
   const handleVote = async (isHelpful) => {
     try {
       if (!user) {
@@ -138,7 +122,6 @@ const PromptDetailPage = () => {
         });
         return;
       }
-
       if (user && prompt && user.id === prompt.user_id) {
         notification.warning({
           title: t('common.warning', 'Warning'),
@@ -147,37 +130,25 @@ const PromptDetailPage = () => {
         });
         return;
       }
-
       setVoteLoading(true);
-      
-      // Call API to vote
       await voteService.votePrompt(prompt.id, isHelpful);
-      
-      // Update local state với format giống API response
       setUserVote({ 
         prompt_id: prompt.id,
         is_helpful: isHelpful,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
-      
-      // Refresh vote stats
       const updatedStats = await voteService.getPromptVoteStats(prompt.id);
       setVoteStats(updatedStats);
-      
-      // Cập nhật rating dựa trên vote stats mới
       setCurrentRating(calculateSimpleRating({
         rating: prompt.rating,
         like_count: updatedStats.helpful_count || 0,
         dislike_count: updatedStats.not_helpful_count || 0
       }));
-      
-      // Cập nhật view count từ stats
       setPrompt(prev => ({
         ...prev,
         view_count: updatedStats.view_count || 0
       }));
-      
       notification.success({
         title: t('common.success', 'Success'),
         description: isHelpful ? t('promptDetail.votedHelpful') : t('promptDetail.votedNotHelpful'),
@@ -194,7 +165,6 @@ const PromptDetailPage = () => {
       setVoteLoading(false);
     }
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -206,18 +176,15 @@ const PromptDetailPage = () => {
       </div>
     );
   }
-
   if (!prompt) {
     return <NotFoundPage />;
   }
-
   const instructions = [
     t('promptDetail.defaultInstructions.0'),
     t('promptDetail.defaultInstructions.1'),
     t('promptDetail.defaultInstructions.2'),
     t('promptDetail.defaultInstructions.3')
   ];
-
   const breadcrumbItems = [
     { title: <Link to={ROUTES.HOME}>{t('promptDetail.home')}</Link> },
     {
@@ -227,15 +194,12 @@ const PromptDetailPage = () => {
     },
     { title: prompt.title }
   ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full">
           <Breadcrumb items={breadcrumbItems} className="mb-6" />
-
           <div className="mt-2 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 mb-8 overflow-hidden relative">
             <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
               <Avatar 
@@ -252,7 +216,6 @@ const PromptDetailPage = () => {
                   </Tag>
                 </div>
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">{prompt.description}</p>
-
                 <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
                   {formatRating(currentRating) && (
                     <div className={`flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 ${getRatingContainerColor(currentRating)}`}>
@@ -285,7 +248,6 @@ const PromptDetailPage = () => {
                 </div>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
               {(!user || user.id !== prompt.user_id) && (
                 <>
@@ -315,7 +277,6 @@ const PromptDetailPage = () => {
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
@@ -338,7 +299,6 @@ const PromptDetailPage = () => {
                 </Button>
               </div>
             </div>
-
             {prompt.full_description && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-3">
@@ -350,7 +310,6 @@ const PromptDetailPage = () => {
               </div>
             )}
           </div>
-
           <div className="space-y-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-6">{t('promptDetail.instructions')}</h2>
@@ -365,7 +324,6 @@ const PromptDetailPage = () => {
                 ))}
               </ol>
             </div>
-
             <div className="bg-linear-to-br from-blue-600 to-purple-700 rounded-2xl p-6 sm:p-8 shadow-lg text-white">
               <h2 className="text-xl font-bold mb-4">{t('promptDetail.category')}</h2>
               <p className="text-blue-50 mb-6 leading-relaxed opacity-90">
@@ -391,5 +349,4 @@ const PromptDetailPage = () => {
     </div>
   );
 };
-
 export default PromptDetailPage;

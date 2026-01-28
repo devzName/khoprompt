@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next';
-
 export const useLanguage = () => {
   const { t, i18n } = useTranslation();
-
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     localStorage.setItem('language', lng);
   };
-
   const getLanguageMenuItems = () => [
     {
       key: 'vi',
@@ -20,7 +17,6 @@ export const useLanguage = () => {
       onClick: () => changeLanguage('en'),
     },
   ];
-
   return {
     t,
     i18n,

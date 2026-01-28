@@ -1,5 +1,4 @@
 import apiClient from '../axios/apiClient';
-
 export const aiService = {
   formatText: async (text, type = 'description') => {
     try {
@@ -14,5 +13,4 @@ export const aiService = {
     }
   }
 };
-
 export default aiService;

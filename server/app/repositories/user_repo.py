@@ -26,12 +26,6 @@ class UserRepository:
         return result.scalar_one_or_none()
     
     @staticmethod
-    async def get_by_google_id(session: AsyncSession, google_id: str) -> User | None:
-        stmt = select(User).where(User.google_id == google_id, User.is_deleted == False)
-        result = await session.execute(stmt)
-        return result.scalar_one_or_none()
-    
-    @staticmethod
     async def get_by_id(session: AsyncSession, user_id: UUID) -> User | None:
         stmt = select(User).where(User.id == user_id, User.is_deleted == False)
         result = await session.execute(stmt)

@@ -8,5 +8,4 @@ export const ROUTES = {
   MY_PROMPTS_CREATE: '/my-prompts?tab=create',
   CREATE_PROMPT: '/my-prompts',
 };
-
 export default ROUTES;

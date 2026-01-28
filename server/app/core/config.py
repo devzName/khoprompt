@@ -45,15 +45,6 @@ class Settings(BaseSettings):
         validation_alias="ALLOWED_ORIGINS",
     )
 
-    # LDAP Configuration
-    ldap_server_host: str = Field(default="ldap://your-company-ldap-server.com", validation_alias="LDAP_SERVER_HOST")
-    ldap_server_port: int = Field(default=389, validation_alias="LDAP_SERVER_PORT")
-    ldap_base_dn: str = Field(default="dc=company,dc=com", validation_alias="LDAP_BASE_DN")
-    ldap_user_search_base: str = Field(default="ou=users,dc=company,dc=com", validation_alias="LDAP_USER_SEARCH_BASE")
-    ldap_bind_dn_template: str = Field(default="cn={username},ou=users,dc=company,dc=com", validation_alias="LDAP_BIND_DN_TEMPLATE")
-    ldap_use_ssl: bool = Field(default=False, validation_alias="LDAP_USE_SSL")
-    ldap_use_ntlm: bool = Field(default=False, validation_alias="LDAP_USE_NTLM")
-
     @field_validator("allowed_origins", mode="before")
     @classmethod
     def _parse_origins(cls, v):

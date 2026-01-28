@@ -2,11 +2,8 @@ import { LogoutOutlined, GlobalOutlined, BookOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom';
 import { Avatar } from 'antd';
 import { ROUTES } from '../constants/routes';
-
 export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMyPrompts = false, user = null) => {
   const items = [];
-
-  // Add user info at the top
   if (user) {
     items.push(
       {
@@ -27,8 +24,6 @@ export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMy
       }
     );
   }
-
-  // Add My Prompts if needed (for Header)
   if (includeMyPrompts) {
     items.push(
       {
@@ -41,8 +36,6 @@ export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMy
       }
     );
   }
-
-  // Add Language submenu
   items.push(
     {
       key: 'language',
@@ -61,6 +54,5 @@ export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMy
       onClick: onLogout,
     }
   );
-
   return items;
 };

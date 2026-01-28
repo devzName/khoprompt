@@ -1,6 +1,5 @@
 import { Card, Avatar } from 'antd';
 import { EyeOutlined, UserOutlined } from '@ant-design/icons';
-
 const PromptCard = ({ title, description, author }) => {
   return (
     <Card
@@ -32,5 +31,4 @@ const PromptCard = ({ title, description, author }) => {
     </Card>
   );
 };
-
 export default PromptCard;

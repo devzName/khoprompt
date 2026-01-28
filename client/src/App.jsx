@@ -6,7 +6,6 @@ import MyPromptsPage from './pages/MyPromptsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
-
 function App() {
   return (
     <Router>
@@ -22,11 +21,9 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        {/* Catch all unmatched routes */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
 }
-
 export default App;

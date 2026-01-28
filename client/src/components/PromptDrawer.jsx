@@ -4,20 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
 import { PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
-
 const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
   const handleCopy = () => {
     if (prompt?.content) {
-      // Convert HTML to plain text for copying
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = prompt.content;
       const plainText = tempDiv.textContent || tempDiv.innerText || '';
       navigator.clipboard.writeText(plainText);
-      
-      // Show success notification
       notification.success({
         message: t('common.success', 'Success'),
         description: t('promptDetail.copied', 'Đã copy!'),
@@ -26,29 +21,23 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
       });
     }
   };
-
   const handleViewDetail = () => {
     navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.slug));
     onClose();
   };
-
   const handleApprove = () => {
     if (onApprove && prompt?.id) {
       onApprove(prompt.id);
       onClose();
     }
   };
-
   const handleReject = () => {
     if (onReject && prompt?.id) {
       onReject(prompt.id);
       onClose();
     }
   };
-
-  // Show approve/reject buttons only for admin and pending prompts
   const showApprovalButtons = currentUser?.user_type === 'admin' && prompt?.status === 'pending';
-
   return (
     <Drawer
       title={
@@ -103,7 +92,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
     >
       {prompt && (
         <div className="space-y-6">
-          {/* Prompt Details */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.promptDetails')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -156,16 +144,12 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           </div>
-
-          {/* Description */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.description')}</h3>
             <div className="text-gray-700 leading-relaxed">
               {prompt.description}
             </div>
           </div>
-
-          {/* Prompt Content - Highlighted */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-blue-500 pl-3">
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
@@ -185,8 +169,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </Button>
             </div>
           </div>
-
-          {/* Notes */}
           {prompt.full_description && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-purple-500 pl-3">
@@ -199,10 +181,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           )}
-
           <Divider />
-
-          {/* Category & Tags */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-orange-500 pl-3">
               {t('reviewPromptDrawer.categoryTags', 'Danh mục & Tags')}
@@ -220,8 +199,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               ))}
             </div>
           </div>
-
-          {/* Stats */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.statsInteraction')}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -248,8 +225,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
                 <div className="text-gray-600 text-xs">{t('reviewPromptDrawer.ageInDays')}</div>
               </div>
             </div>
-            
-            {/* Additional Stats */}
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -268,8 +243,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           </div>
-
-          {/* Author Info - Last */}
           {prompt.user && (
             <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.authorInfo')}</h3>
@@ -310,5 +283,4 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
     </Drawer>
   );
 };
-
 export default PromptDrawer;

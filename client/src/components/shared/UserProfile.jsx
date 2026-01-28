@@ -1,8 +1,6 @@
 import { Avatar, Dropdown } from 'antd';
-
 const UserProfile = ({ user, menuItems, placement = 'topRight', size = 40 }) => {
   if (!user) return null;
-
   return (
     <Dropdown menu={{ items: menuItems }} placement={placement} trigger={['click']}>
       <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -18,5 +16,4 @@ const UserProfile = ({ user, menuItems, placement = 'topRight', size = 40 }) => 
     </Dropdown>
   );
 };
-
 export default UserProfile;

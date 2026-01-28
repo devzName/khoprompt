@@ -13,7 +13,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import apiClient from '../axios/apiClient';
 import { API_ENDPOINTS } from '../constants/api';
-
 const ManageCategoriesTags = ({ onMenuClick }) => {
   const { t } = useTranslation();
   const [treeData, setTreeData] = useState([]);
@@ -25,21 +24,17 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
   const [categories, setCategories] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [allKeys, setAllKeys] = useState([]);
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await apiClient.get(API_ENDPOINTS.CATEGORIES.TREE);
       const categoriesData = response.data;
       setCategories(categoriesData);
-      
       const formattedTree = categoriesData.map(cat => {
         const isOtherCategory = cat.slug === 'other';
-        
         return {
           title: (
             <div className="flex items-center justify-between group">
@@ -122,7 +117,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
           }))
         };
       });
-      
       const categoryKeys = categoriesData.map(cat => `cat-${cat.id}`);
       setAllKeys(categoryKeys);
       setExpandedKeys(categoryKeys);
@@ -138,14 +132,12 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       setLoading(false);
     }
   };
-
   const handleAddCategory = () => {
     setModalType('add-category');
     setEditingItem(null);
     form.resetFields();
     setModalOpen(true);
   };
-
   const handleEditCategory = (category) => {
     setModalType('edit-category');
     setEditingItem(category);
@@ -155,7 +147,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
     });
     setModalOpen(true);
   };
-
   const handleAddTag = (category) => {
     setModalType('add-tag');
     setEditingItem({ category });
@@ -164,7 +155,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
     });
     setModalOpen(true);
   };
-
   const handleEditTag = (tag, category) => {
     setModalType('edit-tag');
     setEditingItem({ tag, category });
@@ -174,7 +164,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
     });
     setModalOpen(true);
   };
-
   const handleDeleteCategory = (category) => {
     Modal.confirm({
       title: t('manageCategoriesTags.deleteCategory', 'Delete Category'),
@@ -201,7 +190,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       }
     });
   };
-
   const handleDeleteTag = (tag) => {
     Modal.confirm({
       title: t('manageCategoriesTags.deleteTag', 'Delete Tag'),
@@ -228,11 +216,9 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       }
     });
   };
-
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
-      
       if (modalType === 'add-category') {
         await apiClient.post(API_ENDPOINTS.CATEGORIES.BASE, values);
         notification.success({
@@ -262,7 +248,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
           placement: 'topRight'
         });
       }
-      
       setModalOpen(false);
       form.resetFields();
       fetchData();
@@ -275,7 +260,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       });
     }
   };
-
   const getModalTitle = () => {
     switch (modalType) {
       case 'add-category': return t('manageCategoriesTags.addCategory', 'Add Category');
@@ -285,17 +269,13 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
       default: return '';
     }
   };
-
   const handleExpandAll = () => {
     setExpandedKeys(allKeys);
   };
-
   const handleCollapseAll = () => {
     setExpandedKeys([]);
   };
-
   const isAllExpanded = expandedKeys.length === allKeys.length;
-
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -332,7 +312,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
           </Space>
         </div>
       </div>
-
       <div className="flex-1 overflow-auto p-6">
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -350,7 +329,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
           </div>
         )}
       </div>
-
       <Modal
         title={getModalTitle()}
         open={modalOpen}
@@ -381,7 +359,6 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
               </Form.Item>
             </>
           )}
-          
           {(modalType === 'add-tag' || modalType === 'edit-tag') && (
             <>
               <Form.Item
@@ -414,5 +391,4 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
     </div>
   );
 };
-
 export default ManageCategoriesTags;

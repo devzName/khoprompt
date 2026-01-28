@@ -2,9 +2,7 @@ import { useTranslation } from 'react-i18next';
 import PageHeader from '../shared/PageHeader';
 import PromptsTable from '../shared/PromptsTable';
 import { Input } from 'antd';
-
 const { Search } = Input;
-
 const ReviewPromptsList = ({
   searchValue = '',
   onSearchChange,
@@ -19,7 +17,6 @@ const ReviewPromptsList = ({
   onTableChange
 }) => {
   const { t } = useTranslation();
-
   return (
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
@@ -42,7 +39,6 @@ const ReviewPromptsList = ({
           </div>
         </div>
       </PageHeader>
-
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full p-4 sm:p-6">
           <PromptsTable
@@ -61,5 +57,4 @@ const ReviewPromptsList = ({
     </div>
   );
 };
-
 export default ReviewPromptsList;

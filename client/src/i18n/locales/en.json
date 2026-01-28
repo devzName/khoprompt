@@ -27,15 +27,21 @@
     "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "signIn": "Sign In",
-    "footer": "Sign in to experience all features of Prompt Library",
+    "or": "or",
+    "signInWithMicrosoft": "Sign in with Microsoft",
+    "loggingIn": "Logging in...",
+    "footer": "By signing in, you agree to our terms of service",
     "success": "Login successful!",
-    "error": "Login failed. Please try again!",
-    "invalidCredentials": "Invalid username or password!",
-    "networkError": "Network error. Please check your internet connection!",
-    "serverError": "Server error. Please try again later!",
+    "error": "Login failed",
+    "invalidCredentials": "Invalid username or password",
+    "networkError": "Network error. Please check your internet connection",
+    "serverError": "Server error. Please try again later",
     "fillAllFields": "Please fill in all fields",
     "rememberMe": "Remember me",
-    "required": "Please login to continue"
+    "required": "Please login to continue",
+    "invalidMicrosoftToken": "Invalid Microsoft access token",
+    "organizationNotAllowed": "Account not from allowed organization",
+    "microsoftError": "Microsoft login error"
   },
   "sidebar": {
     "backToHome": "Back to home",
@@ -334,7 +340,7 @@
       "delete": "Delete"
     }
   },
-  "categories": {
+  "categoriesPage": {
     "title": "Prompt Categories",
     "all": "All",
     "viewGrid": "Grid",

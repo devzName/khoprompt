@@ -9,7 +9,6 @@ import NotesSection from './NotesSection';
 import FormActions from './FormActions';
 import { promptCategoriesService } from '../../services/promptCategoriesService';
 import { promptTagsService } from '../../services/promptTagsService';
-
 const CreatePromptForm = ({
   form,
   loading,
@@ -22,7 +21,6 @@ const CreatePromptForm = ({
   const [categories, setCategories] = useState([]);
   const [allTags, setAllTags] = useState([]);
   const [filteredTags, setFilteredTags] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,20 +28,17 @@ const CreatePromptForm = ({
           promptCategoriesService.getCategories(),
           promptTagsService.getTags()
         ]);
-        
         setCategories(categoriesData.map(cat => ({ 
           label: cat.name, 
           value: cat.id, 
           slug: cat.slug 
         })));
-        
         const mappedTags = tagsData.map(tag => ({ 
           label: tag.name, 
           value: tag.id.toString(),
           categoryId: tag.category_id
         }));
         setAllTags(mappedTags);
-        
         const initialCategory = form.getFieldValue('category');
         if (initialCategory) {
           const filtered = mappedTags.filter(tag => tag.categoryId === initialCategory);
@@ -53,30 +48,22 @@ const CreatePromptForm = ({
         console.error('Error fetching data:', error);
       }
     };
-
     fetchData();
   }, []);
-
   const handleCategoryChange = (value) => {
     const filtered = allTags.filter(tag => tag.categoryId === value);
     setFilteredTags(filtered);
     form.setFieldsValue({ tags: [] });
   };
-
   const handleFormSubmit = (values) => {
-    // Convert form values to API format
     const processedValues = {
       ...values,
       category_id: values.category, // Chuyển từ category thành category_id cho API
       tags: values.tags ? values.tags.map(tagId => parseInt(tagId, 10)) : []
     };
-    
-    // Remove the original category field
     delete processedValues.category;
-    
     onSubmit(processedValues);
   };
-
   return (
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
@@ -85,7 +72,6 @@ const CreatePromptForm = ({
         breadcrumb={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
         onMenuClick={onMenuClick}
       />
-
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full p-4 sm:p-6">
           <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
@@ -104,5 +90,4 @@ const CreatePromptForm = ({
     </div>
   );
 };
-
 export default CreatePromptForm;

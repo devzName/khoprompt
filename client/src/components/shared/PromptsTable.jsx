@@ -6,7 +6,6 @@ import { PROMPT_STATUS, PROMPT_STATUS_COLORS, getStatusLabel } from '../../const
 import PromptDrawer from '../PromptDrawer';
 import { promptService } from '../../services/promptService';
 import { promptCategoriesService } from '../../services/promptCategoriesService';
-
 const PromptsTable = ({
   prompts = [],
   loading = false,
@@ -27,7 +26,6 @@ const PromptsTable = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [categories, setCategories] = useState([]);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -39,7 +37,6 @@ const PromptsTable = ({
     };
     fetchCategories();
   }, []);
-
   const handleQuickView = async (prompt) => {
     try {
       const detailedPrompt = await promptService.getPromptById(prompt.id);
@@ -63,7 +60,6 @@ const PromptsTable = ({
       }, 100);
     }
   };
-
   const handleDeletePrompt = (promptId) => {
     Modal.confirm({
       title: t('myPrompts.deleteConfirmTitle'),
@@ -77,43 +73,31 @@ const PromptsTable = ({
       },
     });
   };
-
-  // Get categories from API for filter
   const categoryFilters = categories.map(cat => ({ 
     text: cat.name, 
     value: cat.name 
   }));
-
-  // All available status filters (not just from current prompts)
   const statusFilters = [
     { text: getStatusLabel(PROMPT_STATUS.DRAFT, t), value: PROMPT_STATUS.DRAFT },
     { text: getStatusLabel(PROMPT_STATUS.PENDING, t), value: PROMPT_STATUS.PENDING },
     { text: getStatusLabel(PROMPT_STATUS.APPROVED, t), value: PROMPT_STATUS.APPROVED },
     { text: getStatusLabel(PROMPT_STATUS.REJECTED, t), value: PROMPT_STATUS.REJECTED }
   ];
-
   const handleTableChange = (paginationConfig, filters, sorter) => {
     if (onTableChange) {
-      // Extract filter values
       const categoryFilter = filters.category?.[0] || null;
       const statusFilter = filters.status?.[0] || null;
-      
-      // Extract sort values
       let sortBy = null;
       let sortOrder = null;
-      
       if (sorter.order) {
-        // Map column key to API field name
         const sortFieldMap = {
           'title': 'title',
           'view_count': 'view_count',
           'created_at': 'created_at'
         };
-        
         sortBy = sortFieldMap[sorter.field] || null;
         sortOrder = sorter.order === 'ascend' ? 'asc' : 'desc';
       }
-      
       onTableChange({
         page: paginationConfig.current,
         category: categoryFilter,
@@ -123,7 +107,6 @@ const PromptsTable = ({
       });
     }
   };
-
   const columns = [
     {
       title: t('myPrompts.table.title', 'Tiêu đề'),
@@ -206,7 +189,6 @@ const PromptsTable = ({
       align: 'center',
       render: (_, record) => {
         if (mode === 'review') {
-          // Review mode actions
           return (
             <Space size="small">
               <Tooltip title={t('common.view', 'Xem')}>
@@ -218,7 +200,6 @@ const PromptsTable = ({
                   className="text-blue-600 hover:text-blue-700"
                 />
               </Tooltip>
-              
               <Tooltip title={t('reviewPrompts.approve', 'Duyệt')}>
                 <Button
                   type="link"
@@ -228,7 +209,6 @@ const PromptsTable = ({
                   className="text-green-600 hover:text-green-700"
                 />
               </Tooltip>
-              
               <Tooltip title={t('reviewPrompts.reject', 'Từ chối')}>
                 <Button
                   type="link"
@@ -241,8 +221,6 @@ const PromptsTable = ({
             </Space>
           );
         }
-        
-        // Default mode actions
         return (
           <Space size="small">
             <Tooltip title={t('common.view', 'Xem')}>
@@ -254,7 +232,6 @@ const PromptsTable = ({
                 className="text-blue-600 hover:text-blue-700"
               />
             </Tooltip>
-            
             <Tooltip title={t('common.edit', 'Sửa')}>
               <Button
                 type="link"
@@ -265,7 +242,6 @@ const PromptsTable = ({
                 className="text-green-600 hover:text-green-700"
               />
             </Tooltip>
-            
             {record.status === PROMPT_STATUS.DRAFT && (
               <Tooltip title={t('myPrompts.submitForReview', 'Gửi duyệt')}>
                 <Button
@@ -277,7 +253,6 @@ const PromptsTable = ({
                 />
               </Tooltip>
             )}
-            
             <Tooltip title={t('myPrompts.delete', 'Xóa')}>
               <Button
                 type="link"
@@ -292,7 +267,6 @@ const PromptsTable = ({
       },
     },
   ];
-
   return (
     <>
       <Card className="shadow-sm">
@@ -338,7 +312,6 @@ const PromptsTable = ({
           }}
         />
       </Card>
-
       <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -350,5 +323,4 @@ const PromptsTable = ({
     </>
   );
 };
-
 export default PromptsTable;

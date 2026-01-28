@@ -6,15 +6,12 @@ import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
-
 const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
-
   const featuredPrompts = prompts;
-
   if (loading) {
     return (
       <section className="py-4 bg-white">
@@ -43,11 +40,9 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
       </section>
     );
   }
-
   if (featuredPrompts.length === 0) {
     return null;
   }
-
   const handleQuickView = async (e, prompt) => {
     e.stopPropagation();
     try {
@@ -72,11 +67,9 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
       }, 100);
     }
   };
-
   const handleCardClick = (prompt) => {
     navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.slug));
   };
-
   return (
     <>
       <section className="py-4 bg-white">
@@ -92,7 +85,6 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
               </p>
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredPrompts.map((prompt) => (
               <div
@@ -113,10 +105,8 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                     </div>
                   )}
                 </div>
-
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
-
                 <div className="flex flex-wrap gap-2 mb-4">
                   {prompt.tags?.slice(0, 3).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
@@ -129,7 +119,6 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                     </span>
                   )}
                 </div>
-
                 <div className="flex items-center justify-between text-sm mt-auto">
                   <div className="flex items-center gap-3 text-gray-500">
                     <span>{t('featured.by')} {prompt.author || prompt.user?.full_name || 'Unknown'}</span>
@@ -147,7 +136,6 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
           </div>
         </div>
       </section>
-
       <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -156,5 +144,4 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
     </>
   );
 };
-
 export default FeaturedPrompts;

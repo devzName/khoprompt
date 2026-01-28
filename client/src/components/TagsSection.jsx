@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { TagOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { promptTagsService } from '../services/promptTagsService';
-
 const TagsSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -11,12 +10,9 @@ const TagsSection = () => {
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const INITIAL_DISPLAY_COUNT = 24;
-
   const handleTagClick = (tagName) => {
-    // Chuyển đến SearchPage với tag đã chọn và type=tag để phân biệt
     navigate(`/search?q=${encodeURIComponent(tagName)}&type=tag`);
   };
-  
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -29,10 +25,8 @@ const TagsSection = () => {
         setLoading(false);
       }
     };
-
     fetchTags();
   }, [t]);
-
   if (loading) {
     return (
       <section className="py-4 pb-8 bg-white">
@@ -48,7 +42,6 @@ const TagsSection = () => {
               {t('tags.subtitle')}
             </p>
           </div>
-
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-3">
             {[...Array(24)].map((_, index) => (
               <div
@@ -61,10 +54,8 @@ const TagsSection = () => {
       </section>
     );
   }
-
   const displayedTags = showAll ? tags : tags.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMoreTags = tags.length > INITIAL_DISPLAY_COUNT;
-
   return (
     <section className="py-4 pb-8 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,7 +70,6 @@ const TagsSection = () => {
             {t('tags.subtitle')}
           </p>
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-3">
           {displayedTags.length > 0 ? (
             displayedTags.map((tag, index) => (
@@ -99,7 +89,6 @@ const TagsSection = () => {
             </div>
           )}
         </div>
-
         {hasMoreTags && (
           <div className="flex justify-end mt-6">
             <button
@@ -124,5 +113,4 @@ const TagsSection = () => {
     </section>
   );
 };
-
 export default TagsSection;

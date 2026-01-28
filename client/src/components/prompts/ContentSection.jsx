@@ -6,8 +6,6 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import PromptFormSection from './PromptFormSection';
 import aiService from '../../services/aiService';
-
-// Wrapper component để CKEditor hoạt động với Ant Design Form
 const CKEditorWrapper = ({ value, onChange, placeholder }) => {
   return (
     <CKEditor
@@ -53,31 +51,24 @@ const CKEditorWrapper = ({ value, onChange, placeholder }) => {
     />
   );
 };
-
 const ContentSection = () => {
   const { t } = useTranslation();
   const [isFormatting, setIsFormatting] = useState(false);
   const form = Form.useFormInstance();
-
   const stripHtmlTags = (html) => {
     const div = document.createElement('div');
     div.innerHTML = html;
     return div.textContent || div.innerText || '';
   };
-
   const handleAIFormat = async () => {
     const content = form.getFieldValue('content');
-    
     if (!content || stripHtmlTags(content).trim() === '') {
       return;
     }
-
     setIsFormatting(true);
-    
     try {
       const plainText = stripHtmlTags(content);
       const result = await aiService.formatText(plainText, 'content');
-      
       const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
       form.setFieldValue('content', formattedHtml);
     } catch (error) {
@@ -86,7 +77,6 @@ const ContentSection = () => {
       setIsFormatting(false);
     }
   };
-
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.content')}>
       <Form.Item
@@ -116,5 +106,4 @@ const ContentSection = () => {
     </PromptFormSection>
   );
 };
-
 export default ContentSection;

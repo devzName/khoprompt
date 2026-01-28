@@ -1,6 +1,5 @@
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-
 const EmptyState = ({ 
   icon: Icon, 
   title, 
@@ -30,5 +29,4 @@ const EmptyState = ({
     </div>
   );
 };
-
 export default EmptyState;

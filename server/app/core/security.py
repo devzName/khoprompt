@@ -6,8 +6,6 @@ from uuid import UUID
 import hashlib
 
 from jose import JWTError, jwt
-from google.auth.transport import requests
-from google.oauth2 import id_token
 from passlib.context import CryptContext
 
 from app.core.config import get_settings

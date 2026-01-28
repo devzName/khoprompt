@@ -21,7 +21,6 @@ import { Segmented } from 'antd';
 import { API_ENDPOINTS } from '../constants/api';
 import apiClient from '../axios/apiClient';
 import CategoryTree from './CategoryTree';
-
 const Categories = ({ selectedCategory, onCategorySelect }) => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
@@ -30,9 +29,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
   const [treeLoading, setTreeLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
-  
   const INITIAL_DISPLAY_COUNT = 4;
-
   const getIcon = (name) => {
     switch (name) {
       case 'HR': return <TeamOutlined />;
@@ -47,7 +44,6 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
       default: return <AppstoreOutlined />;
     }
   };
-
   const handleCategoryClick = (category) => {
     if (category.slug === 'all') {
       onCategorySelect(null); // null means "all categories"
@@ -55,13 +51,11 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
       onCategorySelect(category);
     }
   };
-
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await apiClient.get(API_ENDPOINTS.CATEGORIES.STATS);
         const { categories, total_prompts } = response.data;
-
         const formattedCategories = [
           {
             id: null,
@@ -85,7 +79,6 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
         setLoading(false);
       }
     };
-
     const fetchTreeData = async () => {
       try {
         const response = await apiClient.get(API_ENDPOINTS.CATEGORIES.TREE);
@@ -96,14 +89,10 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
         setTreeLoading(false);
       }
     };
-
     fetchStats();
     fetchTreeData();
   }, [t]);
-
   if (loading) return null;
-
-  // Tree view
   if (viewMode === 'tree') {
     return (
       <section className="py-4 bg-white">
@@ -140,7 +129,6 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
               ]}
             />
           </div>
-
           <CategoryTree 
             selectedCategory={selectedCategory}
             onCategorySelect={onCategorySelect}
@@ -151,11 +139,8 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
       </section>
     );
   }
-
-  // Grid view (existing code)
   const displayedCategories = isExpanded ? categories : categories.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMoreCategories = categories.length > INITIAL_DISPLAY_COUNT;
-
   return (
     <section className="py-4 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -191,11 +176,9 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
             ]}
           />
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {displayedCategories.map((category, index) => {
             const isSelected = selectedCategory?.id === category.id || (!selectedCategory && category.slug === 'all');
-            
             return (
               <div
                 key={index}
@@ -233,7 +216,6 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
             );
           })}
         </div>
-
         {hasMoreCategories && (
           <div className="flex justify-end mt-6">
             <button
@@ -258,5 +240,4 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
     </section>
   );
 };
-
 export default Categories;

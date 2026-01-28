@@ -13,7 +13,6 @@ import DashboardOverview from '../components/DashboardOverview';
 import PromptsList from '../components/prompts/PromptsList';
 import PromptDrawer from '../components/PromptDrawer';
 import ManageCategoriesTags from '../components/ManageCategoriesTags';
-
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
@@ -34,13 +33,10 @@ const MyPromptsPage = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
-  
-  // Filter and sort states
   const [filters, setFilters] = useState({ category: null, status: null });
   const [sorter, setSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
   const [dashboardFilters, setDashboardFilters] = useState({ category: null, status: null });
   const [dashboardSorter, setDashboardSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
-
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
     if (tabFromUrl === 'create') {
@@ -55,25 +51,21 @@ const MyPromptsPage = () => {
       setActiveTab('list');
     }
   }, [searchParams, form, user?.user_type]);
-
   useEffect(() => {
     if (user?.id && activeTab === 'list') {
       setCurrentPage(1);
       setInitialLoading(true);
-      // Reset filters and sorter to default when switching tabs
       setFilters({ category: null, status: null });
       setSorter({ sortBy: 'created_at', sortOrder: 'desc' });
       fetchMyPrompts(1, '', { category: null, status: null }, { sortBy: 'created_at', sortOrder: 'desc' });
     } else if (user?.user_type === 'admin' && activeTab === 'dashboard') {
       setDashboardCurrentPage(1);
       setInitialLoading(true);
-      // Reset filters and sorter to default when switching tabs
       setDashboardFilters({ category: null, status: null });
       setDashboardSorter({ sortBy: 'created_at', sortOrder: 'desc' });
       fetchAllPrompts(1, '', { category: null, status: null }, { sortBy: 'created_at', sortOrder: 'desc' });
     }
   }, [user?.id, user?.user_type, activeTab]);
-
   const fetchMyPrompts = async (page = currentPage, search = searchValue, filterParams = filters, sortParams = sorter) => {
     try {
       const params = {
@@ -107,7 +99,6 @@ const MyPromptsPage = () => {
       setInitialLoading(false);
     }
   };
-
   const fetchAllPrompts = async (page = dashboardCurrentPage, search = '', filterParams = dashboardFilters, sortParams = dashboardSorter) => {
     try {
       setLoading(true);
@@ -143,13 +134,11 @@ const MyPromptsPage = () => {
       setInitialLoading(false);
     }
   };
-
   const handleCreatePrompt = () => {
     setEditingPrompt(null);
     form.resetFields();
     setActiveTab('create');
   };
-
   const handleEditPrompt = (prompt) => {
     setEditingPrompt(prompt);
     form.setFieldsValue({
@@ -165,11 +154,9 @@ const MyPromptsPage = () => {
     });
     setActiveTab('create');
   };
-
   const handleSubmitPrompt = async (values) => {
     try {
       setLoading(true);
-      
       if (editingPrompt) {
         await promptService.updatePrompt(editingPrompt.id, values);
         notification.success({
@@ -185,7 +172,6 @@ const MyPromptsPage = () => {
           placement: 'topRight'
         });
       }
-
       form.resetFields();
       setEditingPrompt(null);
       setActiveTab('list');
@@ -202,11 +188,9 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-
   const handleSubmitForReview = async (id) => {
     try {
       setLoading(true);
-      
       await promptService.submitPrompt(id);
       notification.success({
         message: t('common.success', 'Success'),
@@ -225,11 +209,9 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-
   const handleDeletePrompt = async (id) => {
     try {
       setLoading(true);
-      
       await promptService.deletePrompt(id);
       notification.success({
         message: t('common.success', 'Success'),
@@ -248,11 +230,9 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-
   const handleApprovePrompt = async (id) => {
     try {
       setLoading(true);
-      
       await promptService.approvePrompt(id);
       notification.success({
         message: t('common.success', 'Success'),
@@ -271,11 +251,9 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-
   const handleRejectPrompt = async (id) => {
     try {
       setLoading(true);
-      
       await promptService.rejectPrompt(id);
       notification.success({
         message: t('common.success', 'Success'),
@@ -294,12 +272,10 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchMyPrompts(page, searchValue, filters, sorter);
   };
-
   const handleTableChange = (tableFilters) => {
     const newPage = tableFilters.page || 1;
     const newFilters = {
@@ -310,18 +286,15 @@ const MyPromptsPage = () => {
       sortBy: tableFilters.sortBy || 'created_at',
       sortOrder: tableFilters.sortOrder || 'desc'
     };
-    
     setCurrentPage(newPage);
     setFilters(newFilters);
     setSorter(newSorter);
     fetchMyPrompts(newPage, searchValue, newFilters, newSorter);
   };
-
   const handleDashboardPageChange = (page) => {
     setDashboardCurrentPage(page);
     fetchAllPrompts(page, searchValue, dashboardFilters, dashboardSorter);
   };
-
   const handleDashboardTableChange = (tableFilters) => {
     const newPage = tableFilters.page || 1;
     const newFilters = {
@@ -332,38 +305,31 @@ const MyPromptsPage = () => {
       sortBy: tableFilters.sortBy || 'created_at',
       sortOrder: tableFilters.sortOrder || 'desc'
     };
-    
     setDashboardCurrentPage(newPage);
     setDashboardFilters(newFilters);
     setDashboardSorter(newSorter);
     fetchAllPrompts(newPage, searchValue, newFilters, newSorter);
   };
-
   const handleDashboardSearchSubmit = (value) => {
     setSearchValue(value);
     setDashboardCurrentPage(1);
     fetchAllPrompts(1, value);
   };
-
   const handleLogout = () => {
     logout(() => setMobileMenuOpen(false));
   };
-
   const handleSearchSubmit = (value) => {
     setSearchValue(value);
     setCurrentPage(1);
     fetchMyPrompts(1, value);
   };
-
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
   };
-
   const handleViewPrompt = (prompt) => {
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
   };
-
   const menuItems = [
     ...(user?.user_type === 'admin' ? [{
       key: 'dashboard', 
@@ -408,13 +374,11 @@ const MyPromptsPage = () => {
       }
     }] : [])
   ];
-
   return (
     <div className="flex h-screen bg-gray-50">
       <div className="hidden lg:block">
         <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab={activeTab} />
       </div>
-
       <Drawer
         title={null}
         placement="left"
@@ -434,7 +398,6 @@ const MyPromptsPage = () => {
           isMobile={true}
         />
       </Drawer>
-
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {activeTab === 'manage' && user?.user_type === 'admin' ? (
           <ManageCategoriesTags onMenuClick={() => setMobileMenuOpen(true)} />
@@ -495,7 +458,6 @@ const MyPromptsPage = () => {
           />
         )}
       </div>
-
       <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -505,5 +467,4 @@ const MyPromptsPage = () => {
     </div>
   );
 };
-
 export default MyPromptsPage;

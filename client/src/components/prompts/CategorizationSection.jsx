@@ -1,10 +1,8 @@
 import { Form, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
-
 const CategorizationSection = ({ categories, predefinedTags, onCategoryChange }) => {
   const { t } = useTranslation();
-
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.categorization')}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -21,7 +19,6 @@ const CategorizationSection = ({ categories, predefinedTags, onCategoryChange })
             onChange={onCategoryChange}
           />
         </Form.Item>
-
         <Form.Item
           label={t('myPrompts.createPrompt.tagsLabel')}
           name="tags"
@@ -40,5 +37,4 @@ const CategorizationSection = ({ categories, predefinedTags, onCategoryChange })
     </PromptFormSection>
   );
 };
-
 export default CategorizationSection;

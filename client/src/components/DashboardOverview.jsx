@@ -10,9 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { PROMPT_STATUS } from '../constants/promptStatus';
 import PromptsTable from './shared/PromptsTable';
 import PageHeader from './shared/PageHeader';
-
 const { Search } = Input;
-
 const DashboardOverview = ({ 
   prompts = [], 
   loading = false,
@@ -37,9 +35,7 @@ const DashboardOverview = ({
     rejected: 0,
     draft: 0
   });
-
   useEffect(() => {
-    // Tính toán statistics từ prompts
     const newStats = {
       total: prompts.length,
       approved: prompts.filter(p => p.status === PROMPT_STATUS.APPROVED).length,
@@ -49,7 +45,6 @@ const DashboardOverview = ({
     };
     setStats(newStats);
   }, [prompts]);
-
   return (
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
@@ -70,10 +65,9 @@ const DashboardOverview = ({
           />
         </div>
       </PageHeader>
-
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full p-4 sm:p-6">
-          {/* Statistics Cards */}
+          {}
           <Row gutter={[16, 16]} className="mb-6">
             <Col xs={24} sm={12} lg={6}>
               <Card className="shadow-sm hover:shadow-md transition-shadow">
@@ -85,7 +79,6 @@ const DashboardOverview = ({
                 />
               </Card>
             </Col>
-            
             <Col xs={24} sm={12} lg={6}>
               <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <Statistic
@@ -96,7 +89,6 @@ const DashboardOverview = ({
                 />
               </Card>
             </Col>
-            
             <Col xs={24} sm={12} lg={6}>
               <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <Statistic
@@ -107,7 +99,6 @@ const DashboardOverview = ({
                 />
               </Card>
             </Col>
-            
             <Col xs={24} sm={12} lg={6}>
               <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <Statistic
@@ -119,8 +110,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
           </Row>
-
-          {/* Prompts Table */}
+          {}
           <PromptsTable
             prompts={prompts}
             loading={loading}
@@ -139,5 +129,4 @@ const DashboardOverview = ({
     </div>
   );
 };
-
 export default DashboardOverview;

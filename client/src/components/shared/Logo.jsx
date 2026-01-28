@@ -1,16 +1,12 @@
 import { useTranslation } from 'react-i18next';
-
 const Logo = ({ size = 'medium', onClick, className = '' }) => {
   const { t } = useTranslation();
-  
   const sizes = {
     small: { img: 'w-8 h-8', title: 'text-lg', subtitle: 'text-xs' },
     medium: { img: 'w-8 h-8', title: 'text-lg', subtitle: 'text-xs' },
     large: { img: 'w-14 h-14', title: 'text-xl', subtitle: 'text-xs' },
   };
-
   const currentSize = sizes[size];
-
   const logoContent = (
     <>
       <img 
@@ -28,7 +24,6 @@ const Logo = ({ size = 'medium', onClick, className = '' }) => {
       </div>
     </>
   );
-
   if (onClick) {
     return (
       <button 
@@ -39,12 +34,10 @@ const Logo = ({ size = 'medium', onClick, className = '' }) => {
       </button>
     );
   }
-
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {logoContent}
     </div>
   );
 };
-
 export default Logo;

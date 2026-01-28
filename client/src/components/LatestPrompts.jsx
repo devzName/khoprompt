@@ -7,7 +7,6 @@ import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
-
 const LatestPrompts = ({
   title = null,
   prompts = [],
@@ -25,9 +24,7 @@ const LatestPrompts = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
   let filteredPrompts = prompts || [];
-
   if (currentPrompt && filterByCategory) {
     const currentCategory = typeof currentPrompt.category === 'object' ? currentPrompt.category?.name : currentPrompt.category;
     filteredPrompts = filteredPrompts.filter(prompt => {
@@ -37,11 +34,8 @@ const LatestPrompts = ({
   } else if (currentPrompt) {
     filteredPrompts = filteredPrompts.filter(prompt => prompt.id !== currentPrompt.id);
   }
-
   const totalItems = pagination ? pagination.total : filteredPrompts.length;
   let paginatedPrompts = filteredPrompts;
-
-  // If using external pagination (from API), don't slice here
   if (!pagination && showPagination && !maxItems) {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -49,7 +43,6 @@ const LatestPrompts = ({
   } else if (maxItems) {
     paginatedPrompts = filteredPrompts.slice(0, maxItems);
   }
-
   const getGridClasses = () => {
     if (columns === 3) {
       return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8";
@@ -57,12 +50,10 @@ const LatestPrompts = ({
       return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8";
     }
   };
-
   if (loading) {
     return (
       <section className="py-4 bg-white latest-prompts-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Simple Loading Placeholder */}
           <div className="animate-pulse flex space-x-4">
             <div className="flex-1 space-y-4 py-1">
               <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -76,13 +67,10 @@ const LatestPrompts = ({
       </section>
     );
   }
-
   if (filteredPrompts.length === 0) {
     return null;
   }
-
   const handlePageChange = (page) => {
-    // Don't scroll here if using external pagination
     if (!pagination) {
       setCurrentPage(page);
       document.querySelector('.latest-prompts-section')?.scrollIntoView({
@@ -91,7 +79,6 @@ const LatestPrompts = ({
       });
     }
   };
-
   const handleQuickView = async (e, prompt) => {
     e.stopPropagation();
     try {
@@ -116,11 +103,9 @@ const LatestPrompts = ({
       }, 100);
     }
   };
-
   const handleCardClick = (prompt) => {
     navigate(ROUTES.PROMPT_DETAIL_PATH(prompt.slug));
   };
-
   return (
     <>
       <section className="py-4 bg-white latest-prompts-section">
@@ -136,7 +121,6 @@ const LatestPrompts = ({
               </div>
             </div>
           </div>
-
           <div className={getGridClasses()}>
             {paginatedPrompts.map((prompt) => (
               <div
@@ -152,10 +136,8 @@ const LatestPrompts = ({
                     <StarOutlined className="text-yellow-500 text-sm" />
                   )}
                 </div>
-
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
-
                 <div className="flex flex-wrap gap-1 mb-3">
                   {prompt.tags?.slice(0, 2).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
@@ -168,7 +150,6 @@ const LatestPrompts = ({
                     </span>
                   )}
                 </div>
-
                 <div className="flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-2 text-gray-500">
                     {formatRating(calculateSimpleRating(prompt)) && (
@@ -191,7 +172,6 @@ const LatestPrompts = ({
               </div>
             ))}
           </div>
-
           {(showPagination || pagination) && !maxItems && totalItems > (pagination?.pageSize || pageSize) && (
             <div className="flex justify-center">
               <Pagination
@@ -207,7 +187,6 @@ const LatestPrompts = ({
           )}
         </div>
       </section>
-
       <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -216,5 +195,4 @@ const LatestPrompts = ({
     </>
   );
 };
-
 export default LatestPrompts;

@@ -1,12 +1,9 @@
 import { Form, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
-
 const { TextArea } = Input;
-
 const NotesSection = () => {
   const { t } = useTranslation();
-
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.notes')}>
       <Form.Item
@@ -23,5 +20,4 @@ const NotesSection = () => {
     </PromptFormSection>
   );
 };
-
 export default NotesSection;

@@ -8,20 +8,17 @@ import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
 import { promptService } from '../services/promptService';
 import { PAGINATION } from '../constants/pagination';
-
 const SearchPage = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const isTagSearch = searchParams.get('type') === 'tag';
-  
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
   const [pagination, setPagination] = useState(null);
-
   useEffect(() => {
     const searchPrompts = async () => {
       if (!query.trim()) {
@@ -31,24 +28,20 @@ const SearchPage = () => {
         setInitialLoading(false);
         return;
       }
-
       try {
         if (currentPage === 1) {
           setInitialLoading(true);
         } else {
           setLoading(true);
         }
-        
         const response = await promptService.getPrompts({ 
           search: isTagSearch ? undefined : query,
           tag: isTagSearch ? query : undefined,
           page: currentPage, 
           limit: PAGINATION.PAGE_SIZE 
         });
-        
         setPrompts(response.data || response);
         setTotalPrompts(response.pagination?.total || response.length);
-        
         if (response.pagination) {
           setPagination({
             current: response.pagination.current_page,
@@ -71,24 +64,19 @@ const SearchPage = () => {
         setInitialLoading(false);
       }
     };
-
     searchPrompts();
   }, [query, currentPage]);
-
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
   }, [query]);
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {initialLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -122,7 +110,6 @@ const SearchPage = () => {
                 </div>
               </div>
             )}
-            
             <div className={loading ? 'opacity-50 pointer-events-none transition-opacity duration-200' : 'transition-opacity duration-200'}>
               <LatestPrompts 
                 title={isTagSearch ? t('search.tagResults', { query }) : t('search.searchResults', { query })}
@@ -137,10 +124,8 @@ const SearchPage = () => {
           </div>
         ) : null}
       </div>
-
       <Footer />
     </div>
   );
 };
-
 export default SearchPage;

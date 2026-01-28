@@ -25,5 +25,4 @@ const PageHero = ({ title, description, breadcrumb, stats }) => {
     </div>
   );
 };
-
 export default PageHero;

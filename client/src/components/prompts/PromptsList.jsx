@@ -1,11 +1,9 @@
 import { Button, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-
 const { Search } = Input;
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../shared/PageHeader';
 import PromptsTable from '../shared/PromptsTable';
-
 const PromptsList = ({
   searchValue = '',
   onSearchChange,
@@ -22,7 +20,6 @@ const PromptsList = ({
   onTableChange
 }) => {
   const { t } = useTranslation();
-
   return (
     <div className="flex-1 flex flex-col h-full">
       <PageHeader
@@ -54,7 +51,6 @@ const PromptsList = ({
           </Button>
         </div>
       </PageHeader>
-
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full p-4 sm:p-6">
           <PromptsTable
@@ -75,5 +71,4 @@ const PromptsList = ({
     </div>
   );
 };
-
 export default PromptsList;

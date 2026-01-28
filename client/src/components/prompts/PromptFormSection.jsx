@@ -6,5 +6,4 @@ const PromptFormSection = ({ title, children, className = '' }) => {
     </div>
   );
 };
-
 export default PromptFormSection;

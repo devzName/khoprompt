@@ -4,7 +4,6 @@ import { StarOutlined, EyeOutlined } from '@ant-design/icons';
 import { Pagination } from 'antd';
 import PromptDrawer from './PromptDrawer';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
-
 const PromptGrid = ({ 
   prompts = [], 
   title, 
@@ -17,26 +16,20 @@ const PromptGrid = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
   const handleQuickView = (e, prompt) => {
     e.stopPropagation(); // Prevent card click
     setSelectedPrompt(prompt);
     setDrawerOpen(true);
   };
-
   const handleCardClick = (prompt) => {
     navigate(`/prompt/${prompt.id}`);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentPrompts = showPagination ? prompts.slice(startIndex, endIndex) : prompts;
-
   return (
     <>
       <section className="py-4 bg-white">
@@ -51,7 +44,6 @@ const PromptGrid = ({
               </div>
             </div>
           )}
-
           <div className={`grid ${gridCols} gap-6`}>
             {currentPrompts.map((prompt) => (
               <div 
@@ -67,10 +59,8 @@ const PromptGrid = ({
                     <StarOutlined className="text-yellow-500 text-sm" />
                   )}
                 </div>
-                
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">{prompt.title}</h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
-                
                 <div className="flex flex-wrap gap-1 mb-3">
                   {prompt.tags?.slice(0, 2).map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
@@ -83,7 +73,6 @@ const PromptGrid = ({
                     </span>
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between text-xs mt-auto">
                   {formatRating(calculateSimpleRating(prompt)) && (
                     <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
@@ -104,7 +93,6 @@ const PromptGrid = ({
               </div>
             ))}
           </div>
-
           {showPagination && prompts.length > pageSize && (
             <div className="flex justify-center mt-8">
               <Pagination
@@ -122,7 +110,6 @@ const PromptGrid = ({
           )}
         </div>
       </section>
-
       <PromptDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -131,5 +118,4 @@ const PromptGrid = ({
     </>
   );
 };
-
 export default PromptGrid;
