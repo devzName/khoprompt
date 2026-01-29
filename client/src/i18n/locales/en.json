@@ -27,8 +27,6 @@
     "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "signIn": "Sign In",
-    "or": "or",
-    "signInWithMicrosoft": "Sign in with Microsoft",
     "loggingIn": "Logging in...",
     "footer": "By signing in, you agree to our terms of service",
     "success": "Login successful!",
@@ -38,10 +36,7 @@
     "serverError": "Server error. Please try again later",
     "fillAllFields": "Please fill in all fields",
     "rememberMe": "Remember me",
-    "required": "Please login to continue",
-    "invalidMicrosoftToken": "Invalid Microsoft access token",
-    "organizationNotAllowed": "Account not from allowed organization",
-    "microsoftError": "Microsoft login error"
+    "required": "Please login to continue"
   },
   "sidebar": {
     "backToHome": "Back to home",

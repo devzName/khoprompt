@@ -27,8 +27,6 @@
     "usernamePlaceholder": "Tên đăng nhập",
     "passwordPlaceholder": "Mật khẩu",
     "signIn": "Đăng nhập",
-    "or": "hoặc",
-    "signInWithMicrosoft": "Đăng nhập với Microsoft",
     "loggingIn": "Đang đăng nhập...",
     "footer": "Bằng cách đăng nhập, bạn đồng ý với điều khoản sử dụng",
     "success": "Đăng nhập thành công!",
@@ -38,10 +36,7 @@
     "serverError": "Lỗi máy chủ. Vui lòng thử lại sau",
     "fillAllFields": "Vui lòng điền đầy đủ thông tin",
     "rememberMe": "Ghi nhớ đăng nhập",
-    "required": "Vui lòng đăng nhập để tiếp tục",
-    "invalidMicrosoftToken": "Microsoft access token không hợp lệ",
-    "organizationNotAllowed": "Tài khoản không thuộc tổ chức được phép",
-    "microsoftError": "Lỗi đăng nhập Microsoft"
+    "required": "Vui lòng đăng nhập để tiếp tục"
   },
   "sidebar": {
     "backToHome": "Quay về trang chủ",

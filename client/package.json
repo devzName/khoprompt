@@ -14,8 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
-    "@azure/msal-browser": "^5.0.2",
-    "@azure/msal-react": "^5.0.2",
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
     "@ckeditor/ckeditor5-react": "^11.0.1",
     "antd": "^6.1.1",
