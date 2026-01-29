@@ -8,6 +8,12 @@ export const authService = {
     });
     return response.data;
   },
+  loginWithMicrosoft: async (microsoftToken) => {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN_MICROSOFT, {
+      token: microsoftToken,
+    });
+    return response.data;
+  },
   getCurrentUser: async () => {
     const response = await apiClient.get(API_ENDPOINTS.AUTH.ME);
     return response.data;

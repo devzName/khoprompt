@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     # AI Services Configuration
     openai_api_key: str | None = Field(default=None, validation_alias="OPENAI_API_KEY")
 
+    # Microsoft OAuth Configuration
+    microsoft_client_id: str | None = Field(default=None, validation_alias="MICROSOFT_CLIENT_ID")
+    microsoft_tenant_id: str | None = Field(default=None, validation_alias="MICROSOFT_TENANT_ID")
+
     database_url: str = Field(
         default="postgresql+asyncpg://app:app@localhost:5432/app",
         validation_alias="DATABASE_URL",

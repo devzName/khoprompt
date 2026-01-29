@@ -10,6 +10,10 @@ class AdminLoginRequest(BaseModel):
     password: str = Field(min_length=1, description="Admin password")
 
 
+class MicrosoftLoginRequest(BaseModel):
+    token: str = Field(min_length=1, description="Microsoft ID token")
+
+
 class UserOut(BaseModel):
     id: UUID
     email: str

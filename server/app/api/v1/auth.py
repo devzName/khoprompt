@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import DbSession
 from app.api.auth_deps import CurrentUser
-from app.schemas.auth import AdminLoginRequest, TokenResponse, UserOut
+from app.schemas.auth import AdminLoginRequest, MicrosoftLoginRequest, TokenResponse, UserOut
 from app.services.auth_service import AuthService
 
 router = APIRouter()
@@ -21,6 +21,22 @@ async def admin_login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid admin credentials"
+        )
+        
+    return result
+
+
+@router.post("/login-microsoft", response_model=TokenResponse)
+async def microsoft_login(
+    request: MicrosoftLoginRequest,
+    session: DbSession
+):
+    result = await AuthService.microsoft_login(session, request.token)
+    
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Microsoft token"
         )
         
     return result

@@ -1,6 +1,7 @@
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN_ADMIN: '/auth/login',
+    LOGIN_MICROSOFT: '/auth/login-microsoft',
     ME: '/auth/me',
   },
   PROMPTS: {
