@@ -1,12 +1,14 @@
-import { Modal, notification, Input, Button, Checkbox, Divider } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
+import { Input, Button, Checkbox, Divider, notification } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { ROUTES } from '../constants/routes';
 import { PublicClientApplication } from '@azure/msal-browser';
-const LoginModal = ({ open, onClose, onLoginSuccess }) => {
+import Logo from '../components/shared/Logo';
+
+const LoginPage = ({ onLoginSuccess }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [formLoading, setFormLoading] = useState(false);
@@ -35,9 +37,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       setMsalInstance(pca);
     };
 
-    initializeMsal();
-  }, []);
-  useEffect(() => {
     const savedCredentials = localStorage.getItem('rememberedCredentials');
     if (savedCredentials) {
       const { username: savedUsername, password: savedPassword } = JSON.parse(savedCredentials);
@@ -45,7 +44,9 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       setPassword(savedPassword || '');
       setRememberMe(true);
     }
-  }, [open]);
+
+    initializeMsal();
+  }, []);
 
   const handleMicrosoftLogin = async () => {
     if (!msalInstance) return;
@@ -72,7 +73,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       localStorage.setItem('user', JSON.stringify(user));
 
       onLoginSuccess(user);
-      onClose();
       navigate(ROUTES.HOME);
     } catch (error) {
       console.error('Microsoft login error:', error);
@@ -126,7 +126,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       };
       localStorage.setItem('user', JSON.stringify(user));
       onLoginSuccess(user);
-      onClose();
       navigate(ROUTES.HOME);
       if (!rememberMe) {
         setUsername('');
@@ -159,26 +158,21 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       setFormLoading(false);
     }
   };
+
   return (
-    <Modal
-      open={open}
-      onCancel={onClose}
-      footer={null}
-      width="90%"
-      style={{ maxWidth: 480 }}
-      centered
-      className="login-modal"
-    >
-      <div className="py-4 px-2 sm:py-6 sm:px-4">
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <div className="text-center mb-8">
+          <Logo size="large" />
+          <h1 className="text-2xl font-bold text-gray-900 mt-4">
             {t('login.welcome', 'Chào mừng')}
-          </h2>
-          <p className="text-sm sm:text-base text-gray-600">
+          </h1>
+          <p className="text-gray-600 mt-2">
             {t('login.subtitle', 'Đăng nhập để tiếp tục')}
           </p>
         </div>
-        <form onSubmit={handleFormLogin} className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+
+        <form onSubmit={handleFormLogin} className="space-y-4 mb-6">
           <Input
             size="large"
             placeholder={t('login.usernamePlaceholder', 'Tên đăng nhập')}
@@ -195,7 +189,7 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-xl"
           />
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <Checkbox
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
@@ -214,7 +208,9 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
             {t('login.signIn', 'Đăng nhập')}
           </Button>
         </form>
+
         <Divider>{t('login.or', 'Hoặc')}</Divider>
+
         <Button
           type="default"
           size="large"
@@ -230,11 +226,13 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
           </svg>
           {t('login.microsoftSignIn', 'Đăng nhập với Microsoft')}
         </Button>
-        <div className="text-center text-xs text-gray-500 px-2 mt-6">
+
+        <div className="text-center text-xs text-gray-500 mt-6">
           {t('login.footer', 'Bằng cách đăng nhập, bạn đồng ý với điều khoản sử dụng')}
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };
-export default LoginModal;
+
+export default LoginPage;

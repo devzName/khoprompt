@@ -37,7 +37,8 @@ export const useAuth = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
     setUser(null);
-    navigate(ROUTES.HOME);
+    window.dispatchEvent(new Event('logout'));
+    navigate(ROUTES.LOGIN);
     if (closeMobileMenu) {
       closeMobileMenu();
     }

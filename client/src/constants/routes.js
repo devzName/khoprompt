@@ -1,4 +1,5 @@
 export const ROUTES = {
+  LOGIN: '/login',
   HOME: '/',
   SEARCH: '/search',
   PROMPT_DETAIL: '/prompt/:slug',
