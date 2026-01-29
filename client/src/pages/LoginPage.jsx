@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Input, Button, Checkbox, Divider, notification } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Input, Button, Checkbox, Divider, notification, Dropdown } from 'antd';
+import { UserOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -9,7 +9,7 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import Logo from '../components/shared/Logo';
 
 const LoginPage = ({ onLoginSuccess }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [formLoading, setFormLoading] = useState(false);
   const [msalLoading, setMsalLoading] = useState(false);
@@ -17,6 +17,20 @@ const LoginPage = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [msalInstance, setMsalInstance] = useState(null);
+
+  const handleLanguageChange = (lang) => {
+    i18n.changeLanguage(lang);
+  };
+
+  const getLanguageName = () => {
+    const currentLang = i18n.language;
+    return currentLang === 'vi' ? 'Tiếng Việt' : 'English';
+  };
+
+  const languageItems = [
+    { key: 'vi', label: 'Tiếng Việt' },
+    { key: 'en', label: 'English' },
+  ];
 
   useEffect(() => {
     const initializeMsal = async () => {
@@ -160,8 +174,25 @@ const LoginPage = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-500 flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <Dropdown
+          menu={{
+            items: languageItems,
+            onClick: (e) => handleLanguageChange(e.key),
+          }}
+          placement="bottomRight"
+          trigger={['click']}
+        >
+          <span
+            className="text-white rounded-full px-4 py-2 flex items-center gap-2 cursor-pointer hover:bg-white/20 transition-colors"
+          >
+            <GlobalOutlined className="text-xl" />
+            <span className="text-xs font-semibold">{getLanguageName()}</span>
+          </span>
+        </Dropdown>
+      </div>
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <Logo size="large" />
           <h1 className="text-2xl font-bold text-gray-900 mt-4">
