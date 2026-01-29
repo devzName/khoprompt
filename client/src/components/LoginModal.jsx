@@ -71,12 +71,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
       };
       localStorage.setItem('user', JSON.stringify(user));
 
-      notification.success({
-        message: t('common.success', 'Success'),
-        description: t('login.success', 'Đăng nhập thành công'),
-        placement: 'topRight'
-      });
-
       onLoginSuccess(user);
       onClose();
       navigate(ROUTES.HOME);
@@ -131,11 +125,6 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
         picture: userInfo.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.email}`,
       };
       localStorage.setItem('user', JSON.stringify(user));
-      notification.success({
-        message: t('common.success', 'Success'),
-        description: t('login.success', 'Đăng nhập thành công'),
-        placement: 'topRight'
-      });
       onLoginSuccess(user);
       onClose();
       navigate(ROUTES.HOME);
@@ -233,8 +222,11 @@ const LoginModal = ({ open, onClose, onLoginSuccess }) => {
           onClick={handleMicrosoftLogin}
           className="w-full rounded-xl font-medium border-gray-300 hover:border-blue-500 hover:text-blue-600"
         >
-          <svg className="w-5 h-5 inline-block mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z" />
+          <svg className="w-5 h-5 inline-block mr-2" viewBox="0 0 23 23" fill="currentColor">
+            <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+            <rect x="13" y="1" width="9" height="9" fill="#7FBA00" />
+            <rect x="1" y="13" width="9" height="9" fill="#00A4EF" />
+            <rect x="13" y="13" width="9" height="9" fill="#FFB900" />
           </svg>
           {t('login.microsoftSignIn', 'Đăng nhập với Microsoft')}
         </Button>
