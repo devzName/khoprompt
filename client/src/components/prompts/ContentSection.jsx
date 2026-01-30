@@ -55,6 +55,8 @@ const ContentSection = () => {
   const { t } = useTranslation();
   const [isFormatting, setIsFormatting] = useState(false);
   const form = Form.useFormInstance();
+  const content = Form.useWatch('content', form);
+
   const stripHtmlTags = (html) => {
     const div = document.createElement('div');
     div.innerHTML = html;
@@ -62,20 +64,52 @@ const ContentSection = () => {
   };
   const handleAIFormat = async () => {
     const content = form.getFieldValue('content');
-    if (!content || stripHtmlTags(content).trim() === '') {
+    const title = form.getFieldValue('title');
+    const plainText = stripHtmlTags(content);
+    
+    if (!title || title.trim() === '') {
+      form.setFields([
+        {
+          name: 'title',
+          errors: [t('myPrompts.createPrompt.titleRequired')]
+        }
+      ]);
       return;
     }
+    
+    if (title.trim().length < 20) {
+      form.setFields([
+        {
+          name: 'title',
+          errors: [t('myPrompts.createPrompt.titleMinLength')]
+        }
+      ]);
+      return;
+    }
+    
     setIsFormatting(true);
     try {
-      const plainText = stripHtmlTags(content);
-      const result = await aiService.formatText(plainText, 'content');
-      const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
-      form.setFieldValue('content', formattedHtml);
+      if (!content || plainText.trim() === '') {
+        const result = await aiService.formatText(title, 'content');
+        const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
+        form.setFieldValue('content', formattedHtml);
+      } else {
+        const result = await aiService.formatText(plainText, 'content');
+        const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
+        form.setFieldValue('content', formattedHtml);
+      }
     } catch (error) {
       console.error('AI formatting error:', error);
     } finally {
       setIsFormatting(false);
     }
+  };
+
+  const getAIButtonLabel = () => {
+    const plainText = stripHtmlTags(content);
+    return (!content || plainText.trim() === '') 
+      ? t('myPrompts.createPrompt.aiWrite', 'AI viết giúp')
+      : t('myPrompts.createPrompt.aiEdit', 'AI sửa giúp');
   };
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.content')}>
@@ -84,14 +118,12 @@ const ContentSection = () => {
           <div className="flex items-center gap-2">
             <span>{t('myPrompts.createPrompt.contentLabel')}</span>
             <Button
-              type="text"
               size="small"
               icon={<ThunderboltOutlined />}
               loading={isFormatting}
               onClick={handleAIFormat}
-              className="text-blue-600 hover:text-blue-700"
             >
-              {t('myPrompts.createPrompt.aiFormat')}
+              {getAIButtonLabel()}
             </Button>
           </div>
         }

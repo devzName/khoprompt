@@ -6,17 +6,23 @@ import logging
 import jwt
 from jwt import PyJWTError
 import httpx
+import random
 
 from app.core.config import get_settings
 from app.core.security import create_access_token, verify_password
 from app.repositories.user_repo import UserRepository
 from app.schemas.auth import TokenResponse, UserOut
+from app.constants.avatar_colors import AVATAR_COLORS
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
 class AuthService:
+    @staticmethod
+    def _get_random_color() -> str:
+        return random.choice(AVATAR_COLORS)
+
     @staticmethod
     async def admin_login(session: AsyncSession, username: str, password: str) -> TokenResponse | None:
         if username == "admin":
@@ -90,10 +96,15 @@ class AuthService:
             
             user = await UserRepository.get_by_email(session, email)
             
+            avatar_name = full_name or email.split('@')[0]
+            random_color = AuthService._get_random_color()
+            avatar_url = f"https://ui-avatars.com/api/?name={avatar_name}&background={random_color}&color=fff&size=200"
+            
             if not user:
                 user_data = {
                     'email': email,
                     'full_name': full_name,
+                    'avatar_url': avatar_url,
                     'user_type': 'user',
                     'is_active': True,
                 }

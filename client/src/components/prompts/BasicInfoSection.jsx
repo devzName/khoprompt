@@ -9,27 +9,62 @@ const BasicInfoSection = () => {
   const { t } = useTranslation();
   const [isFormatting, setIsFormatting] = useState(false);
   const form = Form.useFormInstance();
+  const description = Form.useWatch('description', form);
+
   const handleAIFormat = async () => {
     const description = form.getFieldValue('description');
-    if (!description || description.trim() === '') {
+    const title = form.getFieldValue('title');
+    
+    if (!title || title.trim() === '') {
+      form.setFields([
+        {
+          name: 'title',
+          errors: [t('myPrompts.createPrompt.titleRequired')]
+        }
+      ]);
       return;
     }
+    
+    if (title.trim().length < 20) {
+      form.setFields([
+        {
+          name: 'title',
+          errors: [t('myPrompts.createPrompt.titleMinLength')]
+        }
+      ]);
+      return;
+    }
+    
     setIsFormatting(true);
     try {
-      const result = await aiService.formatText(description, 'description');
-      form.setFieldValue('description', result.formattedText);
+      if (!description || description.trim() === '') {
+        const result = await aiService.formatText(title, 'description');
+        form.setFieldValue('description', result.formattedText);
+      } else {
+        const result = await aiService.formatText(description, 'description');
+        form.setFieldValue('description', result.formattedText);
+      }
     } catch (error) {
       console.error('AI formatting error:', error);
     } finally {
       setIsFormatting(false);
     }
   };
+
+  const getAIButtonLabel = () => {
+    return (!description || description.trim() === '') 
+      ? t('myPrompts.createPrompt.aiWrite', 'AI viết giúp')
+      : t('myPrompts.createPrompt.aiEdit', 'AI sửa giúp');
+  };
   return (
     <PromptFormSection title={t('myPrompts.createPrompt.basicInfo')}>
       <Form.Item
         label={t('myPrompts.createPrompt.titleLabel')}
         name="title"
-        rules={[{ required: true, message: t('myPrompts.createPrompt.titleRequired') }]}
+        rules={[
+          { required: true, message: t('myPrompts.createPrompt.titleRequired') },
+          { min: 20, message: t('myPrompts.createPrompt.titleMinLength', 'Tiêu đề prompt ít nhất 20 ký tự') }
+        ]}
         className="mb-4"
       >
         <Input 
@@ -42,14 +77,12 @@ const BasicInfoSection = () => {
           <div className="flex items-center gap-2">
             <span>{t('myPrompts.createPrompt.descriptionLabel')}</span>
             <Button
-              type="text"
               size="small"
               icon={<ThunderboltOutlined />}
               loading={isFormatting}
               onClick={handleAIFormat}
-              className="text-blue-600 hover:text-blue-700"
             >
-              {t('myPrompts.createPrompt.aiFormat')}
+              {getAIButtonLabel()}
             </Button>
           </div>
         }
