@@ -38,10 +38,10 @@ const BasicInfoSection = () => {
     setIsFormatting(true);
     try {
       if (!description || description.trim() === '') {
-        const result = await aiService.formatText(title, 'description');
+        const result = await aiService.generateText(title, 'description');
         form.setFieldValue('description', result.formattedText);
       } else {
-        const result = await aiService.formatText(description, 'description');
+        const result = await aiService.improveText(title, description, 'description');
         form.setFieldValue('description', result.formattedText);
       }
     } catch (error) {

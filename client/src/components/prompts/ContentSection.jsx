@@ -90,11 +90,11 @@ const ContentSection = () => {
     setIsFormatting(true);
     try {
       if (!content || plainText.trim() === '') {
-        const result = await aiService.formatText(title, 'content');
+        const result = await aiService.generateText(title, 'content');
         const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
         form.setFieldValue('content', formattedHtml);
       } else {
-        const result = await aiService.formatText(plainText, 'content');
+        const result = await aiService.improveText(title, plainText, 'content');
         const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
         form.setFieldValue('content', formattedHtml);
       }
