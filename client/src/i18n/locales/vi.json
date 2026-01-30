@@ -21,7 +21,7 @@
     "logout": "Đăng xuất"
   },
   "login": {
-    "welcome": "Chào mừng bạn trở lại",
+    "welcome": "Hãy bắt đầu",
     "subtitle": "Đăng nhập vào tài khoản của bạn",
     "emailPlaceholder": "Email của bạn",
     "usernamePlaceholder": "Tên đăng nhập",

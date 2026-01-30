@@ -21,7 +21,7 @@
     "logout": "Logout"
   },
   "login": {
-    "welcome": "Welcome back",
+    "welcome": "Welcome",
     "subtitle": "Sign in to your account",
     "emailPlaceholder": "Your email",
     "usernamePlaceholder": "Username",
