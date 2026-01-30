@@ -46,9 +46,13 @@ async def generate_text(
         if request.type == "description":
             system_prompt = GENERATE_DESCRIPTION_PROMPT
             user_content = f"Prompt title: {request.title}"
+            max_tokens = 300
+            temperature = 0.7
         else:
             system_prompt = GENERATE_PROMPT_CONTENT
             user_content = f"Prompt title: {request.title}\n\nAdditional context:\n{request.value}" if request.value else f"Prompt title: {request.title}"
+            max_tokens = 1500
+            temperature = 0.7
 
         response = client.chat.completions.create(
             model="openai/gpt-oss-120b:free",
@@ -56,8 +60,8 @@ async def generate_text(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content}
             ],
-            max_tokens=1000,
-            temperature=0.7
+            max_tokens=max_tokens,
+            temperature=temperature
         )
 
         generated_text = response.choices[0].message.content.strip()
@@ -85,8 +89,12 @@ async def improve_text(
         
         if request.type == "description":
             system_prompt = IMPROVE_DESCRIPTION_PROMPT
+            max_tokens = 300
+            temperature = 0.3
         else:
             system_prompt = IMPROVE_PROMPT_CONTENT
+            max_tokens = 1500
+            temperature = 0.3
         
         combined_text = f"Title: {request.text}\n\nContent:\n{request.value}"
         
@@ -96,8 +104,8 @@ async def improve_text(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": combined_text}
             ],
-            max_tokens=1000,
-            temperature=0.3
+            max_tokens=max_tokens,
+            temperature=temperature
         )
 
         improved_text = response.choices[0].message.content.strip()
