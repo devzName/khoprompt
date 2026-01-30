@@ -38,7 +38,7 @@ const BasicInfoSection = () => {
     setIsFormatting(true);
     try {
       if (!description || description.trim() === '') {
-        const result = await aiService.generateText(title, 'description');
+        const result = await aiService.generateText(title, '', 'description');
         form.setFieldValue('description', result.formattedText);
       } else {
         const result = await aiService.improveText(title, description, 'description');

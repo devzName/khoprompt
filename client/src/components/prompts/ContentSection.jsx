@@ -65,6 +65,7 @@ const ContentSection = () => {
   const handleAIFormat = async () => {
     const content = form.getFieldValue('content');
     const title = form.getFieldValue('title');
+    const description = form.getFieldValue('description');
     const plainText = stripHtmlTags(content);
     
     if (!title || title.trim() === '') {
@@ -90,7 +91,7 @@ const ContentSection = () => {
     setIsFormatting(true);
     try {
       if (!content || plainText.trim() === '') {
-        const result = await aiService.generateText(title, 'content');
+        const result = await aiService.generateText(title, description, 'content');
         const formattedHtml = result.formattedText.replace(/\n/g, '<br>');
         form.setFieldValue('content', formattedHtml);
       } else {

@@ -1,9 +1,10 @@
 import apiClient from '../axios/apiClient';
 export const aiService = {
-  generateText: async (title, type = 'description') => {
+  generateText: async (title, value, type = 'description') => {
     try {
       const response = await apiClient.post('/ai/generate-text', {
         title,
+        value,
         type
       });
       return response.data;

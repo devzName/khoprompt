@@ -3,6 +3,12 @@ from pydantic import BaseModel
 from app.api.auth_deps import get_current_user
 from app.models.user import User
 from app.core.config import get_settings
+from app.core.prompts import (
+    GENERATE_DESCRIPTION_PROMPT,
+    GENERATE_PROMPT_CONTENT,
+    IMPROVE_DESCRIPTION_PROMPT,
+    IMPROVE_PROMPT_CONTENT
+)
 import openai
 
 
@@ -12,6 +18,7 @@ settings = get_settings()
 class GenerateTextRequest(BaseModel):
     title: str
     type: str = "description"
+    value: str = ""
 
 class ImproveTextRequest(BaseModel):
     text: str
@@ -37,19 +44,19 @@ async def generate_text(
         )
         
         if request.type == "description":
-            system_prompt = """You are a professional prompt writer. Based on the given prompt title, generate a concise and clear description (2-3 sentences) that explains what this prompt does and its purpose.
-Return only the description without any explanations or additional comments."""
+            system_prompt = GENERATE_DESCRIPTION_PROMPT
+            user_content = f"Prompt title: {request.title}"
         else:
-            system_prompt = """You are a professional prompt writer. Based on the given prompt title, generate detailed and well-structured prompt content that can be used with AI models.
-Return only the prompt content without any explanations or additional comments."""
-        
+            system_prompt = GENERATE_PROMPT_CONTENT
+            user_content = f"Prompt title: {request.title}\n\nAdditional context:\n{request.value}" if request.value else f"Prompt title: {request.title}"
+
         response = client.chat.completions.create(
             model="openai/gpt-oss-120b:free",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Prompt title: {request.title}"}
+                {"role": "user", "content": user_content}
             ],
-            max_tokens=500,
+            max_tokens=1000,
             temperature=0.7
         )
 
@@ -77,23 +84,9 @@ async def improve_text(
         )
         
         if request.type == "description":
-            system_prompt = """You are a professional text editor. Your task is to improve the given description by:
-1. Fixing grammar and spelling errors
-2. Improving sentence structure and flow
-3. Making it more concise and clear
-4. Maintaining the original meaning and tone
-5. Ensuring it's suitable for a prompt description
-
-Return only the improved text without any explanations or additional comments."""
+            system_prompt = IMPROVE_DESCRIPTION_PROMPT
         else:
-            system_prompt = """You are a professional text editor. Your task is to improve the given prompt content by:
-1. Fixing grammar and spelling errors
-2. Improving sentence structure and clarity
-3. Making instructions more precise and actionable
-4. Organizing content with better structure
-5. Maintaining the original intent and functionality
-
-Return only the improved text without any explanations or additional comments."""
+            system_prompt = IMPROVE_PROMPT_CONTENT
         
         combined_text = f"Title: {request.text}\n\nContent:\n{request.value}"
         
@@ -103,7 +96,7 @@ Return only the improved text without any explanations or additional comments.""
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": combined_text}
             ],
-            max_tokens=500,
+            max_tokens=1000,
             temperature=0.3
         )
 
