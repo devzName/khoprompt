@@ -95,7 +95,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
   if (loading) return null;
   if (viewMode === 'tree') {
     return (
-      <section className="py-4 bg-white">
+      <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
   const displayedCategories = isExpanded ? categories : categories.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMoreCategories = categories.length > INITIAL_DISPLAY_COUNT;
   return (
-    <section className="py-4 bg-white">
+    <section className="py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">

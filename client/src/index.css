@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Global background color */
+body {
+  /* background-color: #F4F5F7; */
+  background-color: white;
+}
+
 /* Custom line-clamp utilities */
 .line-clamp-1 {
   display: -webkit-box;

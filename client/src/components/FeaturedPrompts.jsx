@@ -14,7 +14,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const featuredPrompts = prompts;
   if (loading) {
     return (
-      <section className="py-4 bg-white">
+      <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-8 animate-pulse">
             <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
@@ -72,7 +72,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   };
   return (
     <>
-      <section className="py-4 bg-white">
+      <section className="py-4 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-8">
             <StarOutlined className="text-2xl text-yellow-500" />
@@ -89,8 +89,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
             {featuredPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col cursor-pointer"
-                onClick={() => handleCardClick(prompt)}
+                className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
@@ -105,7 +104,12 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                     </div>
                   )}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
+                <h3 
+                  className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] transition-colors duration-200"
+                  onClick={() => handleCardClick(prompt)}
+                >
+                  {prompt.title}
+                </h3>
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {prompt.tags?.slice(0, 3).map((tag, index) => (
@@ -125,7 +129,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                   </div>
                   <button
                     onClick={(e) => handleQuickView(e, prompt)}
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"
+                    className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium cursor-pointer"
                   >
                     <EyeOutlined className="text-xs" />
                     {t('featured.quickView')}

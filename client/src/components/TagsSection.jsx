@@ -57,7 +57,7 @@ const TagsSection = () => {
   const displayedTags = showAll ? tags : tags.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMoreTags = tags.length > INITIAL_DISPLAY_COUNT;
   return (
-    <section className="py-4 pb-8 bg-white">
+    <section className="py-4 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">

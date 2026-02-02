@@ -52,7 +52,7 @@ const LatestPrompts = ({
   };
   if (loading) {
     return (
-      <section className="py-4 bg-white latest-prompts-section">
+      <section className="py-4 latest-prompts-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse flex space-x-4">
             <div className="flex-1 space-y-4 py-1">
@@ -108,7 +108,7 @@ const LatestPrompts = ({
   };
   return (
     <>
-      <section className="py-4 bg-white latest-prompts-section">
+      <section className="py-4 latest-prompts-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
@@ -125,8 +125,7 @@ const LatestPrompts = ({
             {paginatedPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 flex flex-col cursor-pointer"
-                onClick={() => handleCardClick(prompt)}
+                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
@@ -136,7 +135,12 @@ const LatestPrompts = ({
                     <StarOutlined className="text-yellow-500 text-sm" />
                   )}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{prompt.title}</h3>
+                <h3 
+                  className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] transition-colors duration-200"
+                  onClick={() => handleCardClick(prompt)}
+                >
+                  {prompt.title}
+                </h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
                 <div className="flex flex-wrap gap-1 mb-3">
                   {prompt.tags?.slice(0, 2).map((tag, index) => (
@@ -163,7 +167,7 @@ const LatestPrompts = ({
                   </div>
                   <button
                     onClick={(e) => handleQuickView(e, prompt)}
-                    className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium"
+                    className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium cursor-pointer"
                   >
                     <EyeOutlined className="text-xs" />
                     {t('latest.quickView')}
