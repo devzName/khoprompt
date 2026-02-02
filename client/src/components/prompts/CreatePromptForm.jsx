@@ -16,7 +16,8 @@ const CreatePromptForm = ({
   onSubmit,
   onCancel,
   onMenuClick,
-  isEditing = false
+  isEditing = false,
+  initialData = null
 }) => {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
@@ -101,7 +102,7 @@ const CreatePromptForm = ({
               onCategoryChange={handleCategoryChange}
             />
             <NotesSection />
-            <ImageUploadSection />
+            <ImageUploadSection existingImages={initialData?.images || []} />
             <FormActions loading={loading} onCancel={onCancel} />
           </Form>
         </div>

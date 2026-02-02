@@ -1,15 +1,33 @@
 import { Form, Upload, Button, message, Card, Empty, Modal } from 'antd';
 import { DeleteOutlined, CloudUploadOutlined, EyeOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
 
-const ImageUploadSection = () => {
+// Get server URL for images
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
+
+const ImageUploadSection = ({ existingImages = [] }) => {
   const { t } = useTranslation();
   const [previewUrls, setPreviewUrls] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
+  const [existingImageUrls, setExistingImageUrls] = useState([]);
   const [viewingIndex, setViewingIndex] = useState(null);
   const form = Form.useFormInstance();
+
+  // Initialize existing images when component mounts or existingImages changes
+  useEffect(() => {
+    if (existingImages && existingImages.length > 0) {
+      const urls = existingImages.map(imagePath => `${SERVER_URL}/${imagePath}`);
+      setExistingImageUrls(urls);
+    } else {
+      setExistingImageUrls([]);
+    }
+  }, [existingImages]);
+
+  // Get all images (existing + new uploads)
+  const allImages = [...existingImageUrls, ...previewUrls];
+  const totalImages = allImages.length;
 
   const handleBeforeUpload = (file, fileList) => {
     const filesToProcess = fileList || [file];
@@ -50,11 +68,21 @@ const ImageUploadSection = () => {
   };
 
   const handleRemoveImage = (index) => {
-    const newUrls = previewUrls.filter((_, i) => i !== index);
-    const newFiles = imageFiles.filter((_, i) => i !== index);
-    setPreviewUrls(newUrls);
-    setImageFiles(newFiles);
-    form.setFieldValue('images', newFiles.length > 0 ? newFiles : null);
+    const existingCount = existingImageUrls.length;
+    
+    if (index < existingCount) {
+      // Removing existing image
+      const newExistingUrls = existingImageUrls.filter((_, i) => i !== index);
+      setExistingImageUrls(newExistingUrls);
+    } else {
+      // Removing new uploaded image
+      const newIndex = index - existingCount;
+      const newUrls = previewUrls.filter((_, i) => i !== newIndex);
+      const newFiles = imageFiles.filter((_, i) => i !== newIndex);
+      setPreviewUrls(newUrls);
+      setImageFiles(newFiles);
+      form.setFieldValue('images', newFiles.length > 0 ? newFiles : null);
+    }
   };
 
   const handleViewImage = (index) => {
@@ -107,50 +135,62 @@ const ImageUploadSection = () => {
             </ul>
           </div>
 
-          {previewUrls.length > 0 ? (
+          {totalImages > 0 ? (
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-700">
-                  {t('myPrompts.createPrompt.uploadedImages', { count: previewUrls.length })}
+                  {existingImageUrls.length > 0 && previewUrls.length > 0 
+                    ? `Ảnh hiện có: ${existingImageUrls.length} | Ảnh mới: ${previewUrls.length}`
+                    : existingImageUrls.length > 0 
+                    ? `Ảnh hiện có: ${existingImageUrls.length}`
+                    : t('myPrompts.createPrompt.uploadedImages', { count: previewUrls.length })
+                  }
                 </h4>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {previewUrls.map((url, index) => (
-                  <div
-                    key={index}
-                    className="relative rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.querySelector('.overlay')?.classList.remove('hidden');
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.querySelector('.overlay')?.classList.add('hidden');
-                    }}
-                  >
-                    <img
-                      src={url}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-32 object-cover block cursor-pointer"
-                      onClick={() => handleViewImage(index)}
-                    />
-                    <div className="overlay hidden absolute inset-0 bg-opacity-20 flex items-center justify-center gap-2 z-20">
-                      <Button
-                        type="primary"
-                        size="small"
-                        icon={<EyeOutlined />}
+                {allImages.map((url, index) => {
+                  const isExisting = index < existingImageUrls.length;
+                  return (
+                    <div
+                      key={index}
+                      className="relative rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.querySelector('.overlay')?.classList.remove('opacity-0');
+                        e.currentTarget.querySelector('.overlay')?.classList.add('opacity-100');
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.querySelector('.overlay')?.classList.remove('opacity-100');
+                        e.currentTarget.querySelector('.overlay')?.classList.add('opacity-0');
+                      }}
+                    >
+                      <img
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover block cursor-pointer"
                         onClick={() => handleViewImage(index)}
                       />
-                      <Button
-                        danger
-                        size="small"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleRemoveImage(index)}
-                      />
+                      <div className="overlay opacity-0 absolute inset-0 bg-opacity-50 flex items-center justify-center gap-2 z-20 transition-opacity">
+                        <Button
+                          type="primary"
+                          size="small"
+                          icon={<EyeOutlined />}
+                          onClick={() => handleViewImage(index)}
+                        />
+                        <Button
+                          danger
+                          size="small"
+                          icon={<DeleteOutlined />}
+                          onClick={() => handleRemoveImage(index)}
+                        />
+                      </div>
+                      <span className={`absolute top-1 left-1 text-white text-xs font-medium px-2 py-1 rounded z-10 ${
+                        isExisting ? 'bg-green-500' : 'bg-blue-500'
+                      }`}>
+                        {isExisting ? 'Có sẵn' : 'Mới'} {index + 1}
+                      </span>
                     </div>
-                    <span className="absolute top-1 left-1 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded z-10">
-                      {index + 1}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Image Preview Modal */}
@@ -165,7 +205,7 @@ const ImageUploadSection = () => {
                 {viewingIndex !== null && (
                   <div className="flex justify-center">
                     <img
-                      src={previewUrls[viewingIndex]}
+                      src={allImages[viewingIndex]}
                       alt={`Preview ${viewingIndex + 1}`}
                       style={{ maxWidth: '100%', maxHeight: '600px', borderRadius: '8px' }}
                     />

@@ -455,6 +455,7 @@ const MyPromptsPage = () => {
             }}
             onMenuClick={() => setMobileMenuOpen(true)}
             isEditing={!!editingPrompt}
+            initialData={editingPrompt}
           />
         )}
       </div>
