@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
 import { PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
+import ImageGallery from './ImageGallery';
+
+// Get server URL for images
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
 const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -181,6 +185,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           )}
+          
           <Divider />
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-orange-500 pl-3">
@@ -243,6 +248,15 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           </div>
+          
+          {/* Images Section */}
+          <ImageGallery 
+            images={prompt.images} 
+            title={prompt.title}
+            serverUrl={SERVER_URL}
+            isDrawer={true}
+          />
+          
           {prompt.user && (
             <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.authorInfo')}</h3>
