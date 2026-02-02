@@ -307,16 +307,13 @@ async def update_prompt(
                 current_user.user_type
             )
         if not result:
-            # Check if prompt exists
             prompt = await PromptService.get_prompt_by_id(session, prompt_id)
             if not prompt:
                 raise HTTPException(status_code=404, detail="Prompt not found")
             
-            # Check permissions
             if prompt["user_id"] != str(current_user.id) and current_user.user_type != 'admin':
                 raise HTTPException(status_code=403, detail="Access denied: You can only edit your own prompts")
             
-            # If prompt exists and user has permission but update failed, it's status issue
             raise HTTPException(status_code=400, detail="Only draft and approved prompts can be updated")
         return result
     except Exception as e:
