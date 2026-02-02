@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ImageGallery from '../components/ImageGallery';
 import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
@@ -23,8 +22,6 @@ import { useViewTracking } from '../hooks/useViewTracking';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
 
-// Get server URL for images
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
 const PromptDetailPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -285,7 +282,6 @@ const PromptDetailPage = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                 {t('promptDetail.promptContent')}
               </h2>
               <div className="bg-white rounded-xl border border-gray-200 p-6 pr-12 relative">
@@ -306,7 +302,7 @@ const PromptDetailPage = () => {
             
             {prompt.notes && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 border-l-4 border-purple-500 pl-3">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
                   {t('reviewPromptDrawer.notes', 'Ghi chú')}
                 </h2>
                 <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
@@ -315,12 +311,6 @@ const PromptDetailPage = () => {
               </div>
             )}
 
-            {/* Images Section */}
-            <ImageGallery 
-              images={prompt.images} 
-              title={prompt.title}
-              serverUrl={SERVER_URL}
-            />
           </div>
           <div className="space-y-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
