@@ -96,7 +96,7 @@ const PromptDetailPage = () => {
     if (slug) {
       fetchPromptDetail();
     }
-  }, [slug, t, user]);
+  }, []);
   const handleCopyPrompt = () => {
     if (prompt) {
       const tempDiv = document.createElement('div');
