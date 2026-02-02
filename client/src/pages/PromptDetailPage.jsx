@@ -15,7 +15,6 @@ import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NotFoundPage from './NotFoundPage';
-import ImageGallery from '../components/ImageGallery';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
@@ -105,6 +104,9 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
                 alt={`${title} - Thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
               />
+              {index === currentIndex && (
+                <div className="absolute inset-0 bg-opacity-20"></div>
+              )}
             </div>
           ))}
         </div>
@@ -188,7 +190,7 @@ const PromptDetailPage = () => {
     if (slug) {
       fetchPromptDetail();
     }
-  }, []);
+  }, [slug, user]);
   const handleCopyPrompt = () => {
     if (prompt) {
       const tempDiv = document.createElement('div');
@@ -408,7 +410,6 @@ const PromptDetailPage = () => {
             {prompt.images && prompt.images.length > 0 && (
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-green-600 rounded-full"></div>
                   {t('promptDetail.images', 'Hình ảnh')}
                 </h3>
                 <ImageGalleryDetail 

@@ -18,7 +18,10 @@ export const voteService = {
       return response.data.vote;
     } catch (error) {
       console.error('Error fetching user vote:', error);
-      return null; // Fallback to null if any error
+      if (error.response?.status === 404) {
+        return null; // User has not voted yet
+      }
+      return null;
     }
   },
   getPromptVoteStats: async (promptId) => {
