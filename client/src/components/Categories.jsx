@@ -107,6 +107,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
             <Segmented
               value={viewMode}
               onChange={setViewMode}
+              className="border border-gray-300"
               options={[
                 {
                   label: (
@@ -154,6 +155,7 @@ const Categories = ({ selectedCategory, onCategorySelect }) => {
           <Segmented
             value={viewMode}
             onChange={setViewMode}
+            className="border border-gray-300"
             options={[
               {
                 label: (
