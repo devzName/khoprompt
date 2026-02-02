@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FireOutlined, StarOutlined, EyeOutlined } from '@ant-design/icons';
-import { Pagination } from 'antd';
+import { FireOutlined, StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { Pagination, Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
@@ -154,24 +154,31 @@ const LatestPrompts = ({
                     </span>
                   )}
                 </div>
-                <div className="flex items-center justify-between text-xs mt-auto">
-                  <div className="flex items-center gap-2 text-gray-500">
-                    {formatRating(calculateSimpleRating(prompt)) && (
-                      <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
-                        <StarOutlined />
-                        <span>
-                          {formatRating(calculateSimpleRating(prompt))}
-                        </span>
-                      </div>
-                    )}
+                <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs mt-auto">
+                  <div className="flex items-center gap-2">
+                    <Avatar 
+                      size={24} 
+                      src={prompt.user?.avatar_url || prompt.user?.picture}
+                      icon={<UserOutlined />} 
+                      className="shrink-0"
+                    />
+                    <div className="flex flex-col gap-1 text-gray-500">
+                      <span className="text-xs font-medium text-gray-700">
+                        {prompt.user?.full_name || prompt.author || 'Unknown'}
+                      </span>
+                      {prompt.user?.email && (
+                        <span className="text-[10px] text-gray-400">{prompt.user.email}</span>
+                      )}
+                    </div>
                   </div>
-                  <button
-                    onClick={(e) => handleQuickView(e, prompt)}
-                    className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200 text-xs font-medium cursor-pointer"
-                  >
-                    <EyeOutlined className="text-xs" />
-                    {t('latest.quickView')}
-                  </button>
+                  <Tooltip title={t('latest.quickView', 'Xem nhanh')}>
+                    <button
+                      onClick={(e) => handleQuickView(e, prompt)}
+                      className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors duration-200 cursor-pointer"
+                    >
+                      <EyeOutlined className="text-sm" />
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
             ))}

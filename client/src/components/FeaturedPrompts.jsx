@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { StarOutlined, EyeOutlined } from '@ant-design/icons';
+import { StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
@@ -123,17 +124,29 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                     </span>
                   )}
                 </div>
-                <div className="flex items-center justify-between text-sm mt-auto">
-                  <div className="flex items-center gap-3 text-gray-500">
-                    <span>{t('featured.by')} {prompt.author || prompt.user?.full_name || 'Unknown'}</span>
+                <div className="border-t border-gray-200 pt-4 flex items-center justify-between text-sm mt-auto">
+                  <div className="flex items-center gap-3">
+                    <Avatar 
+                      size={32} 
+                      src={prompt.user?.avatar_url || prompt.user?.picture}
+                      icon={<UserOutlined />} 
+                      className="shrink-0"
+                    />
+                    <div className="flex flex-col gap-1 text-gray-500">
+                      <span>{t('featured.by')} {prompt.author || prompt.user?.full_name || 'Unknown'}</span>
+                      {prompt.user?.email && (
+                        <span className="text-xs text-gray-400">{prompt.user.email}</span>
+                      )}
+                    </div>
                   </div>
-                  <button
-                    onClick={(e) => handleQuickView(e, prompt)}
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium cursor-pointer"
-                  >
-                    <EyeOutlined className="text-xs" />
-                    {t('featured.quickView')}
-                  </button>
+                  <Tooltip title={t('featured.quickView', 'Xem nhanh')}>
+                    <button
+                      onClick={(e) => handleQuickView(e, prompt)}
+                      className="flex items-center justify-center w-9 h-9 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors duration-200 cursor-pointer"
+                    >
+                      <EyeOutlined className="text-base" />
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
             ))}
