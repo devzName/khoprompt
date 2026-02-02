@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { FireOutlined, StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import { Pagination, Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
-import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 const LatestPrompts = ({
   title = null,
   prompts = [],
@@ -20,6 +20,7 @@ const LatestPrompts = ({
   pagination = null
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -202,6 +203,7 @@ const LatestPrompts = ({
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}
+        currentUser={user}
       />
     </>
   );

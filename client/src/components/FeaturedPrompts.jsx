@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -157,6 +159,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         prompt={selectedPrompt}
+        currentUser={user}
       />
     </>
   );

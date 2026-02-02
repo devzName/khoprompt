@@ -58,28 +58,30 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
       size="large"
       className="prompt-drawer"
       footer={
-        showApprovalButtons ? (
-          <div className="flex gap-3">
-            <Button 
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={handleApprove}
-              className="flex-1 bg-green-500 hover:bg-green-600 border-green-500"
-              size="large"
-            >
-              {t('reviewPrompts.approve', 'Duyệt')}
-            </Button>
-            <Button 
-              danger
-              icon={<CloseOutlined />}
-              onClick={handleReject}
-              className="flex-1"
-              size="large"
-            >
-              {t('reviewPrompts.reject', 'Từ chối')}
-            </Button>
-          </div>
-        ) : (
+        <div className="space-y-3">
+          {showApprovalButtons && (
+            <div className="flex gap-3">
+              <Button 
+                type="primary"
+                icon={<CheckOutlined />}
+                onClick={handleApprove}
+                className="flex-1 bg-green-500 hover:bg-green-600 border-green-500"
+                size="large"
+              >
+                {t('reviewPrompts.approve', 'Duyệt')}
+              </Button>
+              <Button 
+                danger
+                icon={<CloseOutlined />}
+                onClick={handleReject}
+                className="flex-1"
+                size="large"
+              >
+                {t('reviewPrompts.reject', 'Từ chối')}
+              </Button>
+            </div>
+          )}
+          
           <Button 
             icon={<LinkOutlined />}
             className="w-full"
@@ -88,7 +90,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
           >
             {t('drawer.viewDetail', 'Xem chi tiết')}
           </Button>
-        )
+        </div>
       }
     >
       {prompt && (
