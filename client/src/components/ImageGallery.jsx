@@ -36,7 +36,7 @@ const ImageGallery = ({ images, title, serverUrl, isDrawer = false }) => {
           >
             <img
               src={`${serverUrl}/${image}`}
-              alt={`${title} - Hình ${index + 1}`}
+              alt={`Hình ${index + 1}`}
               className="w-full h-full object-cover transition-all"
               loading="lazy"
             />
