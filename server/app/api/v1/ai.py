@@ -40,7 +40,8 @@ async def generate_text(
         
         client = openai.OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key=settings.openai_api_key
+            api_key=settings.openai_api_key,
+            timeout=120.0  # 2 minutes timeout
         )
         
         if request.type == "description":
@@ -51,7 +52,7 @@ async def generate_text(
         else:
             system_prompt = GENERATE_PROMPT_CONTENT
             user_content = f"Prompt title: {request.title}\n\nAdditional context:\n{request.value}" if request.value else f"Prompt title: {request.title}"
-            max_tokens = 1500
+            max_tokens = 1000
             temperature = 0.7
 
         response = client.chat.completions.create(
@@ -84,17 +85,18 @@ async def improve_text(
         
         client = openai.OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key=settings.openai_api_key
+            api_key=settings.openai_api_key,
+            timeout=120.0  # 2 minutes timeout
         )
         
         if request.type == "description":
             system_prompt = IMPROVE_DESCRIPTION_PROMPT
             max_tokens = 300
-            temperature = 0.3
+            temperature = 0.7
         else:
             system_prompt = IMPROVE_PROMPT_CONTENT
-            max_tokens = 1500
-            temperature = 0.3
+            max_tokens = 1000
+            temperature = 0.7
         
         combined_text = f"Title: {request.text}\n\nContent:\n{request.value}"
         
