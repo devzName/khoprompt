@@ -154,18 +154,18 @@ const MyPromptsPage = () => {
     });
     setActiveTab('create');
   };
-  const handleSubmitPrompt = async (values) => {
+  const handleSubmitPrompt = async (formData) => {
     try {
       setLoading(true);
       if (editingPrompt) {
-        await promptService.updatePrompt(editingPrompt.id, values);
+        await promptService.updatePrompt(editingPrompt.id, formData);
         notification.success({
           message: t('common.success', 'Success'),
           description: t('myPrompts.editPrompt.success', 'Prompt updated successfully'),
           placement: 'topRight'
         });
       } else {
-        await promptService.createPrompt(values);
+        await promptService.createPrompt(formData);
         notification.success({
           message: t('common.success', 'Success'),
           description: t('myPrompts.createPrompt.success'),

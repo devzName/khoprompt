@@ -70,9 +70,9 @@ const CreatePromptForm = ({
     }
     
     if (values.tags && values.tags.length > 0) {
-      values.tags.forEach((tagId) => {
-        formData.append('tags', parseInt(tagId, 10));
-      });
+      formData.append('tags', JSON.stringify(values.tags.map(tag => parseInt(tag, 10))));
+    } else {
+      formData.append('tags', JSON.stringify([]));
     }
     
     if (values.images && values.images.length > 0) {

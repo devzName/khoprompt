@@ -245,8 +245,11 @@ async def update_prompt(
                 try:
                     tag_list = json.loads(tags) if isinstance(tags, str) else tags
                     tag_list = [int(tag) for tag in tag_list if str(tag).isdigit()]
-                except (json.JSONDecodeError, ValueError, TypeError):
+                except (json.JSONDecodeError, ValueError, TypeError) as e:
                     tag_list = []
+            else:
+                # If tags is None or empty string, we should still pass empty list to clear tags
+                tag_list = []
             
             existing_images_to_keep = []
             if existingImages:
@@ -283,7 +286,7 @@ async def update_prompt(
                 content=content,
                 notes=notes,
                 category_id=category_id,
-                tags=tag_list if tag_list else None
+                tags=tag_list  # Always pass tag_list, even if empty
             )
             
             result = await PromptService.update_prompt(
@@ -315,6 +318,7 @@ async def update_prompt(
                 raise HTTPException(status_code=403, detail="Access denied: You can only edit your own prompts")
             
             raise HTTPException(status_code=400, detail="Only draft and approved prompts can be updated")
+        
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

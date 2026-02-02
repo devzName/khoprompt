@@ -310,15 +310,20 @@ class PromptRepository:
             unique_slug = ensure_unique_slug(base_slug, existing_slugs)
             update_data['slug'] = unique_slug
         
+        # Update basic fields
         for field, value in update_data.items():
             if hasattr(prompt, field):
                 setattr(prompt, field, value)
         
+        # Handle tags relationship
         if tag_ids is not None:
-            stmt = select(PromptTag).where(PromptTag.id.in_(tag_ids))
-            result = await session.execute(stmt)
-            tags = result.scalars().all()
-            prompt.tags = tags
+            if len(tag_ids) > 0:
+                stmt = select(PromptTag).where(PromptTag.id.in_(tag_ids))
+                result = await session.execute(stmt)
+                tags = result.scalars().all()
+                prompt.tags = tags
+            else:
+                prompt.tags = []
         
         await session.commit()
         await session.refresh(prompt)
