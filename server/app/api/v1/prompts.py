@@ -219,22 +219,112 @@ async def get_approved_prompts(
 @router.patch("/{prompt_id}", response_model=PromptOut)
 async def update_prompt(
     prompt_id: int,
-    prompt_data: PromptUpdate,
     session: DbSession,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    # For JSON data
+    prompt_data: Optional[PromptUpdate] = None,
+    # For form data
+    title: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    content: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
+    category_id: Optional[int] = Form(None),
+    tags: Optional[str] = Form(None),
+    existingImages: Optional[str] = Form(None),  # JSON string of existing images to keep
+    images: List[UploadFile] = File(default=[])
 ):
-    """Update a prompt (requires authentication and ownership, draft and approved prompts can be updated)"""
-    result = await PromptService.update_prompt(session, prompt_id, prompt_data, current_user.id, current_user.user_type)
-    if not result:
-        # Check if prompt exists and belongs to user
-        prompt = await PromptService.get_prompt_by_id(session, prompt_id)
-        if not prompt:
+    """Update a prompt (supports both JSON and form data)"""
+    try:
+        current_prompt = await PromptService.get_prompt_by_id(session, prompt_id)
+        if not current_prompt:
             raise HTTPException(status_code=404, detail="Prompt not found")
-        if prompt["user_id"] != str(current_user.id):
-            raise HTTPException(status_code=403, detail="Access denied")
-        # If prompt exists and belongs to user but update failed, it's in pending/rejected status
-        raise HTTPException(status_code=400, detail="Only draft and approved prompts can be updated")
-    return result
+        
+        if title is not None or any([description, content, notes, category_id, tags]):
+            tag_list = []
+            if tags:
+                try:
+                    tag_list = json.loads(tags) if isinstance(tags, str) else tags
+                    tag_list = [int(tag) for tag in tag_list if str(tag).isdigit()]
+                except (json.JSONDecodeError, ValueError, TypeError):
+                    tag_list = []
+            
+            existing_images_to_keep = []
+            if existingImages:
+                try:
+                    existing_images_to_keep = json.loads(existingImages) if isinstance(existingImages, str) else existingImages
+                except (json.JSONDecodeError, TypeError):
+                    existing_images_to_keep = []
+            
+            new_image_paths = []
+            if images and len(images) > 0:
+                valid_images = [img for img in images if img.filename and img.filename != '' and img.size > 0]
+                
+                if valid_images:
+                    user_email = current_user.email.replace('@', '_').replace('.', '_')
+                    upload_dir = Path("uploads/prompts") / user_email
+                    upload_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    for image in valid_images:
+                        file_extension = Path(image.filename).suffix
+                        unique_filename = f"{uuid.uuid4()}{file_extension}"
+                        file_path = upload_dir / unique_filename
+                        
+                        with open(file_path, "wb") as buffer:
+                            image_content = await image.read()
+                            buffer.write(image_content)
+                        
+                        new_image_paths.append(str(file_path))
+            
+            final_images = existing_images_to_keep + new_image_paths
+            
+            update_data = PromptUpdate(
+                title=title,
+                description=description,
+                content=content,
+                notes=notes,
+                category_id=category_id,
+                tags=tag_list if tag_list else None
+            )
+            
+            result = await PromptService.update_prompt(
+                session, 
+                prompt_id, 
+                update_data, 
+                current_user.id, 
+                current_user.user_type,
+                existing_images_to_keep=existing_images_to_keep,
+                new_images=new_image_paths
+            )
+        else:
+            if not prompt_data:
+                raise HTTPException(status_code=400, detail="No data provided")
+            
+            result = await PromptService.update_prompt(
+                session, 
+                prompt_id, 
+                prompt_data, 
+                current_user.id, 
+                current_user.user_type
+            )
+        if not result:
+            # Check if prompt exists
+            prompt = await PromptService.get_prompt_by_id(session, prompt_id)
+            if not prompt:
+                raise HTTPException(status_code=404, detail="Prompt not found")
+            
+            # Check permissions
+            if prompt["user_id"] != str(current_user.id) and current_user.user_type != 'admin':
+                raise HTTPException(status_code=403, detail="Access denied: You can only edit your own prompts")
+            
+            # If prompt exists and user has permission but update failed, it's status issue
+            raise HTTPException(status_code=400, detail="Only draft and approved prompts can be updated")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# Remove the PUT endpoint since we're handling both in PATCH
+# @router.put("/{prompt_id}", response_model=PromptOut)
+# async def update_prompt_form_data(...)
 
 @router.post("/{prompt_id}/submit", response_model=PromptOut)
 async def submit_prompt_for_review(

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PromptFormSection from './PromptFormSection';
 
-// Get server URL for images
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
 
 const ImageUploadSection = ({ existingImages = [] }) => {
@@ -12,20 +11,26 @@ const ImageUploadSection = ({ existingImages = [] }) => {
   const [previewUrls, setPreviewUrls] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [existingImageUrls, setExistingImageUrls] = useState([]);
+  const [keptExistingImages, setKeptExistingImages] = useState([]);
   const [viewingIndex, setViewingIndex] = useState(null);
   const form = Form.useFormInstance();
 
-  // Initialize existing images when component mounts or existingImages changes
   useEffect(() => {
     if (existingImages && existingImages.length > 0) {
       const urls = existingImages.map(imagePath => `${SERVER_URL}/${imagePath}`);
       setExistingImageUrls(urls);
+      setKeptExistingImages([...existingImages]);
     } else {
       setExistingImageUrls([]);
+      setKeptExistingImages([]);
     }
   }, [existingImages]);
 
-  // Get all images (existing + new uploads)
+  useEffect(() => {
+    form.setFieldValue('images', imageFiles);
+    form.setFieldValue('existingImages', keptExistingImages);
+  }, [imageFiles, keptExistingImages, form]);
+
   const allImages = [...existingImageUrls, ...previewUrls];
   const totalImages = allImages.length;
 
@@ -59,6 +64,7 @@ const ImageUploadSection = ({ existingImages = [] }) => {
           setPreviewUrls(newUrls);
           setImageFiles(newFiles);
           form.setFieldValue('images', newFiles);
+          form.setFieldValue('existingImages', keptExistingImages);
         }
       };
       reader.readAsDataURL(f);
@@ -71,17 +77,18 @@ const ImageUploadSection = ({ existingImages = [] }) => {
     const existingCount = existingImageUrls.length;
     
     if (index < existingCount) {
-      // Removing existing image
+      const newKeptImages = keptExistingImages.filter((_, i) => i !== index);
       const newExistingUrls = existingImageUrls.filter((_, i) => i !== index);
+      setKeptExistingImages(newKeptImages);
       setExistingImageUrls(newExistingUrls);
+      form.setFieldValue('existingImages', newKeptImages);
     } else {
-      // Removing new uploaded image
       const newIndex = index - existingCount;
       const newUrls = previewUrls.filter((_, i) => i !== newIndex);
       const newFiles = imageFiles.filter((_, i) => i !== newIndex);
       setPreviewUrls(newUrls);
       setImageFiles(newFiles);
-      form.setFieldValue('images', newFiles.length > 0 ? newFiles : null);
+      form.setFieldValue('images', newFiles);
     }
   };
 
@@ -101,6 +108,10 @@ const ImageUploadSection = ({ existingImages = [] }) => {
         className="mb-0"
       >
         <div className="space-y-4">
+          <Form.Item name="existingImages" style={{ display: 'none' }}>
+            <input type="hidden" />
+          </Form.Item>
+          
           <Upload
             multiple
             beforeUpload={handleBeforeUpload}

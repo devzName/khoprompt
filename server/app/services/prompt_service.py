@@ -469,9 +469,12 @@ class PromptService:
         )
 
     @staticmethod
-    async def update_prompt(session: AsyncSession, prompt_id: int, prompt_data: PromptUpdate, user_id: UUID, user_type: str = None) -> dict | None:
+    async def update_prompt(session: AsyncSession, prompt_id: int, prompt_data: PromptUpdate, user_id: UUID, user_type: str = None, existing_images_to_keep: list = None, new_images: list = None) -> dict | None:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
-        if not prompt or prompt.user_id != user_id:
+        if not prompt:
+            return None
+        
+        if prompt.user_id != user_id and user_type != 'admin':
             return None
             
         if prompt.status not in [PromptStatus.DRAFT, PromptStatus.APPROVED]:
@@ -479,7 +482,29 @@ class PromptService:
         
         update_data = prompt_data.model_dump(exclude_unset=True)
         
-        # If updating an approved prompt, change status to PENDING unless user is admin
+        if existing_images_to_keep is not None or new_images is not None:
+            current_images = prompt.images or []
+            
+            kept_images = existing_images_to_keep or []
+            
+            uploaded_images = new_images or []
+            
+            final_images = kept_images + uploaded_images
+            
+            images_to_delete = [img for img in current_images if img not in kept_images]
+            
+            from pathlib import Path
+            for img_path in images_to_delete:
+                try:
+                    full_path = Path(img_path)
+                    if full_path.exists():
+                        full_path.unlink()
+                        print(f"Deleted unused image: {img_path}")
+                except Exception as e:
+                    print(f"Error deleting image {img_path}: {e}")
+            
+            update_data["images"] = final_images if final_images else None
+        
         if prompt.status == PromptStatus.APPROVED and user_type != 'admin':
             update_data["status"] = PromptStatus.PENDING
             

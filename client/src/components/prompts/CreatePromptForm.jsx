@@ -81,6 +81,10 @@ const CreatePromptForm = ({
       });
     }
     
+    if (values.existingImages && values.existingImages.length > 0) {
+      formData.append('existingImages', JSON.stringify(values.existingImages));
+    }
+    
     onSubmit(formData);
   };
   return (
