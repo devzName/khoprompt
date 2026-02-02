@@ -15,12 +15,103 @@ import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NotFoundPage from './NotFoundPage';
+import ImageGallery from '../components/ImageGallery';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
 import { useViewTracking } from '../hooks/useViewTracking';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
+
+// Get server URL for images
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
+
+// Image Gallery Detail Component
+const ImageGalleryDetail = ({ images, title, serverUrl }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleImageClick = (index) => {
+    setCurrentIndex(index);
+  };
+
+  const handleMainImageClick = () => {
+    window.open(`${serverUrl}/${images[currentIndex]}`, '_blank');
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
+
+  if (!images || images.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      {/* Main Image */}
+      <div className="relative bg-gray-50 rounded-lg overflow-hidden aspect-[4/3] border border-gray-200">
+        <img
+          src={`${serverUrl}/${images[currentIndex]}`}
+          alt={`${title} - Hình ${currentIndex + 1}`}
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={handleMainImageClick}
+        />
+        
+        {/* Image Counter */}
+        <div className="absolute top-4 right-4 bg-black bg-opacity-60 text-white text-sm px-3 py-1.5 rounded-full font-medium">
+          {currentIndex + 1}/{images.length}
+        </div>
+
+        {/* Navigation Arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={handlePrevious}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-black rounded-full p-3 transition-all backdrop-blur-sm"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-black rounded-full p-3 transition-all backdrop-blur-sm"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnail Images */}
+      {images.length > 1 && (
+        <div className="grid grid-cols-4 gap-3">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className={`relative bg-gray-50 rounded-lg overflow-hidden aspect-[4/3] border-2 cursor-pointer transition-all ${
+                index === currentIndex 
+                  ? 'border-blue-500 ring-2 ring-blue-200' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+              onClick={() => handleImageClick(index)}
+            >
+              <img
+                src={`${serverUrl}/${image}`}
+                alt={`${title} - Thumbnail ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const PromptDetailPage = () => {
   const { t } = useTranslation();
@@ -278,8 +369,8 @@ const PromptDetailPage = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-3 space-y-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 {t('promptDetail.promptContent')}
@@ -312,7 +403,22 @@ const PromptDetailPage = () => {
             )}
 
           </div>
-          <div className="space-y-8">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Images Section */}
+            {prompt.images && prompt.images.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                  {t('promptDetail.images', 'Hình ảnh')}
+                </h3>
+                <ImageGalleryDetail 
+                  images={prompt.images}
+                  title={prompt.title}
+                  serverUrl={SERVER_URL}
+                />
+              </div>
+            )}
+
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-6">{t('promptDetail.instructions')}</h2>
               <ol className="space-y-4">
