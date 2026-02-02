@@ -45,13 +45,11 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
   return (
     <Drawer
       title={
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold">{prompt?.title}</span>
-          <Tag 
-            color={PROMPT_STATUS_COLORS[prompt?.status] || 'green'}
-            className="text-sm font-medium px-3 py-1"
-          >
-          </Tag>
+        <div>
+          <div className="text-lg font-semibold">{prompt?.title}</div>
+          <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+            {prompt?.description}
+          </div>
         </div>
       }
       placement="right"
@@ -83,7 +81,6 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
           </div>
         ) : (
           <Button 
-            type="primary" 
             icon={<LinkOutlined />}
             className="w-full"
             size="large"
@@ -96,76 +93,62 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
     >
       {prompt && (
         <div className="space-y-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.promptDetails')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.id')}:</span>
-                <span className="ml-2 text-gray-600">#{prompt.id}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.status')}:</span>
-                <Tag 
-                  color={PROMPT_STATUS_COLORS[prompt.status] || 'green'}
-                  className="ml-2 text-xs"
-                >
-                  {getStatusLabel(prompt.status, t) || 'Approved'}
-                </Tag>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.category')}:</span>
-                <span className="ml-2 text-gray-600">
-                  {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category || t('reviewPromptDrawer.uncategorized')}
+          {/* Category & Tags Section */}
+          <div>
+            <h3 className="text-base font-medium text-gray-900 mb-3">
+              {t('reviewPromptDrawer.categoryTags', 'Danh mục & Tags')}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {prompt.category && (
+                <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
+                  {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
                 </span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.author')}:</span>
-                <span className="ml-2 text-gray-600">{prompt.author || prompt.user?.full_name || 'Unknown'}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.createdAt')}:</span>
-                <span className="ml-2 text-gray-600">
-                  {prompt.created_at ? new Date(prompt.created_at).toLocaleString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }) : 'Unknown'}
+              )}
+              {prompt.tags?.map((tag, index) => (
+                <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
+                  #{typeof tag === 'object' ? tag.name : tag}
                 </span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('reviewPromptDrawer.updatedAt')}:</span>
-                <span className="ml-2 text-gray-600">
-                  {prompt.updated_at ? new Date(prompt.updated_at).toLocaleString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }) : 'Unknown'}
-                </span>
-              </div>
+              ))}
             </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.description')}</h3>
-            <div className="text-gray-700 leading-relaxed">
-              {prompt.description}
+
+          {/* Images Section */}
+          <ImageGallery 
+            images={prompt.images} 
+            title={prompt.title}
+            serverUrl={SERVER_URL}
+            isDrawer={true}
+          />
+
+          {/* Stats Section */}
+          <div className="flex gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-gray-300 rounded-full">
+              <EyeOutlined className="text-gray-600 text-xs" />
+              <span className="text-xs font-medium text-gray-900">{prompt.view_count || 0}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-green-400 rounded-full">
+              <LikeOutlined className="text-green-600 text-xs" />
+              <span className="text-xs font-medium text-gray-900">{prompt.like_count || 0}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-red-400 rounded-full">
+              <DislikeOutlined className="text-red-600 text-xs" />
+              <span className="text-xs font-medium text-gray-900">{prompt.dislike_count || 0}</span>
             </div>
           </div>
+
+          {/* Prompt Content */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-blue-500 pl-3">
+            <h3 className="text-base font-medium text-gray-900 mb-3">
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 relative">
+            <div className="bg-gray-50 rounded-lg p-4 relative">
               <div 
-                className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                className="text-gray-800 leading-relaxed text-sm"
                 dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
               />
               <Button
                 icon={<CopyOutlined />}
-                className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
+                className="absolute top-2 right-2 bg-white border-gray-300 text-gray-600 hover:bg-gray-100"
                 size="small"
                 onClick={handleCopy}
               >
@@ -173,9 +156,11 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </Button>
             </div>
           </div>
+
+          {/* Notes if exists */}
           {prompt.notes && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-purple-500 pl-3">
+              <h3 className="text-base font-medium text-gray-900 mb-3">
                 {t('reviewPromptDrawer.notes', 'Ghi chú')}
               </h3>
               <div className="bg-gray-50 rounded-lg p-4">
@@ -185,107 +170,35 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </div>
             </div>
           )}
-          
-          <Divider />
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-orange-500 pl-3">
-              {t('reviewPromptDrawer.categoryTags', 'Danh mục & Tags')}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {prompt.category && (
-                <span className="px-3 py-1 bg-purple-600 text-white text-sm font-medium rounded-md">
-                  {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
-                </span>
-              )}
-              {prompt.tags?.map((tag, index) => (
-                <span key={index} className="px-3 py-1 bg-blue-100 text-blue-600 text-sm font-medium rounded-md">
-                  #{typeof tag === 'object' ? tag.name : tag}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.statsInteraction')}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div className="text-center p-3 bg-white rounded-lg border">
-                <EyeOutlined className="text-blue-500 text-xl mb-2" />
-                <div className="font-semibold text-gray-900">{prompt.view_count || 0}</div>
-                <div className="text-gray-600 text-xs">{t('reviewPromptDrawer.views')}</div>
-              </div>
-              <div className="text-center p-3 bg-white rounded-lg border">
-                <LikeOutlined className="text-green-500 text-xl mb-2" />
-                <div className="font-semibold text-gray-900">{prompt.like_count || 0}</div>
-                <div className="text-gray-600 text-xs">{t('reviewPromptDrawer.likes')}</div>
-              </div>
-              <div className="text-center p-3 bg-white rounded-lg border">
-                <DislikeOutlined className="text-red-500 text-xl mb-2" />
-                <div className="font-semibold text-gray-900">{prompt.dislike_count || 0}</div>
-                <div className="text-gray-600 text-xs">{t('reviewPromptDrawer.dislikes')}</div>
-              </div>
-              <div className="text-center p-3 bg-white rounded-lg border">
-                <CalendarOutlined className="text-purple-500 text-xl mb-2" />
-                <div className="font-semibold text-gray-900">
-                  {prompt.created_at ? Math.ceil((new Date() - new Date(prompt.created_at)) / (1000 * 60 * 60 * 24)) : 0}
-                </div>
-                <div className="text-gray-600 text-xs">{t('reviewPromptDrawer.ageInDays')}</div>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">{t('reviewPromptDrawer.likeRatio')}:</span>
-                  <span className="ml-2 text-gray-600">
-                    {(prompt.like_count || 0) + (prompt.dislike_count || 0) > 0 
-                      ? `${Math.round(((prompt.like_count || 0) / ((prompt.like_count || 0) + (prompt.dislike_count || 0))) * 100)}%`
-                      : t('reviewPromptDrawer.noRating')
-                    }
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Tags:</span>
-                  <span className="ml-2 text-gray-600">{prompt.tags?.length || 0} {t('reviewPromptDrawer.tagCount')}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Images Section */}
-          <ImageGallery 
-            images={prompt.images} 
-            title={prompt.title}
-            serverUrl={SERVER_URL}
-            isDrawer={true}
-          />
-          
+
           {prompt.user && (
-            <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('reviewPromptDrawer.authorInfo')}</h3>
-              <div className="flex items-start gap-4">
-                <Avatar 
-                  size={64} 
-                  src={prompt.user.picture || prompt.user.avatar_url} 
-                  icon={<UserOutlined />}
-                  className="shrink-0"
-                />
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-900 text-lg mb-2">
-                    {prompt.user.full_name || prompt.user.name || 'Unknown User'}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MailOutlined className="text-xs" />
-                      <span>{prompt.user.email || 'No email'}</span>
+            <div>
+              <h3 className="text-base font-medium text-gray-900 mb-3">
+                {t('reviewPromptDrawer.authorInfo', 'Thông tin tác giả')}
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar 
+                    size={48} 
+                    src={prompt.user.picture || prompt.user.avatar_url} 
+                    icon={<UserOutlined />}
+                    className="shrink-0"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 text-sm">
+                      {prompt.user.full_name || prompt.user.name || 'Unknown User'}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <UserOutlined className="text-xs" />
-                      <span>ID: {prompt.user.id}</span>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {prompt.user.email || 'No email'}
                     </div>
                     {prompt.user.user_type && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Tag color={prompt.user.user_type === 'admin' ? 'red' : 'blue'} className="text-xs">
-                          {prompt.user.user_type === 'admin' ? t('reviewPromptDrawer.admin') : t('reviewPromptDrawer.user')}
-                        </Tag>
-                      </div>
+                      <Tag 
+                        color={prompt.user.user_type === 'admin' ? 'red' : 'blue'} 
+                        className="text-xs mt-1"
+                        size="small"
+                      >
+                        {prompt.user.user_type === 'admin' ? t('reviewPromptDrawer.admin') : t('reviewPromptDrawer.user')}
+                      </Tag>
                     )}
                   </div>
                 </div>
