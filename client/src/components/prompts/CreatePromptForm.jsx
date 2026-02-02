@@ -57,13 +57,30 @@ const CreatePromptForm = ({
     form.setFieldsValue({ tags: [] });
   };
   const handleFormSubmit = (values) => {
-    const processedValues = {
-      ...values,
-      category_id: values.category, // Chuyển từ category thành category_id cho API
-      tags: values.tags ? values.tags.map(tagId => parseInt(tagId, 10)) : []
-    };
-    delete processedValues.category;
-    onSubmit(processedValues);
+    const formData = new FormData();
+    
+    formData.append('title', values.title);
+    formData.append('description', values.description);
+    formData.append('content', values.content);
+    formData.append('category_id', values.category);
+
+    if (values.notes) {
+      formData.append('notes', values.notes);
+    }
+    
+    if (values.tags && values.tags.length > 0) {
+      values.tags.forEach((tagId) => {
+        formData.append('tags', parseInt(tagId, 10));
+      });
+    }
+    
+    if (values.images && values.images.length > 0) {
+      values.images.forEach((file) => {
+        formData.append('images', file);
+      });
+    }
+    
+    onSubmit(formData);
   };
   return (
     <div className="flex-1 flex flex-col h-full">

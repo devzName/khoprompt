@@ -7,6 +7,7 @@ import PromptFormSection from './PromptFormSection';
 const ImageUploadSection = () => {
   const { t } = useTranslation();
   const [previewUrls, setPreviewUrls] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
   const [viewingIndex, setViewingIndex] = useState(null);
   const form = Form.useFormInstance();
 
@@ -15,6 +16,7 @@ const ImageUploadSection = () => {
     const allowedFormats = ['image/jpeg', 'image/png'];
     let processedCount = 0;
     const newUrls = [...previewUrls];
+    const newFiles = [...imageFiles];
 
     filesToProcess.forEach((f) => {
       if (!allowedFormats.includes(f.type)) {
@@ -32,11 +34,13 @@ const ImageUploadSection = () => {
       reader.onload = (e) => {
         const base64 = e.target.result;
         newUrls.push(base64);
+        newFiles.push(f);
         processedCount++;
 
         if (processedCount === filesToProcess.length) {
           setPreviewUrls(newUrls);
-          form.setFieldValue('images', newUrls);
+          setImageFiles(newFiles);
+          form.setFieldValue('images', newFiles);
         }
       };
       reader.readAsDataURL(f);
@@ -47,8 +51,10 @@ const ImageUploadSection = () => {
 
   const handleRemoveImage = (index) => {
     const newUrls = previewUrls.filter((_, i) => i !== index);
+    const newFiles = imageFiles.filter((_, i) => i !== index);
     setPreviewUrls(newUrls);
-    form.setFieldValue('images', newUrls.length > 0 ? newUrls : null);
+    setImageFiles(newFiles);
+    form.setFieldValue('images', newFiles.length > 0 ? newFiles : null);
   };
 
   const handleViewImage = (index) => {

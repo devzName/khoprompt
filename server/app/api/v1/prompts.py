@@ -1,7 +1,12 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Form, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List, Optional, Union
+import os
+import uuid
+import json
+from pathlib import Path
 
 from app.api.deps import DbSession
 from app.api.auth_deps import get_current_user, get_current_user_optional
@@ -14,11 +19,85 @@ router = APIRouter()
 
 @router.post("", response_model=PromptOut)
 async def create_prompt(
+    session: DbSession,
+    current_user: User = Depends(get_current_user),
+    title: str = Form(...),
+    description: Optional[str] = Form(None),
+    content: str = Form(...),
+    notes: Optional[str] = Form(None),
+    category_id: Optional[int] = Form(None),
+    tags: Optional[str] = Form(None),  # JSON string of tag IDs
+    images: List[UploadFile] = File(default=[])
+):
+    """Create a new prompt with form data and images (requires authentication)"""
+    try:
+        # Parse tags from JSON string
+        tag_list = []
+        if tags:
+            try:
+                tag_list = json.loads(tags) if isinstance(tags, str) else tags
+                # Ensure it's a list of integers
+                tag_list = [int(tag) for tag in tag_list if str(tag).isdigit()]
+            except (json.JSONDecodeError, ValueError, TypeError):
+                tag_list = []
+        
+        # Handle image uploads
+        image_paths = []
+        if images and len(images) > 0:
+            # Filter out empty files
+            valid_images = [img for img in images if img.filename and img.filename != '' and img.size > 0]
+            
+            if valid_images:
+                # Create uploads directory with user email subfolder
+                user_email = current_user.email.replace('@', '_').replace('.', '_')  # Sanitize email for folder name
+                upload_dir = Path("uploads/prompts") / user_email
+                upload_dir.mkdir(parents=True, exist_ok=True)
+                
+                for image in valid_images:
+                    # Generate unique filename
+                    file_extension = Path(image.filename).suffix
+                    unique_filename = f"{uuid.uuid4()}{file_extension}"
+                    file_path = upload_dir / unique_filename
+                    
+                    # Save file
+                    with open(file_path, "wb") as buffer:
+                        image_content = await image.read()
+                        buffer.write(image_content)
+                    
+                    # Store relative path
+                    image_paths.append(str(file_path))
+        
+        # Create prompt data
+        prompt_data = PromptCreate(
+            title=title,
+            description=description,
+            content=content,
+            notes=notes,
+            category_id=category_id,
+            tags=tag_list
+        )
+        
+        result = await PromptService.create_prompt(
+            session, 
+            prompt_data, 
+            current_user.id, 
+            current_user.user_type,
+            images=image_paths
+        )
+        return result
+    except Exception as e:
+        # Add more detailed error logging
+        print(f"Error creating prompt: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+# Alternative endpoint for JSON data (fallback)
+@router.post("/json", response_model=PromptOut)
+async def create_prompt_json(
     prompt_data: PromptCreate,
     session: DbSession,
     current_user: User = Depends(get_current_user)
 ):
-    """Create a new prompt (requires authentication)"""
+    """Create a new prompt with JSON data (requires authentication)"""
     try:
         result = await PromptService.create_prompt(session, prompt_data, current_user.id, current_user.user_type)
         return result

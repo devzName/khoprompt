@@ -37,11 +37,23 @@ export const promptService = {
     return response.data;
   },
   createPrompt: async (promptData) => {
-    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.BASE, promptData);
+    const config = {};
+    if (promptData instanceof FormData) {
+      config.headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+    }
+    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.BASE, promptData, config);
     return response.data;
   },
   updatePrompt: async (id, promptData) => {
-    const response = await apiClient.patch(API_ENDPOINTS.PROMPTS.BY_ID(id), promptData);
+    const config = {};
+    if (promptData instanceof FormData) {
+      config.headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+    }
+    const response = await apiClient.patch(API_ENDPOINTS.PROMPTS.BY_ID(id), promptData, config);
     return response.data;
   },
   deletePrompt: async (id) => {

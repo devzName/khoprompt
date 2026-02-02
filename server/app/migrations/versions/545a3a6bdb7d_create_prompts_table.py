@@ -24,7 +24,8 @@ def upgrade() -> None:
         sa.Column('title', sa.String(length=255), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('content', sa.Text(), nullable=False),
-        sa.Column('full_description', sa.Text(), nullable=True),
+        sa.Column('notes', sa.Text(), nullable=True),
+        sa.Column('images', sa.dialects.postgresql.ARRAY(sa.String()), nullable=True),
         sa.Column('status', sa.String(length=20), nullable=False, server_default='pending'),
         sa.Column('category_id', sa.Integer(), nullable=True),
         sa.Column('user_id', sa.dialects.postgresql.UUID(as_uuid=True), nullable=False),
@@ -38,6 +39,7 @@ def upgrade() -> None:
         sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('deleted_by', sa.dialects.postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False, server_default=sa.text('false')),
+        
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['category_id'], ['prompt_categories.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'])

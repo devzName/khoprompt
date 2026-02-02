@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import Integer, String, Text, Boolean, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.dialects.postgresql import UUID as PGUUID, ARRAY
 from uuid import UUID
 
 from app.models.base import Base
@@ -24,7 +24,8 @@ class Prompt(AuditMixin, Base):
     slug: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    full_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    images: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
     
     # Status: pending, approved, rejected
     status: Mapped[str] = mapped_column(String(20), nullable=False, default='pending', index=True)

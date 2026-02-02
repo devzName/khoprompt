@@ -150,7 +150,7 @@ const MyPromptsPage = () => {
         const tagId = typeof tag === 'object' ? tag.id : tag;
         return tagId.toString();
       }) || [],
-      full_description: prompt.full_description
+      notes: prompt.notes
     });
     setActiveTab('create');
   };

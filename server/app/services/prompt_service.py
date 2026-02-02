@@ -14,10 +14,15 @@ from app.core.rate_limiter import ViewRateLimiter
 class PromptService:
 
     @staticmethod
-    async def create_prompt(session: AsyncSession, prompt_data: PromptCreate, user_id: UUID, user_type: str = None) -> dict:
+    async def create_prompt(session: AsyncSession, prompt_data: PromptCreate, user_id: UUID, user_type: str = None, images: list[str] = None) -> dict:
+        # Add images to prompt data
+        prompt_dict = prompt_data.model_dump()
+        if images:
+            prompt_dict['images'] = images
+        
         prompt = await PromptRepository.create(
             session, 
-            prompt_data.model_dump(), 
+            prompt_dict, 
             user_id
         )
         
@@ -34,7 +39,8 @@ class PromptService:
             "slug": prompt.slug,
             "description": prompt.description,
             "content": prompt.content,
-            "full_description": prompt.full_description,
+            "notes": prompt.notes,
+            "images": prompt.images,
             "status": prompt.status,
             "category_id": prompt.category_id,
             "user_id": str(prompt.user_id),
@@ -57,7 +63,8 @@ class PromptService:
             "slug": prompt.slug,
             "description": prompt.description,
             "content": prompt.content,
-            "full_description": prompt.full_description,
+            "notes": prompt.notes,
+            "images": prompt.images,
             "status": prompt.status,
             "category_id": prompt.category_id,
             "user_id": str(prompt.user_id),
@@ -95,7 +102,8 @@ class PromptService:
             "slug": prompt.slug,
             "description": prompt.description,
             "content": prompt.content,
-            "full_description": prompt.full_description,
+            "notes": prompt.notes,
+            "images": prompt.images,
             "status": prompt.status,
             "category_id": prompt.category_id,
             "user_id": str(prompt.user_id),
@@ -132,7 +140,8 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
+                "images": prompt.images,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -166,7 +175,7 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -218,7 +227,8 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
+                "images": prompt.images,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -281,7 +291,8 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
+                "images": prompt.images,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -343,7 +354,7 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -415,7 +426,8 @@ class PromptService:
                 "slug": prompt.slug,
                 "description": prompt.description,
                 "content": prompt.content,
-                "full_description": prompt.full_description,
+                "notes": prompt.notes,
+                "images": prompt.images,
                 "status": prompt.status,
                 "category_id": prompt.category_id,
                 "user_id": str(prompt.user_id),
@@ -483,7 +495,8 @@ class PromptService:
             "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
-            "full_description": updated_prompt.full_description,
+            "notes": updated_prompt.notes,
+            "images": updated_prompt.images,
             "status": updated_prompt.status,
             "category_id": updated_prompt.category_id,
             "user_id": str(updated_prompt.user_id),
@@ -516,7 +529,7 @@ class PromptService:
             "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
-            "full_description": updated_prompt.full_description,
+            "notes": updated_prompt.notes,
             "status": updated_prompt.status,
             "category_id": updated_prompt.category_id,
             "user_id": str(updated_prompt.user_id),
@@ -559,7 +572,7 @@ class PromptService:
             "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
-            "full_description": updated_prompt.full_description,
+            "notes": updated_prompt.notes,
             "status": updated_prompt.status,
             "category_id": updated_prompt.category_id,
             "user_id": str(updated_prompt.user_id),
@@ -592,7 +605,7 @@ class PromptService:
             "slug": updated_prompt.slug,
             "description": updated_prompt.description,
             "content": updated_prompt.content,
-            "full_description": updated_prompt.full_description,
+            "notes": updated_prompt.notes,
             "status": updated_prompt.status,
             "category_id": updated_prompt.category_id,
             "user_id": str(updated_prompt.user_id),

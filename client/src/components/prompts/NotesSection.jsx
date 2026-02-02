@@ -8,7 +8,7 @@ const NotesSection = () => {
     <PromptFormSection title={t('myPrompts.createPrompt.notes')}>
       <Form.Item
         label={t('myPrompts.createPrompt.notesLabel')}
-        name="full_description"
+        name="notes"
         className="mb-0"
       >
         <TextArea

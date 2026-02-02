@@ -169,14 +169,14 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               </Button>
             </div>
           </div>
-          {prompt.full_description && (
+          {prompt.notes && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3 border-l-4 border-purple-500 pl-3">
                 {t('reviewPromptDrawer.notes', 'Ghi chú')}
               </h3>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-                  {prompt.full_description}
+                  {prompt.notes}
                 </p>
               </div>
             </div>
