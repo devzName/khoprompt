@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import PageHeader from '../shared/PageHeader';
 import BasicInfoSection from './BasicInfoSection';
 import ContentSection from './ContentSection';
+import ImageUploadSection from './ImageUploadSection';
 import CategorizationSection from './CategorizationSection';
 import NotesSection from './NotesSection';
 import FormActions from './FormActions';
@@ -83,6 +84,7 @@ const CreatePromptForm = ({
               onCategoryChange={handleCategoryChange}
             />
             <NotesSection />
+            <ImageUploadSection />
             <FormActions loading={loading} onCancel={onCancel} />
           </Form>
         </div>
