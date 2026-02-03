@@ -37,7 +37,7 @@ const HomePage = () => {
       try {
         const params = {
           page: currentPage,
-          limit: 9
+          limit: 12
         };
         if (selectedCategory) {
           params.category_id = selectedCategory.id;
