@@ -5,6 +5,7 @@ import { Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
+import TagsDisplay from './TagsDisplay';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
@@ -92,7 +93,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
             {featuredPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col group"
+                className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 transition-all duration-300 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
@@ -114,18 +115,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                   {prompt.title}
                 </h3>
                 <p className="text-gray-600 mb-4 line-clamp-2 grow">{prompt.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {prompt.tags?.slice(0, 3).map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
-                      #{typeof tag === 'object' ? tag.name : tag}
-                    </span>
-                  ))}
-                  {prompt.tags?.length > 3 && (
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
-                      +{prompt.tags.length - 3}
-                    </span>
-                  )}
-                </div>
+                <TagsDisplay tags={prompt.tags} className="mb-4" />
                 <div className="border-t border-gray-200 pt-4 flex items-center justify-between text-sm mt-auto">
                   <div className="flex items-center gap-3">
                     <Avatar 

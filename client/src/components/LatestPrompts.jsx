@@ -5,6 +5,7 @@ import { Pagination, Avatar, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
+import TagsDisplay from './TagsDisplay';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 const LatestPrompts = ({
@@ -143,18 +144,7 @@ const LatestPrompts = ({
                   {prompt.title}
                 </h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {prompt.tags?.slice(0, 2).map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
-                      #{typeof tag === 'object' ? tag.name : tag}
-                    </span>
-                  ))}
-                  {prompt.tags?.length > 2 && (
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">
-                      +{prompt.tags.length - 2}
-                    </span>
-                  )}
-                </div>
+                <TagsDisplay tags={prompt.tags} className="mb-3" />
                 <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-2">
                     <Avatar 
