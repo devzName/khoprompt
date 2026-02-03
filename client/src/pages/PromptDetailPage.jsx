@@ -400,7 +400,7 @@ const PromptDetailPage = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 {t('promptDetail.promptContent')}
               </h2>
-              <div className="bg-white rounded-xl border border-gray-200 p-6 pr-12 relative">
+              <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
                 <div 
                   className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
