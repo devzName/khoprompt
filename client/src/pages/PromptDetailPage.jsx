@@ -305,9 +305,7 @@ const PromptDetailPage = () => {
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-3">
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{prompt.title}</h1>
-                  <Tag color="blue" className="rounded-full px-3 border-blue-100 bg-blue-50 text-blue-600 font-medium">
-                    {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
-                  </Tag>
+                 
                 </div>
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">{prompt.description}</p>
                 <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
@@ -340,10 +338,35 @@ const PromptDetailPage = () => {
                     <span className="font-bold text-gray-800">{prompt.user?.full_name || 'Unknown'}</span>
                   </div>
                 </div>
+                
+                <div className="mt-4 pt-4">
+                  <div className="flex flex-wrap gap-3 items-start">
+                    <div className="flex items-center gap-2">
+                      <Tag color="blue" className="rounded-lg px-3 py-1 border-blue-200 bg-blue-50 text-blue-700 font-medium text-sm">
+                        {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
+                      </Tag>
+                    </div>
+                    
+                    {prompt.tags && prompt.tags.length > 0 && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex flex-wrap gap-2">
+                          {prompt.tags.map((tag, index) => (
+                            <Tag
+                              key={tag.id || index}
+                              className="bg-gray-50 border-gray-200 text-gray-600 rounded-lg px-3 py-1 font-medium text-sm hover:bg-gray-100 transition-colors"
+                            >
+                              #{typeof tag === 'object' ? tag.name : tag}
+                            </Tag>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
-              {(!user || user.id !== prompt.user_id) && (
+            {(!user || user.id !== prompt.user_id) && (
+              <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
                 <>
                   <Button
                     size="large"
@@ -367,8 +390,8 @@ const PromptDetailPage = () => {
                     {t('drawer.notHelpful')}
                   </Button>
                 </>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -433,24 +456,7 @@ const PromptDetailPage = () => {
                 ))}
               </ol>
             </div>
-            <div className="bg-linear-to-br from-blue-600 to-purple-700 rounded-2xl p-6 sm:p-8 shadow-lg text-white">
-              <h2 className="text-xl font-bold mb-4">{t('promptDetail.category')}</h2>
-              <p className="text-blue-50 mb-6 leading-relaxed opacity-90">
-                {t('promptDetail.categoryDesc')} <span className="font-bold underline underline-offset-4">
-                  {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
-                </span>
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {prompt.tags?.map((tag, index) => (
-                  <Tag
-                    key={tag.id || index}
-                    className="bg-white/10 border-white/20 text-white rounded-full px-3 py-0.5"
-                  >
-                    #{typeof tag === 'object' ? tag.name : tag}
-                  </Tag>
-                ))}
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
