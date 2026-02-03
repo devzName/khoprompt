@@ -143,7 +143,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
             <h3 className="text-base font-medium text-gray-900 mb-3">
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
-            <div className="bg-gray-50 rounded-lg p-4 relative">
+            <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
               <div 
                 className="text-gray-800 leading-relaxed text-sm"
                 dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
