@@ -93,7 +93,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
             {featuredPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 transition-all duration-300 flex flex-col group"
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-300 transition-all duration-300 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <Badge 
