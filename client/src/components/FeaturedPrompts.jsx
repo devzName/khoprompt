@@ -82,7 +82,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
             <StarOutlined className="text-2xl text-yellow-500" />
             <div>
               <h2 className="text-3xl font-bold text-gray-900">
-                {t('featured.title')} ({featuredPrompts.length})
+                {t('featured.title')}
               </h2>
               <p className="text-gray-600 mt-1">
                 {t('featured.subtitle', { count: featuredPrompts.length })}

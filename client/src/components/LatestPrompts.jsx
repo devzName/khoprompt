@@ -117,7 +117,7 @@ const LatestPrompts = ({
               <FireOutlined className="text-2xl text-orange-500" />
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">
-                  {title || t('latest.title')} ({totalItems})
+                  {title || t('latest.title')}
                 </h2>
                 <p className="text-gray-600 mt-1">{t('latest.subtitle')}</p>
               </div>
