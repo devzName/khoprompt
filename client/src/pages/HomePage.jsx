@@ -97,7 +97,7 @@ const HomePage = () => {
         pagination={{
           current: currentPage,
           total: totalPrompts,
-          pageSize: 9,
+          pageSize: 12,
           onChange: handlePageChange,
           showSizeChanger: false,
           showQuickJumper: false,
