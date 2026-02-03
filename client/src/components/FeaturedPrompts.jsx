@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Tooltip } from 'antd';
+import { Avatar, Tooltip, Badge } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
@@ -96,9 +96,19 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                 className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 transition-all duration-300 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                    {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
-                  </span>
+                  <Badge 
+                    count={typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
+                    style={{ 
+                      backgroundColor: '#e6f4ff', 
+                      color: '#1677ff',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      borderRadius: '6px',
+                      padding: '2px 8px',
+                      height: 'auto',
+                      lineHeight: '1.4'
+                    }}
+                  />
                   {formatRating(calculateSimpleRating(prompt)) && (
                     <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
                       <StarOutlined className="text-sm" />

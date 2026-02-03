@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FireOutlined, StarOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
-import { Pagination, Avatar, Tooltip } from 'antd';
+import { Pagination, Avatar, Tooltip, Badge } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import PromptDrawer from './PromptDrawer';
@@ -130,9 +130,19 @@ const LatestPrompts = ({
                 className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-md">
-                    {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
-                  </span>
+                  <Badge 
+                    count={typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
+                    style={{ 
+                      backgroundColor: '#f0f0f0', 
+                      color: '#666',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      borderRadius: '6px',
+                      padding: '2px 8px',
+                      height: 'auto',
+                      lineHeight: '1.4'
+                    }}
+                  />
                   {prompt.featured && (
                     <StarOutlined className="text-yellow-500 text-sm" />
                   )}
@@ -143,7 +153,7 @@ const LatestPrompts = ({
                 >
                   {prompt.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow">{prompt.description}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{prompt.description}</p>
                 <TagsDisplay tags={prompt.tags} className="mb-3" />
                 <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-2">

@@ -1,9 +1,8 @@
 import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined, CalendarOutlined, UserOutlined, MailOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Drawer, Button, Tag, Avatar, Divider, notification } from 'antd';
+import { Drawer, Button, Tag, Avatar, notification, Badge } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
-import { PROMPT_STATUS_COLORS, getStatusLabel } from '../constants/promptStatus';
 import ImageGallery from './ImageGallery';
 
 // Get server URL for images
@@ -102,9 +101,19 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
             </h3>
             <div className="flex flex-wrap gap-2">
               {prompt.category && (
-                <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-                  {typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
-                </span>
+                <Badge 
+                  count={typeof prompt.category === 'object' ? prompt.category?.name : prompt.category}
+                  style={{ 
+                    backgroundColor: '#e6f4ff', 
+                    color: '#1677ff',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    borderRadius: '8px',
+                    padding: '4px 12px',
+                    height: 'auto',
+                    lineHeight: '1.4'
+                  }}
+                />
               )}
               {prompt.tags?.map((tag, index) => (
                 <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
@@ -124,15 +133,15 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
           {/* Stats Section */}
           <div className="flex gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-gray-300 rounded-full">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-gray-300 rounded-lg">
               <EyeOutlined className="text-gray-600 text-xs" />
               <span className="text-xs font-medium text-gray-900">{prompt.view_count || 0}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-green-400 rounded-full">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-green-400 rounded-lg">
               <LikeOutlined className="text-green-600 text-xs" />
               <span className="text-xs font-medium text-gray-900">{prompt.like_count || 0}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-red-400 rounded-full">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-red-400 rounded-lg">
               <DislikeOutlined className="text-red-600 text-xs" />
               <span className="text-xs font-medium text-gray-900">{prompt.dislike_count || 0}</span>
             </div>
