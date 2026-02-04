@@ -145,6 +145,12 @@ const PromptDetailPage = () => {
     prompt?.status === 'approved',
     refreshStats
   );
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const fetchPromptDetail = async () => {
       try {
@@ -224,6 +230,12 @@ const PromptDetailPage = () => {
         });
         return;
       }
+
+      // Prevent spam clicking - check if user already voted with the same value
+      if (userVote && userVote.is_helpful === isHelpful) {
+        return;
+      }
+
       setVoteLoading(true);
       await voteService.votePrompt(prompt.id, isHelpful);
       setUserVote({ 
@@ -374,6 +386,7 @@ const PromptDetailPage = () => {
                     icon={<LikeOutlined />}
                     onClick={() => handleVote(true)}
                     loading={voteLoading}
+                    disabled={userVote?.is_helpful === true}
                     className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
                   >
                     {t('drawer.helpful')}
@@ -384,6 +397,7 @@ const PromptDetailPage = () => {
                     icon={<DislikeOutlined />}
                     onClick={() => handleVote(false)}
                     loading={voteLoading}
+                    disabled={userVote?.is_helpful === false}
                     className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
                     danger={userVote?.is_helpful === false}
                   >
