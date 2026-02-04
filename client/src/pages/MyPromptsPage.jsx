@@ -326,16 +326,13 @@ const MyPromptsPage = () => {
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
   };
-  const handleViewPrompt = (prompt) => {
-    setSelectedPrompt(prompt);
-    setDrawerOpen(true);
-  };
   const menuItems = [
     ...(user?.user_type === 'admin' ? [{
       key: 'dashboard', 
       icon: <DashboardOutlined />, 
       label: t('sidebar.dashboard', 'Dashboard'), 
-      action: () => {
+      disabled: activeTab === 'dashboard',
+      action: activeTab === 'dashboard' ? null : () => {
         setActiveTab('dashboard');
         setCurrentPage(1);
         setSearchValue('');
@@ -347,7 +344,8 @@ const MyPromptsPage = () => {
       key: 'my-prompts', 
       icon: <FileTextOutlined />, 
       label: t('sidebar.myPrompts', 'Prompts của tôi'), 
-      action: () => {
+      disabled: activeTab === 'list',
+      action: activeTab === 'list' ? null : () => {
         setActiveTab('list');
         setCurrentPage(1);
         setSearchValue('');
@@ -359,7 +357,8 @@ const MyPromptsPage = () => {
       key: 'create-prompt', 
       icon: <PlusOutlined />, 
       label: t('myPrompts.createPrompt.title'), 
-      action: () => {
+      disabled: activeTab === 'create',
+      action: activeTab === 'create' ? null : () => {
         handleCreatePrompt();
         navigate(ROUTES.MY_PROMPTS_CREATE);
       }
@@ -368,7 +367,8 @@ const MyPromptsPage = () => {
       key: 'manage', 
       icon: <TagsOutlined />, 
       label: t('manageCategoriesTags.title', 'Manage Categories & Tags'), 
-      action: () => {
+      disabled: activeTab === 'manage',
+      action: activeTab === 'manage' ? null : () => {
         setActiveTab('manage');
         navigate(`${ROUTES.MY_PROMPTS}?tab=manage`);
       }
