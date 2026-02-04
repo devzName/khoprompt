@@ -32,7 +32,7 @@ class PromptCategoryRepository:
             )
             .order_by(
                 case((PromptCategory.slug == 'other', 1), else_=0),
-                PromptCategory.display_order.nulls_last(),
+                func.count(Prompt.id).desc(),
                 PromptCategory.name
             )
         )

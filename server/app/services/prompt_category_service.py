@@ -31,8 +31,9 @@ class PromptCategoryService:
         tag_counts = await PromptCategoryRepository.get_tag_prompt_counts(session)
         
         stats_map = {stat['id']: stat['prompt_count'] for stat in stats}
+        stats_order = {stat['id']: idx for idx, stat in enumerate(stats)}
         
-        return [
+        categories_with_tags = [
             {
                 "id": cat.id,
                 "name": cat.name,
@@ -50,6 +51,10 @@ class PromptCategoryService:
             }
             for cat in categories
         ]
+        
+        categories_with_tags.sort(key=lambda x: stats_order.get(x['id'], 999))
+        
+        return categories_with_tags
 
     @staticmethod
     async def create_category(session: AsyncSession, category_data: PromptCategoryCreate) -> dict:
@@ -81,7 +86,6 @@ class PromptCategoryService:
         if not category:
             return None
         
-        # Prevent editing 'other' category
         if category.slug == 'other':
             raise ValueError("Cannot edit 'other' category. It is a system category.")
         
