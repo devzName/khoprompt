@@ -148,7 +148,7 @@ const LatestPrompts = ({
                   )}
                 </div>
                 <h3 
-                  className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] transition-colors duration-200"
+                  className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] transition-colors duration-200 h-14 leading-7"
                   onClick={() => handleCardClick(prompt)}
                 >
                   {prompt.title}
