@@ -42,7 +42,6 @@ const Header = () => {
       setUser(JSON.parse(savedUser));
     }
     
-    // Load search history
     const savedHistory = localStorage.getItem('searchHistory');
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
@@ -50,31 +49,91 @@ const Header = () => {
   }, []);
 
   // Save search to history
-  const saveToHistory = (query) => {
+  const saveToHistory = (query, type = null) => {
     if (!query || query.trim().length < 2) return;
     
     const trimmedQuery = query.trim();
+    const historyItem = {
+      query: trimmedQuery,
+      type: type,
+      timestamp: Date.now()
+    };
+    
     const newHistory = [
-      trimmedQuery,
-      ...searchHistory.filter(item => item !== trimmedQuery)
-    ].slice(0, 10); // Keep only 10 recent searches
+      historyItem,
+      ...searchHistory.filter(item => 
+        typeof item === 'string' ? item !== trimmedQuery : item.query !== trimmedQuery
+      )
+    ].slice(0, 10);
     
     setSearchHistory(newHistory);
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
   };
   const removeFromHistory = (queryToRemove) => {
-    const newHistory = searchHistory.filter(item => item !== queryToRemove);
+    const newHistory = searchHistory.filter(item => 
+      typeof item === 'string' ? item !== queryToRemove : item.query !== queryToRemove
+    );
     setSearchHistory(newHistory);
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
     
-    // Update suggestions if currently showing history
     if ((!searchValue || searchValue.length < 2) && isSearchFocused) {
-      setSuggestions(newHistory.map((query, index) => ({
+      setSuggestions(newHistory.map((item, index) => {
+        const query = typeof item === 'string' ? item : item.query;
+        const type = typeof item === 'string' ? null : item.type;
+        
+        let icon = <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />;
+        if (type === 'category') {
+          icon = <FolderOutlined className="text-gray-400 text-sm shrink-0" />;
+        } else if (type === 'tag') {
+          icon = <TagOutlined className="text-gray-400 text-sm shrink-0" />;
+        }
+        
+        return {
+          value: query,
+          label: (
+            <div className="flex items-center justify-between group">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                {icon}
+                <span className="truncate" title={query}>{query}</span>
+              </div>
+              <button
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFromHistory(query);
+                }}
+              >
+                <CloseOutlined className="text-gray-400 text-xs" />
+              </button>
+            </div>
+          ),
+          key: `history-${index}`,
+          type: type || 'history',
+          historyType: type
+        };
+      }));
+    }
+  };
+  const getHistoryOptions = () => {
+    if (searchValue && searchValue.length >= 2) return [];
+    
+    return searchHistory.map((item, index) => {
+      const query = typeof item === 'string' ? item : item.query;
+      const type = typeof item === 'string' ? null : item.type;
+      
+      let icon = <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />;
+      if (type === 'category') {
+        icon = <FolderOutlined className="text-gray-400 text-sm shrink-0" />;
+      } else if (type === 'tag') {
+        icon = <TagOutlined className="text-gray-400 text-sm shrink-0" />;
+      }
+      
+      return {
         value: query,
         label: (
           <div className="flex items-center justify-between group">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />
+              {icon}
               <span className="truncate" title={query}>{query}</span>
             </div>
             <button
@@ -89,50 +148,20 @@ const Header = () => {
           </div>
         ),
         key: `history-${index}`,
-        type: 'history'
-      })));
-    }
-  };
-  // Get search history options
-  const getHistoryOptions = () => {
-    if (searchValue && searchValue.length >= 2) return [];
-    
-    return searchHistory.map((query, index) => ({
-      value: query,
-      label: (
-        <div className="flex items-center justify-between group">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />
-            <span className="truncate" title={query}>{query}</span>
-          </div>
-          <button
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
-            onClick={(e) => {
-              e.stopPropagation();
-              removeFromHistory(query);
-            }}
-          >
-            <CloseOutlined className="text-gray-400 text-xs" />
-          </button>
-        </div>
-      ),
-      key: `history-${index}`,
-      type: 'history'
-    }));
+        type: type || 'history',
+        historyType: type
+      };
+    });
   };
 
-  // Handle search input focus
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
-    // Show history when focused and no search value
     if (!searchValue || searchValue.length < 2) {
       setSuggestions(getHistoryOptions());
     }
   };
 
-  // Handle search input blur
   const handleSearchBlur = () => {
-    // Delay to allow selection to work
     setTimeout(() => {
       setIsSearchFocused(false);
     }, 200);
@@ -140,7 +169,6 @@ const Header = () => {
   const fetchSuggestions = useCallback(
     debounce(async (query) => {
       if (!query || query.length < 2) {
-        // Show search history when no query and focused
         if (isSearchFocused) {
           setSuggestions(getHistoryOptions());
         }
@@ -225,17 +253,22 @@ const Header = () => {
     if (!value || !value.trim()) return;
 
     const searchQuery = value.trim();
-    
-    // Save to history
-    saveToHistory(searchQuery);
+    let searchType = null;
     
     if (option?.type === 'category') {
-      navigate(`${ROUTES.HOME}?category=${encodeURIComponent(option.key.replace('category-', ''))}`);
-    } else if (option?.type === 'tag') {
-      navigate(`${ROUTES.SEARCH}?tag=${encodeURIComponent(searchQuery.replace('#', ''))}`);
+      searchType = 'category';
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}&type=category`);
+    } else if (option?.type === 'tag' || searchQuery.startsWith('#')) {
+      searchType = 'tag';
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery.replace('#', ''))}&type=tag`);
+    } else if (option?.historyType) {
+      searchType = option.historyType;
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}&type=${option.historyType}`);
     } else {
       navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}`);
     }
+    
+    saveToHistory(searchQuery, searchType);
   };
   
   const handleSearchInputChange = (value) => {
@@ -248,7 +281,6 @@ const Header = () => {
     handleSearch(value, option);
   };
 
-  // Initialize suggestions with history when component mounts
   useEffect(() => {
     if ((!searchValue || searchValue.length < 2) && isSearchFocused) {
       setSuggestions(getHistoryOptions());
