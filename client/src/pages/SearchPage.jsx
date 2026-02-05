@@ -124,6 +124,11 @@ const SearchPage = () => {
                   isCategorySearch ? t('search.categoryResults', { query }) :
                   t('search.searchResults', { query })
                 }
+                description={
+                  isTagSearch ? t('search.tagResultsDesc', { query }) : 
+                  isCategorySearch ? t('search.categoryResultsDesc', { query }) :
+                  t('search.searchResultsDesc', { query })
+                }
                 prompts={prompts}
                 pageSize={12}
                 columns={3}

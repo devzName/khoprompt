@@ -22,6 +22,11 @@ export const API_ENDPOINTS = {
     USER_VOTE: (promptId) => `/votes/prompts/${promptId}/user-vote`,
     STATS: (promptId) => `/votes/prompts/${promptId}/stats`,
   },
+  BOOKMARKS: {
+    LIST: '/bookmarks',
+    CHECK: '/bookmarks/check',
+    TOGGLE: '/bookmarks/toggle',
+  },
   CATEGORIES: {
     BASE: '/prompt-categories',
     STATS: '/prompt-categories/stats',

@@ -28,3 +28,4 @@ class User(AuditMixin, Base):
     prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='user')
     prompt_votes: Mapped[list['PromptVote']] = relationship('PromptVote', back_populates='user')
     prompt_views: Mapped[list['PromptView']] = relationship('PromptView', back_populates='user')
+    bookmarks: Mapped[list['Bookmark']] = relationship('Bookmark', back_populates='user')

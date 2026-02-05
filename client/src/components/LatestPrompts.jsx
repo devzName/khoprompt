@@ -10,6 +10,7 @@ import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 const LatestPrompts = ({
   title = null,
+  description = null,
   prompts = [],
   currentPrompt = null,
   filterByCategory = false,
@@ -119,7 +120,9 @@ const LatestPrompts = ({
                 <h2 className="text-3xl font-bold text-gray-900">
                   {title || t('latest.title')}
                 </h2>
-                <p className="text-gray-600 mt-1">{t('latest.subtitle')}</p>
+                <p className="text-gray-600 mt-1">
+                  {description || t('latest.subtitle')}
+                </p>
               </div>
             </div>
           </div>

@@ -17,6 +17,7 @@
     "search": "Search prompt...",
     "createPrompt": "Create Prompt",
     "myPrompts": "My Prompts",
+    "bookmarked": "Bookmarked",
     "reviewPrompts": "Review Prompts",
     "logout": "Logout",
     "searching": "Searching...",
@@ -256,6 +257,10 @@
     "category": "Category",
     "categoryDesc": "This prompt belongs to category",
     "relatedPrompts": "Related Prompts",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "bookmarkAdded": "Prompt bookmarked successfully",
+    "bookmarkRemoved": "Bookmark removed successfully",
     "defaultInstructions": {
       "0": "Copy the prompt content above using the \"Copy Prompt\" button",
       "1": "Open ChatGPT, Claude or any AI tool you want to use",
@@ -273,8 +278,23 @@
     "noResultsDesc": "No prompts match the keyword \"{{query}}\". Try searching with different keywords.",
     "loadingPage": "Loading page {{page}}...",
     "searchResults": "Search results for \"{{query}}\"",
+    "searchResultsDesc": "Found prompts matching your search query",
     "tagResults": "Prompts with tag \"#{{query}}\"",
-    "categoryResults": "Prompts in category \"{{query}}\""
+    "tagResultsDesc": "All prompts tagged with #{{query}}",
+    "categoryResults": "Prompts in category \"{{query}}\"",
+    "categoryResultsDesc": "Browse all prompts in the {{query}} category",
+    "bookmarkAdded": "Prompt bookmarked successfully",
+    "bookmarkRemoved": "Bookmark removed successfully",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked"
+  },
+  "bookmarked": {
+    "title": "Bookmarked Prompts",
+    "description": "Your saved prompts for quick access",
+    "loginRequired": "Please login to view bookmarked prompts",
+    "empty": "No bookmarked prompts yet",
+    "emptyDescription": "Start bookmarking prompts to see them here",
+    "errorFetching": "Error fetching bookmarked prompts"
   },
   "tags": {
     "title": "Explore by Tags",

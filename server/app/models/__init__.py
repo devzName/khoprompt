@@ -3,4 +3,5 @@ from app.models.prompt_tag import PromptTag
 from app.models.prompt import Prompt
 from app.models.prompt_vote import PromptVote
 from app.models.prompt_view import PromptView
+from app.models.bookmark import Bookmark
 from app.models.user import User

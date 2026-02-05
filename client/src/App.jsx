@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import PromptDetailPage from './pages/PromptDetailPage';
 import SearchPage from './pages/SearchPage';
 import MyPromptsPage from './pages/MyPromptsPage';
+import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
@@ -78,6 +79,14 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <MyPromptsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path={ROUTES.BOOKMARKED} 
+        element={
+          <ProtectedRoute>
+            <BookmarkedPage />
           </ProtectedRoute>
         } 
       />

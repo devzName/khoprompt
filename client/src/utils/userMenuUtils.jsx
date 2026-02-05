@@ -1,4 +1,4 @@
-import { LogoutOutlined, GlobalOutlined, BookOutlined } from '@ant-design/icons';
+import { LogoutOutlined, GlobalOutlined, FileOutlined, BookOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'antd';
 import { ROUTES } from '../constants/routes';
@@ -28,8 +28,16 @@ export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMy
     items.push(
       {
         key: 'my-prompts',
-        icon: <BookOutlined />,
+        icon: <FileOutlined />,
         label: <Link to={ROUTES.MY_PROMPTS}>{t('header.myPrompts')}</Link>,
+      },
+      {
+        type: 'divider',
+      },
+      {
+        key: 'bookmarked',
+        icon: <BookOutlined />,
+        label: <Link to={ROUTES.BOOKMARKED}>{t('header.bookmarked')}</Link>,
       },
       {
         type: 'divider',

@@ -51,6 +51,9 @@ class Prompt(AuditMixin, Base):
     # Views relationship
     views: Mapped[list['PromptView']] = relationship('PromptView', back_populates='prompt')
     
+    # Bookmarks relationship
+    bookmarks: Mapped[list['Bookmark']] = relationship('Bookmark', back_populates='prompt')
+    
     # Stats
     view_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     like_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

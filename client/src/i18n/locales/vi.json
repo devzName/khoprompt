@@ -17,6 +17,7 @@
     "search": "Tìm kiếm prompt...",
     "createPrompt": "Tạo Prompt",
     "myPrompts": "Prompts của tôi",
+    "bookmarked": "Đã lưu",
     "reviewPrompts": "Duyệt Prompt",
     "logout": "Đăng xuất",
     "searching": "Đang tìm kiếm...",
@@ -303,6 +304,10 @@
     "category": "Danh mục",
     "categoryDesc": "Prompt này thuộc danh mục",
     "relatedPrompts": "Prompts cùng danh mục",
+    "bookmark": "Lưu",
+    "bookmarked": "Đã lưu",
+    "bookmarkAdded": "Đã lưu prompt thành công",
+    "bookmarkRemoved": "Đã bỏ lưu prompt thành công",
     "defaultInstructions": {
       "0": "Nhấn Copy nội dung prompt ở trên bằng nút \"Copy Prompt\"",
       "1": "Mở ChatGPT, Claude hoặc AI tool bạn muốn sử dụng",
@@ -320,8 +325,23 @@
     "noResultsDesc": "Không có prompt nào phù hợp với từ khóa \"{{query}}\". Thử tìm kiếm với từ khóa khác.",
     "loadingPage": "Đang tải trang {{page}}...",
     "searchResults": "Kết quả tìm kiếm cho \"{{query}}\"",
+    "searchResultsDesc": "Tìm thấy các prompt phù hợp với từ khóa tìm kiếm",
     "tagResults": "Prompts với tag \"#{{query}}\"",
-    "categoryResults": "Prompts trong danh mục \"{{query}}\""
+    "tagResultsDesc": "Tất cả prompts được gắn tag #{{query}}",
+    "categoryResults": "Prompts trong danh mục \"{{query}}\"",
+    "categoryResultsDesc": "Duyệt tất cả prompts trong danh mục {{query}}",
+    "bookmarkAdded": "Đã lưu prompt thành công",
+    "bookmarkRemoved": "Đã bỏ lưu prompt thành công", 
+    "bookmark": "Lưu",
+    "bookmarked": "Đã lưu"
+  },
+  "bookmarked": {
+    "title": "Prompts đã lưu",
+    "description": "Các prompt bạn đã lưu để truy cập nhanh",
+    "loginRequired": "Vui lòng đăng nhập để xem prompts đã lưu",
+    "empty": "Chưa có prompt nào được lưu",
+    "emptyDescription": "Hãy bắt đầu lưu các prompt để xem chúng ở đây",
+    "errorFetching": "Lỗi khi tải prompts đã lưu"
   },
   "tags": {
     "title": "Khám phá theo Tags",

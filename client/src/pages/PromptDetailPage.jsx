@@ -8,7 +8,8 @@ import {
   DislikeOutlined,
   CalendarOutlined,
   UserOutlined,
-  StarOutlined
+  StarOutlined,
+  BookOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -18,6 +19,7 @@ import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
+import { bookmarkService } from '../services/bookmarkService';
 import { useViewTracking } from '../hooks/useViewTracking';
 import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
@@ -126,6 +128,8 @@ const PromptDetailPage = () => {
   const [voteLoading, setVoteLoading] = useState(false);
   const [voteStats, setVoteStats] = useState({ helpful_count: 0, not_helpful_count: 0 });
   const [currentRating, setCurrentRating] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const refreshStats = async () => {
     if (prompt?.id) {
       try {
@@ -175,6 +179,13 @@ const PromptDetailPage = () => {
               setUserVote(vote);
             } catch (error) {
               console.error('Error fetching user vote:', error);
+            }
+
+            try {
+              const bookmarked = await bookmarkService.isBookmarked(response.id);
+              setIsBookmarked(bookmarked);
+            } catch (error) {
+              console.error('Error checking bookmark status:', error);
             }
           }
         }
@@ -267,6 +278,40 @@ const PromptDetailPage = () => {
       setVoteLoading(false);
     }
   };
+
+  const handleBookmark = async () => {
+    try {
+      if (!user) {
+        notification.warning({
+          title: t('common.warning', 'Warning'),
+          description: t('login.required'),
+          placement: 'topRight'
+        });
+        return;
+      }
+
+      setBookmarkLoading(true);
+      const result = await bookmarkService.toggleBookmark(prompt.id);
+      setIsBookmarked(result.is_bookmarked);
+      
+      notification.success({
+        title: t('common.success', 'Success'),
+        description: result.is_bookmarked 
+          ? t('promptDetail.bookmarkAdded', 'Prompt bookmarked successfully')
+          : t('promptDetail.bookmarkRemoved', 'Bookmark removed successfully'),
+        placement: 'topRight'
+      });
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+      notification.error({
+        title: t('common.error', 'Error'),
+        description: error.response?.data?.detail || t('common.error'),
+        placement: 'topRight'
+      });
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -315,7 +360,6 @@ const PromptDetailPage = () => {
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-3">
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{prompt.title}</h1>
-                 
                 </div>
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">{prompt.description}</p>
                 <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
@@ -375,35 +419,50 @@ const PromptDetailPage = () => {
                 </div>
               </div>
             </div>
-            {(!user || user.id !== prompt.user_id) && (
-              <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
-                <>
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
+              <div className="flex gap-4 flex-1">
+                {(!user || user.id !== prompt.user_id) && (
+                  <>
+                    <Button
+                      size="large"
+                      type={userVote?.is_helpful === true ? "primary" : "default"}
+                      icon={<LikeOutlined />}
+                      onClick={() => handleVote(true)}
+                      loading={voteLoading}
+                      disabled={userVote?.is_helpful === true}
+                      className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
+                    >
+                      {t('drawer.helpful')}
+                    </Button>
+                    <Button
+                      size="large"
+                      type={userVote?.is_helpful === false ? "primary" : "default"}
+                      icon={<DislikeOutlined />}
+                      onClick={() => handleVote(false)}
+                      loading={voteLoading}
+                      disabled={userVote?.is_helpful === false}
+                      className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
+                      danger={userVote?.is_helpful === false}
+                    >
+                      {t('drawer.notHelpful')}
+                    </Button>
+                  </>
+                )}
+                
+                {user && (
                   <Button
                     size="large"
-                    type={userVote?.is_helpful === true ? "primary" : "default"}
-                    icon={<LikeOutlined />}
-                    onClick={() => handleVote(true)}
-                    loading={voteLoading}
-                    disabled={userVote?.is_helpful === true}
-                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === true ? 'bg-green-600 hover:bg-green-700 border-0' : ''}`}
+                    type={isBookmarked ? "primary" : "default"}
+                    icon={<BookOutlined />}
+                    onClick={handleBookmark}
+                    loading={bookmarkLoading}
+                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${isBookmarked ? 'bg-blue-600 hover:bg-blue-700 border-0' : ''}`}
                   >
-                    {t('drawer.helpful')}
+                    {isBookmarked ? t('promptDetail.bookmarked') : t('promptDetail.bookmark')}
                   </Button>
-                  <Button
-                    size="large"
-                    type={userVote?.is_helpful === false ? "primary" : "default"}
-                    icon={<DislikeOutlined />}
-                    onClick={() => handleVote(false)}
-                    loading={voteLoading}
-                    disabled={userVote?.is_helpful === false}
-                    className={`flex-1 sm:flex-none h-12 rounded-xl font-semibold ${userVote?.is_helpful === false ? 'bg-red-600 hover:bg-red-700 border-0' : ''}`}
-                    danger={userVote?.is_helpful === false}
-                  >
-                    {t('drawer.notHelpful')}
-                  </Button>
-                </>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

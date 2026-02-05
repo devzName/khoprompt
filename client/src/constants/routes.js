@@ -8,5 +8,6 @@ export const ROUTES = {
   MY_PROMPTS_DASHBOARD: '/my-prompts?tab=dashboard',
   MY_PROMPTS_CREATE: '/my-prompts?tab=create',
   CREATE_PROMPT: '/my-prompts',
+  BOOKMARKED: '/bookmarked',
 };
 export default ROUTES;
