@@ -18,7 +18,9 @@
     "createPrompt": "Create Prompt",
     "myPrompts": "My Prompts",
     "reviewPrompts": "Review Prompts",
-    "logout": "Logout"
+    "logout": "Logout",
+    "searching": "Searching...",
+    "noResults": "No results found"
   },
   "login": {
     "welcome": "Welcome",
@@ -207,11 +209,6 @@
     "quickView": "Quick View",
     "pagination": "of"
   },
-  "categories": {
-    "title": "Prompt Categories",
-    "subtitle": "Explore prompts by professional field",
-    "all": "All"
-  },
   "footer": {
     "description": "High-quality AI prompt library for ChatGPT, Claude, Gemini and other AI tools. Optimize your work with professional prompts.",
     "copyright": "© 2025 Prompt Library. All rights reserved.",
@@ -350,14 +347,15 @@
       "delete": "Delete"
     }
   },
-  "categoriesPage": {
+  "categories": {
     "title": "Prompt Categories",
     "all": "All",
     "viewGrid": "Grid",
     "viewTree": "Tree",
     "showMore": "Show more",
     "showLess": "Show less",
-    "treeHint": "Click category to view all, click tag (#) to filter by tag"
+    "treeHint": "Click category to view all, click tag (#) to filter by tag",
+    "subtitle": "Explore prompts by professional field"
   },
   "manageCategoriesTags": {
     "title": "Manage Categories & Tags",

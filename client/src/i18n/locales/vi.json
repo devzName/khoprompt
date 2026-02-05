@@ -18,7 +18,9 @@
     "createPrompt": "Tạo Prompt",
     "myPrompts": "Prompts của tôi",
     "reviewPrompts": "Duyệt Prompt",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "searching": "Đang tìm kiếm...",
+    "noResults": "Không tìm thấy kết quả"
   },
   "login": {
     "welcome": "Hãy bắt đầu",

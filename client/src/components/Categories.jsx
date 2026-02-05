@@ -16,13 +16,13 @@ import {
   UnorderedListOutlined
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../hooks/useLanguage';
 import { Segmented } from 'antd';
 import { API_ENDPOINTS } from '../constants/api';
 import apiClient from '../axios/apiClient';
 import CategoryTree from './CategoryTree';
 const Categories = ({ selectedCategory, onCategorySelect }) => {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [treeData, setTreeData] = useState([]);
   const [loading, setLoading] = useState(true);
