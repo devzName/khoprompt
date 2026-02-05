@@ -44,7 +44,8 @@ class ElasticsearchService:
         if not self.client:
             return
             
-        mapping = {
+        # Create prompts index
+        prompts_mapping = {
             "mappings": {
                 "properties": {
                     "id": {"type": "integer"},
@@ -68,38 +69,11 @@ class ElasticsearchService:
                         "analyzer": "standard"
                     },
                     "slug": {"type": "keyword"},
-                    "category": {
-                        "properties": {
-                            "id": {"type": "integer"},
-                            "name": {
-                                "type": "text",
-                                "fields": {
-                                    "keyword": {"type": "keyword"},
-                                    "suggest": {
-                                        "type": "completion",
-                                        "analyzer": "simple"
-                                    }
-                                }
-                            },
-                            "slug": {"type": "keyword"}
-                        }
-                    },
-                    "tags": {
-                        "type": "nested",
-                        "properties": {
-                            "id": {"type": "integer"},
-                            "name": {
-                                "type": "text",
-                                "fields": {
-                                    "keyword": {"type": "keyword"},
-                                    "suggest": {
-                                        "type": "completion",
-                                        "analyzer": "simple"
-                                    }
-                                }
-                            }
-                        }
-                    },
+                    "category_id": {"type": "integer"},
+                    "category_name": {"type": "keyword"},
+                    "category_slug": {"type": "keyword"},
+                    "tag_ids": {"type": "integer"},
+                    "tag_names": {"type": "keyword"},
                     "user": {
                         "properties": {
                             "id": {"type": "keyword"},
@@ -141,12 +115,89 @@ class ElasticsearchService:
             }
         }
         
+        # Create categories index
+        categories_mapping = {
+            "mappings": {
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {
+                        "type": "text",
+                        "analyzer": "vietnamese_analyzer",
+                        "fields": {
+                            "keyword": {"type": "keyword"},
+                            "suggest": {
+                                "type": "completion",
+                                "analyzer": "simple"
+                            }
+                        }
+                    },
+                    "slug": {"type": "keyword"}
+                }
+            },
+            "settings": {
+                "analysis": {
+                    "analyzer": {
+                        "vietnamese_analyzer": {
+                            "tokenizer": "standard",
+                            "filter": ["lowercase", "asciifolding"]
+                        }
+                    }
+                }
+            }
+        }
+        
+        # Create tags index
+        tags_mapping = {
+            "mappings": {
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {
+                        "type": "text",
+                        "analyzer": "vietnamese_analyzer",
+                        "fields": {
+                            "keyword": {"type": "keyword"},
+                            "suggest": {
+                                "type": "completion",
+                                "analyzer": "simple"
+                            }
+                        }
+                    },
+                    "category_id": {"type": "integer"},
+                    "prompt_count": {"type": "integer"}
+                }
+            },
+            "settings": {
+                "analysis": {
+                    "analyzer": {
+                        "vietnamese_analyzer": {
+                            "tokenizer": "standard",
+                            "filter": ["lowercase", "asciifolding"]
+                        }
+                    }
+                }
+            }
+        }
+        
         try:
-            exists = await self.client.indices.exists(index=self.index_name)
-            if not exists:
-                await self.client.indices.create(index=self.index_name, body=mapping)
+            # Create prompts index
+            prompts_exists = await self.client.indices.exists(index=self.index_name)
+            if not prompts_exists:
+                await self.client.indices.create(index=self.index_name, body=prompts_mapping)
+                
+            # Create categories index
+            categories_index = f"{self.settings.elasticsearch_index_prefix}_categories"
+            categories_exists = await self.client.indices.exists(index=categories_index)
+            if not categories_exists:
+                await self.client.indices.create(index=categories_index, body=categories_mapping)
+                
+            # Create tags index
+            tags_index = f"{self.settings.elasticsearch_index_prefix}_tags"
+            tags_exists = await self.client.indices.exists(index=tags_index)
+            if not tags_exists:
+                await self.client.indices.create(index=tags_index, body=tags_mapping)
+                
         except Exception as e:
-            logger.error(f"Failed to create Elasticsearch index: {e}")
+            logger.error(f"Failed to create Elasticsearch indices: {e}")
 
     async def index_prompt(self, prompt: Prompt):
         """Index a single prompt"""
@@ -154,24 +205,18 @@ class ElasticsearchService:
             return
             
         try:
-            doc = {
+            # Index prompt
+            prompt_doc = {
                 "id": prompt.id,
                 "title": prompt.title,
                 "description": prompt.description,
                 "content": prompt.content,
                 "slug": prompt.slug,
-                "category": {
-                    "id": prompt.category.id,
-                    "name": prompt.category.name,
-                    "slug": prompt.category.slug
-                } if prompt.category else None,
-                "tags": [
-                    {
-                        "id": tag.id,
-                        "name": tag.name
-                    }
-                    for tag in prompt.tags
-                ] if prompt.tags else [],
+                "category_id": prompt.category.id if prompt.category else None,
+                "category_name": prompt.category.name if prompt.category else None,
+                "category_slug": prompt.category.slug if prompt.category else None,
+                "tag_ids": [tag.id for tag in prompt.tags] if prompt.tags else [],
+                "tag_names": [tag.name for tag in prompt.tags] if prompt.tags else [],
                 "user": {
                     "id": str(prompt.user.id),
                     "full_name": prompt.user.full_name,
@@ -186,11 +231,82 @@ class ElasticsearchService:
             await self.client.index(
                 index=self.index_name,
                 id=prompt.id,
-                body=doc
+                body=prompt_doc
             )
+            
+            # Index category separately if exists
+            if prompt.category:
+                await self.index_category(prompt.category)
+                
+            # Index tags separately if exist
+            if prompt.tags:
+                for tag in prompt.tags:
+                    await self.index_tag(tag)
             
         except Exception as e:
             logger.error(f"Failed to index prompt {prompt.id}: {e}")
+
+    async def index_category(self, category):
+        """Index a single category"""
+        if not self.client or not category:
+            return
+            
+        try:
+            categories_index = f"{self.settings.elasticsearch_index_prefix}_categories"
+            
+            category_doc = {
+                "id": category.id,
+                "name": category.name,
+                "slug": category.slug
+            }
+            
+            await self.client.index(
+                index=categories_index,
+                id=category.id,
+                body=category_doc
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to index category {category.id}: {e}")
+
+    async def index_tag(self, tag):
+        """Index a single tag"""
+        if not self.client or not tag:
+            return
+            
+        try:
+            tags_index = f"{self.settings.elasticsearch_index_prefix}_tags"
+            
+            # Count prompts with this tag
+            count_query = {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"term": {"status": "approved"}},
+                            {"term": {"tag_ids": tag.id}}
+                        ]
+                    }
+                }
+            }
+            
+            count_result = await self.client.count(index=self.index_name, body=count_query)
+            prompt_count = count_result.get("count", 0)
+            
+            tag_doc = {
+                "id": tag.id,
+                "name": tag.name,
+                "category_id": getattr(tag, 'category_id', None),
+                "prompt_count": prompt_count
+            }
+            
+            await self.client.index(
+                index=tags_index,
+                id=tag.id,
+                body=tag_doc
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to index tag {tag.id}: {e}")
 
     async def delete_prompt(self, prompt_id: int):
         """Delete a prompt from index"""
@@ -206,6 +322,36 @@ class ElasticsearchService:
         except Exception as e:
             logger.error(f"Failed to delete prompt {prompt_id}: {e}")
 
+    async def delete_tag(self, tag_id: int):
+        """Delete a tag from tags index"""
+        if not self.client:
+            return
+            
+        try:
+            tags_index = f"{self.settings.elasticsearch_index_prefix}_tags"
+            await self.client.delete(
+                index=tags_index,
+                id=tag_id,
+                ignore=[404]
+            )
+        except Exception as e:
+            logger.error(f"Failed to delete tag {tag_id}: {e}")
+
+    async def delete_category(self, category_id: int):
+        """Delete a category from categories index"""
+        if not self.client:
+            return
+            
+        try:
+            categories_index = f"{self.settings.elasticsearch_index_prefix}_categories"
+            await self.client.delete(
+                index=categories_index,
+                id=category_id,
+                ignore=[404]
+            )
+        except Exception as e:
+            logger.error(f"Failed to delete category {category_id}: {e}")
+
     def _normalize_vietnamese(self, text: str) -> str:
         """Convert Vietnamese text with diacritics to without diacritics"""
         import unicodedata
@@ -215,12 +361,12 @@ class ElasticsearchService:
         return without_diacritics.lower()
 
     async def search_suggestions(self, query: str, limit: int = 10) -> Dict[str, List[Dict]]:
-        """Get search suggestions using Elasticsearch"""
+        """Get search suggestions using Elasticsearch with separate indices"""
         if not self.client:
             return {"prompts": [], "categories": [], "tags": []}
         
         try:
-            # Search for prompts with partial matching (wildcard + analyzed)
+            # Search for prompts
             prompt_search = {
                 "query": {
                     "bool": {
@@ -255,7 +401,7 @@ class ElasticsearchService:
                     }
                 },
                 "size": limit,
-                "_source": ["id", "title", "category"]
+                "_source": ["id", "title", "category_name"]
             }
             
             prompt_result = await self.client.search(
@@ -269,104 +415,107 @@ class ElasticsearchService:
                 prompts.append({
                     "id": source["id"],
                     "title": source["title"],
-                    "category": source.get("category", {}).get("name") if source.get("category") else None
+                    "category": source.get("category_name")
                 })
             
-            # Get category suggestions
+            # Search categories in separate index
+            categories_index = f"{self.settings.elasticsearch_index_prefix}_categories"
             category_search = {
                 "query": {
                     "bool": {
-                        "must": [
-                            {"term": {"status": "approved"}},
+                        "should": [
+                            {
+                                "match_phrase": {
+                                    "name": query
+                                }
+                            },
                             {
                                 "match": {
-                                    "category.name": {
+                                    "name": {
                                         "query": query,
-                                        "fuzziness": "AUTO"
+                                        "fuzziness": "0",
+                                        "operator": "and"
                                     }
+                                }
+                            },
+                            {
+                                "wildcard": {
+                                    "name.keyword": f"*{query}*"
                                 }
                             }
                         ]
                     }
                 },
-                "size": 0,
-                "aggs": {
-                    "categories": {
-                        "terms": {
-                            "field": "category.name.keyword",
-                            "size": limit
-                        }
-                    }
-                }
+                "size": limit,
+                "_source": ["id", "name"]
             }
             
-            category_result = await self.client.search(
-                index=self.index_name,
-                body=category_search
-            )
-            
-            categories = []
-            if "aggregations" in category_result:
-                for bucket in category_result["aggregations"]["categories"]["buckets"]:
+            try:
+                category_result = await self.client.search(
+                    index=categories_index,
+                    body=category_search
+                )
+                
+                categories = []
+                for hit in category_result["hits"]["hits"]:
+                    source = hit["_source"]
                     categories.append({
-                        "id": None,
-                        "name": bucket["key"],
-                        "count": bucket["doc_count"]
+                        "id": source["id"],
+                        "name": source["name"]
                     })
+            except Exception as e:
+                logger.warning(f"Categories search failed: {e}")
+                categories = []
             
-            # Get tag suggestions
+            # Search tags in separate index
+            tags_index = f"{self.settings.elasticsearch_index_prefix}_tags"
             tag_search = {
                 "query": {
                     "bool": {
-                        "must": [
-                            {"term": {"status": "approved"}},
+                        "should": [
                             {
-                                "nested": {
-                                    "path": "tags",
-                                    "query": {
-                                        "match": {
-                                            "tags.name": {
-                                                "query": query,
-                                                "fuzziness": "AUTO"
-                                            }
-                                        }
+                                "match_phrase": {
+                                    "name": query
+                                }
+                            },
+                            {
+                                "match": {
+                                    "name": {
+                                        "query": query,
+                                        "fuzziness": "0",
+                                        "operator": "and"
                                     }
+                                }
+                            },
+                            {
+                                "wildcard": {
+                                    "name.keyword": f"*{query}*"
                                 }
                             }
                         ]
                     }
                 },
-                "size": 0,
-                "aggs": {
-                    "tags": {
-                        "nested": {
-                            "path": "tags"
-                        },
-                        "aggs": {
-                            "tag_names": {
-                                "terms": {
-                                    "field": "tags.name.keyword",
-                                    "size": limit
-                                }
-                            }
-                        }
-                    }
-                }
+                "size": limit,
+                "_source": ["id", "name", "prompt_count"]
             }
             
-            tag_result = await self.client.search(
-                index=self.index_name,
-                body=tag_search
-            )
-            
-            tags = []
-            if "aggregations" in tag_result:
-                for bucket in tag_result["aggregations"]["tags"]["tag_names"]["buckets"]:
+            try:
+                tag_result = await self.client.search(
+                    index=tags_index,
+                    body=tag_search
+                )
+                
+                tags = []
+                for hit in tag_result["hits"]["hits"]:
+                    source = hit["_source"]
                     tags.append({
-                        "id": None,
-                        "name": bucket["key"],
-                        "count": bucket["doc_count"]
+                        "id": source["id"],
+                        "name": source["name"],
+                        "count": source.get("prompt_count", 0)
                     })
+            except Exception as e:
+                logger.warning(f"Tags search failed: {e}")
+                tags = []
             
             return {
                 "prompts": prompts,
@@ -424,20 +573,15 @@ class ElasticsearchService:
                 must_clauses.append({
                     "bool": {
                         "should": [
-                            {"term": {"category.slug": category}},
-                            {"match": {"category.name": category}}
+                            {"term": {"category_slug": category}},
+                            {"match": {"category_name": category}}
                         ]
                     }
                 })
             
             if tag:
                 must_clauses.append({
-                    "nested": {
-                        "path": "tags",
-                        "query": {
-                            "match": {"tags.name": tag}
-                        }
-                    }
+                    "terms": {"tag_names": [tag]}
                 })
             
             search_body = {
@@ -462,13 +606,32 @@ class ElasticsearchService:
             prompts = []
             for hit in result["hits"]["hits"]:
                 source = hit["_source"]
+                
+                # Reconstruct category and tags objects for compatibility
+                category = None
+                if source.get("category_id"):
+                    category = {
+                        "id": source["category_id"],
+                        "name": source.get("category_name"),
+                        "slug": source.get("category_slug")
+                    }
+                
+                tags = []
+                if source.get("tag_ids") and source.get("tag_names"):
+                    for i, tag_id in enumerate(source["tag_ids"]):
+                        if i < len(source["tag_names"]):
+                            tags.append({
+                                "id": tag_id,
+                                "name": source["tag_names"][i]
+                            })
+                
                 prompts.append({
                     "id": source["id"],
                     "title": source["title"],
                     "description": source["description"],
                     "slug": source["slug"],
-                    "category": source.get("category"),
-                    "tags": source.get("tags", []),
+                    "category": category,
+                    "tags": tags,
                     "user": source.get("user"),
                     "created_at": source.get("created_at"),
                     "view_count": source.get("view_count", 0),
@@ -499,25 +662,22 @@ class ElasticsearchService:
             
         try:
             actions = []
+            categories_to_index = {}
+            tags_to_index = {}
+            
             for prompt in prompts:
-                doc = {
+                # Prepare prompt document
+                prompt_doc = {
                     "id": prompt.id,
                     "title": prompt.title,
                     "description": prompt.description,
                     "content": prompt.content,
                     "slug": prompt.slug,
-                    "category": {
-                        "id": prompt.category.id,
-                        "name": prompt.category.name,
-                        "slug": prompt.category.slug
-                    } if prompt.category else None,
-                    "tags": [
-                        {
-                            "id": tag.id,
-                            "name": tag.name
-                        }
-                        for tag in prompt.tags
-                    ] if prompt.tags else [],
+                    "category_id": prompt.category.id if prompt.category else None,
+                    "category_name": prompt.category.name if prompt.category else None,
+                    "category_slug": prompt.category.slug if prompt.category else None,
+                    "tag_ids": [tag.id for tag in prompt.tags] if prompt.tags else [],
+                    "tag_names": [tag.name for tag in prompt.tags] if prompt.tags else [],
                     "user": {
                         "id": str(prompt.user.id),
                         "full_name": prompt.user.full_name,
@@ -532,11 +692,28 @@ class ElasticsearchService:
                 actions.append({
                     "_index": self.index_name,
                     "_id": prompt.id,
-                    "_source": doc
+                    "_source": prompt_doc
                 })
+                
+                # Collect categories and tags for separate indexing
+                if prompt.category:
+                    categories_to_index[prompt.category.id] = prompt.category
+                    
+                if prompt.tags:
+                    for tag in prompt.tags:
+                        tags_to_index[tag.id] = tag
             
+            # Bulk index prompts
             from elasticsearch.helpers import async_bulk
             await async_bulk(self.client, actions)
+            
+            # Index categories separately
+            for category in categories_to_index.values():
+                await self.index_category(category)
+                
+            # Index tags separately
+            for tag in tags_to_index.values():
+                await self.index_tag(tag)
             
         except Exception as e:
             logger.error(f"Bulk indexing failed: {e}")

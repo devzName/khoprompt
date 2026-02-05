@@ -23,6 +23,15 @@ class PromptTagService:
             raise ValueError("Cannot create tags for 'other' category. It is a system category without tags.")
         
         tag = await PromptTagRepository.create(session, tag_data.model_dump())
+        
+        # Sync with Elasticsearch
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.index_tag(tag))
+        except Exception as e:
+            print(f"Failed to index tag {tag.id} in Elasticsearch: {e}")
+        
         return {
             "id": tag.id,
             "name": tag.name,
@@ -49,6 +58,14 @@ class PromptTagService:
             tag_data.model_dump(exclude_unset=True)
         )
         
+        # Sync with Elasticsearch
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.index_tag(updated_tag))
+        except Exception as e:
+            print(f"Failed to update tag {updated_tag.id} in Elasticsearch: {e}")
+        
         return {
             "id": updated_tag.id,
             "name": updated_tag.name,
@@ -74,10 +91,33 @@ class PromptTagService:
         # Check if tag is being used by any prompts
         prompt_count = await PromptTagRepository.count_prompts_using_tag(session, tag_id)
         
+        # Remove from Elasticsearch first
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.delete_tag(tag_id))
+        except Exception as e:
+            print(f"Failed to delete tag {tag_id} from Elasticsearch: {e}")
+        
         if prompt_count > 0:
+            # Get affected prompts before removing tag (for reindexing)
+            affected_prompts = await PromptTagRepository.get_prompts_by_tag_removal(session, tag_id)
+            
             # Remove tag from all prompts first
             removed_count = await PromptTagRepository.remove_tag_from_all_prompts(session, tag_id)
             await PromptTagRepository.delete(session, tag)
+            
+            # Reindex affected prompts to update their tag_ids and tag_names
+            try:
+                import asyncio
+                from app.services.elasticsearch_service import elasticsearch_service
+                for prompt in affected_prompts:
+                    if prompt.status == 'approved':  # Only reindex approved prompts
+                        fresh_prompt = await PromptTagRepository.get_prompt_with_relations(session, prompt.id)
+                        if fresh_prompt:
+                            asyncio.create_task(elasticsearch_service.index_prompt(fresh_prompt))
+            except Exception as e:
+                print(f"Failed to reindex affected prompts after tag deletion: {e}")
             
             return {
                 "success": True,

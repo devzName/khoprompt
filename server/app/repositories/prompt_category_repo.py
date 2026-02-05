@@ -180,3 +180,33 @@ class PromptCategoryRepository:
         result = await session.execute(update_stmt)
         await session.commit()
         return result.rowcount
+
+    @staticmethod
+    async def get_prompts_in_category(session: AsyncSession, category_id: int) -> list:
+        """Get all prompts in a category (for reindexing)"""
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.category_id == category_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_prompt_with_relations(session: AsyncSession, prompt_id: int):
+        """Get prompt with all relations loaded"""
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.id == prompt_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()

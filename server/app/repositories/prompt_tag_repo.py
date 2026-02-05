@@ -64,3 +64,41 @@ class PromptTagRepository:
         result = await session.execute(stmt)
         await session.commit()
         return result.rowcount
+
+    @staticmethod
+    async def get_prompts_by_tag_removal(session: AsyncSession, tag_id: int) -> list:
+        """Get prompts that were affected by tag removal (for reindexing)"""
+        from app.models.prompt import Prompt, prompt_tags_association
+        from sqlalchemy.orm import selectinload
+        
+        # Get prompts that had this tag
+        stmt = (
+            select(Prompt)
+            .join(prompt_tags_association, Prompt.id == prompt_tags_association.c.prompt_id)
+            .where(prompt_tags_association.c.tag_id == tag_id)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    @staticmethod
+    async def get_prompt_with_relations(session: AsyncSession, prompt_id: int):
+        """Get prompt with all relations loaded"""
+        from app.models.prompt import Prompt
+        from sqlalchemy.orm import selectinload
+        
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags)
+            )
+            .where(Prompt.id == prompt_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()

@@ -184,7 +184,6 @@ const Header = () => {
                 <div className="flex items-center gap-2">
                   <FolderOutlined className="text-gray-400 text-sm" />
                   <span className="truncate" title={category.name}>{category.name}</span>
-                  <span className="text-gray-400 text-xs ml-auto">({category.count} prompts)</span>
                 </div>
               ),
               key: `category-${category.id}`,

@@ -71,6 +71,15 @@ class PromptCategoryService:
                 raise ValueError(f"Slug '{data['slug']}' already exists")
         
         category = await PromptCategoryRepository.create(session, data)
+        
+        # Sync with Elasticsearch
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.index_category(category))
+        except Exception as e:
+            print(f"Failed to index category {category.id} in Elasticsearch: {e}")
+        
         return {
             "id": category.id,
             "name": category.name,
@@ -102,6 +111,23 @@ class PromptCategoryService:
                 raise ValueError(f"Slug '{data['slug']}' already exists")
         
         updated_category = await PromptCategoryRepository.update(session, category, data)
+        
+        # Sync with Elasticsearch
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.index_category(updated_category))
+            
+            # If category name or slug changed, reindex all prompts in this category
+            if 'name' in data or 'slug' in data:
+                affected_prompts = await PromptCategoryRepository.get_prompts_in_category(session, category_id)
+                for prompt in affected_prompts:
+                    if prompt.status == 'approved':  # Only reindex approved prompts
+                        fresh_prompt = await PromptCategoryRepository.get_prompt_with_relations(session, prompt.id)
+                        if fresh_prompt:
+                            asyncio.create_task(elasticsearch_service.index_prompt(fresh_prompt))
+        except Exception as e:
+            print(f"Failed to update category {updated_category.id} in Elasticsearch: {e}")
         
         return {
             "id": updated_category.id,
@@ -137,7 +163,18 @@ class PromptCategoryService:
         # Count prompts in this category
         prompt_count = await PromptCategoryRepository.count_prompts_in_category(session, category_id)
         
+        # Remove from Elasticsearch first
+        try:
+            import asyncio
+            from app.services.elasticsearch_service import elasticsearch_service
+            asyncio.create_task(elasticsearch_service.delete_category(category_id))
+        except Exception as e:
+            print(f"Failed to delete category {category_id} from Elasticsearch: {e}")
+        
         if prompt_count > 0:
+            # Get affected prompts before moving them (for reindexing)
+            affected_prompts = await PromptCategoryRepository.get_prompts_in_category(session, category_id)
+            
             # Move prompts to 'other' category and remove their tags
             moved_count = await PromptCategoryRepository.move_prompts_to_category(
                 session, 
@@ -147,6 +184,18 @@ class PromptCategoryService:
             
             # Delete the category
             await PromptCategoryRepository.delete(session, category)
+            
+            # Reindex affected prompts to update their category info
+            try:
+                import asyncio
+                from app.services.elasticsearch_service import elasticsearch_service
+                for prompt in affected_prompts:
+                    if prompt.status == 'approved':  # Only reindex approved prompts
+                        fresh_prompt = await PromptCategoryRepository.get_prompt_with_relations(session, prompt.id)
+                        if fresh_prompt:
+                            asyncio.create_task(elasticsearch_service.index_prompt(fresh_prompt))
+            except Exception as e:
+                print(f"Failed to reindex affected prompts after category deletion: {e}")
             
             return {
                 "success": True,
