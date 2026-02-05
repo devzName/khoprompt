@@ -291,7 +291,9 @@ const PromptDetailPage = () => {
     { title: <Link to={ROUTES.HOME}>{t('promptDetail.home')}</Link> },
     {
       title: prompt.category ? (
-        typeof prompt.category === 'object' ? prompt.category.name : prompt.category
+        <Link to={`${ROUTES.SEARCH}?q=${encodeURIComponent(typeof prompt.category === 'object' ? prompt.category.name : prompt.category)}&type=category`}>
+          {typeof prompt.category === 'object' ? prompt.category.name : prompt.category}
+        </Link>
       ) : 'Uncategorized'
     },
     { title: prompt.title }
