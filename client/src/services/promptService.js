@@ -76,10 +76,4 @@ export const promptService = {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.VIEW(id));
     return response.data;
   },
-  votePrompt: async (id, value) => {
-    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.VOTE(id), null, {
-      params: { value }
-    });
-    return response.data;
-  },
 };

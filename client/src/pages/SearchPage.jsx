@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
-import { promptService } from '../services/promptService';
+import { searchService } from '../services/searchService';
 import { PAGINATION } from '../constants/pagination';
 const SearchPage = () => {
   const { t } = useTranslation();
@@ -19,6 +19,7 @@ const SearchPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPrompts, setTotalPrompts] = useState(0);
   const [pagination, setPagination] = useState(null);
+  
   useEffect(() => {
     const searchPrompts = async () => {
       if (!query.trim()) {
@@ -34,19 +35,19 @@ const SearchPage = () => {
         } else {
           setLoading(true);
         }
-        const response = await promptService.getPrompts({ 
-          search: isTagSearch ? undefined : query,
+        const response = await searchService.searchPrompts({ 
+          q: isTagSearch ? undefined : query,
           tag: isTagSearch ? query : undefined,
           page: currentPage, 
           limit: PAGINATION.PAGE_SIZE 
         });
-        setPrompts(response.data || response);
-        setTotalPrompts(response.pagination?.total || response.length);
+        setPrompts(response.data || []);
+        setTotalPrompts(response.pagination?.total || 0);
         if (response.pagination) {
           setPagination({
-            current: response.pagination.current_page,
+            current: response.pagination.page,
             total: response.pagination.total,
-            pageSize: response.pagination.per_page,
+            pageSize: response.pagination.limit,
             onChange: handlePageChange,
             showSizeChanger: false,
             showQuickJumper: false,
@@ -66,14 +67,17 @@ const SearchPage = () => {
     };
     searchPrompts();
   }, [query, currentPage]);
+
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
   }, [query]);
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />

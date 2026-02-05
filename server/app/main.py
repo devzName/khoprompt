@@ -2,9 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 from app.api.v1 import router as v1_router
 from app.core.config import get_settings
+from app.services.elasticsearch_service import elasticsearch_service
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await elasticsearch_service.connect()
+    yield
+    # Shutdown
+    await elasticsearch_service.disconnect()
 
 
 def create_app() -> FastAPI:
@@ -17,6 +28,7 @@ def create_app() -> FastAPI:
         redoc_url=settings.redoc_url,
         openapi_url=settings.openapi_url,
         swagger_ui_parameters=settings.swagger_ui_parameters,
+        lifespan=lifespan,
     )
 
     app.add_middleware(

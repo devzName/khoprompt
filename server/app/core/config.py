@@ -34,6 +34,20 @@ class Settings(BaseSettings):
     # AI Services Configuration
     openai_api_key: str | None = Field(default=None, validation_alias="OPENAI_API_KEY")
 
+    # Elasticsearch Configuration
+    elasticsearch_url: str = Field(
+        default="http://localhost:9200",
+        validation_alias="ELASTICSEARCH_URL"
+    )
+    elasticsearch_index_prefix: str = Field(
+        default="khoprompt",
+        validation_alias="ELASTICSEARCH_INDEX_PREFIX"
+    )
+    elasticsearch_enabled: bool = Field(
+        default=True,
+        validation_alias="ELASTICSEARCH_ENABLED"
+    )
+
     # Microsoft OAuth Configuration
     microsoft_client_id: str | None = Field(default=None, validation_alias="MICROSOFT_CLIENT_ID")
     microsoft_tenant_id: str | None = Field(default=None, validation_alias="MICROSOFT_TENANT_ID")

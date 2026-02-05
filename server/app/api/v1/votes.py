@@ -82,18 +82,3 @@ async def get_vote_stats(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/prompts/{prompt_id}/stats/public", response_model=VoteStats)
-async def get_vote_stats_public(
-    prompt_id: int,
-    session: DbSession
-):
-    """Get public vote statistics for a prompt (no user vote info)"""
-    try:
-        result = await VoteService.get_vote_stats(session, prompt_id, None)
-        return VoteStats.from_service_response(result)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")

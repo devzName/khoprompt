@@ -19,8 +19,3 @@ router.include_router(vote_router, prefix="/votes", tags=["votes"])
 router.include_router(statistics_router, prefix="/statistics", tags=["statistics"])
 router.include_router(ai_router, prefix="/ai", tags=["ai"])
 router.include_router(search_router, prefix="/search", tags=["search"])
-
-
-@router.get("/health")
-async def health_check():
-    return {"status": "ok"}

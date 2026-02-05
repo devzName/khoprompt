@@ -8,6 +8,8 @@ from app.models.prompt import Prompt
 from app.models.prompt_category import PromptCategory
 from app.models.prompt_tag import PromptTag
 from app.constants.prompt_status import PromptStatus
+from app.services.elasticsearch_service import elasticsearch_service
+from loguru import logger
 
 
 class SearchService:
@@ -16,6 +18,22 @@ class SearchService:
     async def get_suggestions(session: AsyncSession, query: str, limit: int = 10) -> dict:
         """
         Get search suggestions for prompts, categories, and tags
+        Uses Elasticsearch if available, falls back to SQL
+        """
+        # Try Elasticsearch first
+        if elasticsearch_service.client:
+            try:
+                return await elasticsearch_service.search_suggestions(query, limit)
+            except Exception as e:
+                logger.warning(f"Elasticsearch suggestions failed, falling back to SQL: {e}")
+        
+        # Fallback to SQL-based search
+        return await SearchService._get_sql_suggestions(session, query, limit)
+
+    @staticmethod
+    async def _get_sql_suggestions(session: AsyncSession, query: str, limit: int = 10) -> dict:
+        """
+        SQL-based search suggestions (fallback)
         """
         query_lower = query.lower().strip()
         
@@ -125,6 +143,29 @@ class SearchService:
     ) -> dict:
         """
         Search prompts with various filters
+        Uses Elasticsearch if available, falls back to SQL
+        """
+        # Try Elasticsearch first
+        if elasticsearch_service.client:
+            try:
+                return await elasticsearch_service.search_prompts(query, tag, category, page, limit)
+            except Exception as e:
+                logger.warning(f"Elasticsearch search failed, falling back to SQL: {e}")
+        
+        # Fallback to SQL-based search
+        return await SearchService._search_prompts_sql(session, query, tag, category, page, limit)
+
+    @staticmethod
+    async def _search_prompts_sql(
+        session: AsyncSession,
+        query: str = None,
+        tag: str = None,
+        category: str = None,
+        page: int = 1,
+        limit: int = 20
+    ) -> dict:
+        """
+        SQL-based prompt search (fallback)
         """
         stmt = (
             select(Prompt)
@@ -218,3 +259,36 @@ class SearchService:
                 "pages": (total + limit - 1) // limit
             }
         }
+
+    @staticmethod
+    async def index_prompt(prompt: Prompt):
+        """
+        Index a prompt in Elasticsearch
+        """
+        if elasticsearch_service.client:
+            try:
+                await elasticsearch_service.index_prompt(prompt)
+            except Exception as e:
+                logger.error(f"Failed to index prompt {prompt.id}: {e}")
+
+    @staticmethod
+    async def delete_prompt_from_index(prompt_id: int):
+        """
+        Delete a prompt from Elasticsearch index
+        """
+        if elasticsearch_service.client:
+            try:
+                await elasticsearch_service.delete_prompt(prompt_id)
+            except Exception as e:
+                logger.error(f"Failed to delete prompt {prompt_id} from index: {e}")
+
+    @staticmethod
+    async def bulk_index_prompts(prompts: list[Prompt]):
+        """
+        Bulk index prompts in Elasticsearch
+        """
+        if elasticsearch_service.client:
+            try:
+                await elasticsearch_service.bulk_index_prompts(prompts)
+            except Exception as e:
+                logger.error(f"Failed to bulk index prompts: {e}")

@@ -90,20 +90,6 @@ async def create_prompt(
         print(f"Error creating prompt: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
-# Alternative endpoint for JSON data (fallback)
-@router.post("/json", response_model=PromptOut)
-async def create_prompt_json(
-    prompt_data: PromptCreate,
-    session: DbSession,
-    current_user: User = Depends(get_current_user)
-):
-    """Create a new prompt with JSON data (requires authentication)"""
-    try:
-        result = await PromptService.create_prompt(session, prompt_data, current_user.id, current_user.user_type)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 @router.get("/pending", response_model=PaginatedResponse[PromptWithDetails])
 async def get_pending_prompts(
     session: DbSession,

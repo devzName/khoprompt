@@ -16,10 +16,6 @@ export const API_ENDPOINTS = {
     APPROVE: (id) => `/prompts/${id}/approve`,
     REJECT: (id) => `/prompts/${id}/reject`,
     VIEW: (id) => `/prompts/${id}/view`,
-    LIKE: (id) => `/prompts/${id}/like`,
-    DISLIKE: (id) => `/prompts/${id}/dislike`,
-    FEED_LATEST: '/prompts/feed/latest',
-    VOTE: (id) => `/prompts/${id}/vote`,
   },
   VOTES: {
     PROMPTS: '/votes/prompts',
@@ -32,10 +28,4 @@ export const API_ENDPOINTS = {
     TREE: '/prompt-categories/tree',
   },
   TAGS: '/prompt-tags',
-  NOTIFICATIONS: {
-    BASE: '/notifications',
-    UNREAD_COUNT: '/notifications/unread-count',
-    MARK_READ: (id) => `/notifications/${id}/read`,
-    MARK_ALL_READ: '/notifications/read-all',
-  },
 };
