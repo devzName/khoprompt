@@ -55,3 +55,25 @@ def ensure_unique_slug(base_slug: str, existing_slugs: list[str]) -> str:
         counter += 1
     
     return slug
+
+
+async def generate_unique_slug(base_slug: str, check_exists_func, max_attempts: int = 100) -> str:
+    """
+    Generate a unique slug by appending numbers if slug already exists
+    
+    Args:
+        base_slug: The base slug to start with
+        check_exists_func: Async function that checks if slug exists (returns bool)
+        max_attempts: Maximum number of attempts to find unique slug
+    
+    Returns:
+        A unique slug
+    """
+    slug = base_slug
+    counter = 1
+    
+    while await check_exists_func(slug) and counter < max_attempts:
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    
+    return slug
