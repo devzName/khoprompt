@@ -48,3 +48,6 @@ class PromptWithDetails(PromptOut):
     user: dict | None = None
     category: dict | None = None
     tags: list[dict] = Field(default_factory=list)
+    rating: float | None = None
+    simple_rating: float | None = None
+    author: str | None = None

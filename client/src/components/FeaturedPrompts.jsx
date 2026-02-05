@@ -8,7 +8,7 @@ import PromptDrawer from './PromptDrawer';
 import TagsDisplay from './TagsDisplay';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
-import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
+import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 const FeaturedPrompts = ({ prompts = [], loading = false }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -109,11 +109,11 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                       lineHeight: '1.4'
                     }}
                   />
-                  {formatRating(calculateSimpleRating(prompt)) && (
-                    <div className={`flex items-center gap-1 ${getRatingContainerColor(calculateSimpleRating(prompt))}`}>
+                  {prompt.simple_rating && (
+                    <div className={`flex items-center gap-1 ${getRatingContainerColor(prompt.simple_rating)}`}>
                       <StarOutlined className="text-sm" />
                       <span className="text-sm font-medium">
-                        {formatRating(calculateSimpleRating(prompt))}
+                        {formatRating(prompt.simple_rating)}
                       </span>
                     </div>
                   )}

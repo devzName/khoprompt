@@ -19,7 +19,7 @@ import { ROUTES } from '../constants/routes';
 import { promptService } from '../services/promptService';
 import { voteService } from '../services/voteService';
 import { useViewTracking } from '../hooks/useViewTracking';
-import { calculateSimpleRating, formatRating, getRatingContainerColor } from '../utils/ratingUtils';
+import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import dayjs from 'dayjs';
 
 // Get server URL for images
@@ -161,11 +161,7 @@ const PromptDetailPage = () => {
           try {
             const stats = await voteService.getPromptVoteStats(response.id);
             setVoteStats(stats);
-            setCurrentRating(calculateSimpleRating({
-              rating: response.rating,
-              like_count: stats.helpful_count || 0,
-              dislike_count: stats.not_helpful_count || 0
-            }));
+            setCurrentRating(response.simple_rating || stats.simple_rating);
             setPrompt(prev => ({
               ...prev,
               view_count: stats.view_count || 0
@@ -244,13 +240,13 @@ const PromptDetailPage = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
+      // Update rating from server response if available
       const updatedStats = await voteService.getPromptVoteStats(prompt.id);
       setVoteStats(updatedStats);
-      setCurrentRating(calculateSimpleRating({
-        rating: prompt.rating,
-        like_count: updatedStats.helpful_count || 0,
-        dislike_count: updatedStats.not_helpful_count || 0
-      }));
+      // Keep existing rating or use updated stats if available
+      if (updatedStats.simple_rating) {
+        setCurrentRating(updatedStats.simple_rating);
+      }
       setPrompt(prev => ({
         ...prev,
         view_count: updatedStats.view_count || 0

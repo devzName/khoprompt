@@ -14,6 +14,24 @@ from app.core.rate_limiter import ViewRateLimiter
 class PromptService:
 
     @staticmethod
+    def _calculate_simple_rating(prompt) -> float | None:
+        """Calculate simple rating (1-5 stars based on like ratio)"""
+        like_count = prompt.like_count or 0
+        dislike_count = prompt.dislike_count or 0
+        total_votes = like_count + dislike_count
+        
+        if total_votes == 0:
+            return None
+        
+        like_ratio = like_count / total_votes
+        return round(1 + (like_ratio * 4), 1)  # Convert [0,1] to [1,5]
+
+    @staticmethod
+    def _calculate_engagement_rating(prompt) -> float:
+        """Calculate engagement rating (original algorithm)"""
+        return round((prompt.like_count * 2 + prompt.view_count * 0.1) / max(1, prompt.like_count + prompt.dislike_count + 1), 1)
+
+    @staticmethod
     async def create_prompt(session: AsyncSession, prompt_data: PromptCreate, user_id: UUID, user_type: str = None, images: list[str] = None) -> dict:
         # Add images to prompt data
         prompt_dict = prompt_data.model_dump()
@@ -99,7 +117,10 @@ class PromptService:
             "tags": [
                 {"id": tag.id, "name": tag.name} 
                 for tag in prompt.tags
-            ]
+            ],
+            "rating": PromptService._calculate_engagement_rating(prompt),
+            "simple_rating": PromptService._calculate_simple_rating(prompt),
+            "author": prompt.user.full_name if prompt.user else "Unknown"
         }
 
     @staticmethod
@@ -138,7 +159,10 @@ class PromptService:
             "tags": [
                 {"id": tag.id, "name": tag.name} 
                 for tag in prompt.tags
-            ]
+            ],
+            "rating": PromptService._calculate_engagement_rating(prompt),
+            "simple_rating": PromptService._calculate_simple_rating(prompt),
+            "author": prompt.user.full_name if prompt.user else "Unknown"
         }
 
     @staticmethod
@@ -229,45 +253,69 @@ class PromptService:
 
     @staticmethod
     async def get_featured_prompts(session: AsyncSession, limit: int = 6, category_id: int | None = None, tag_id: int | None = None) -> list[dict]:
-        """Get featured prompts based on engagement metrics"""
+        """Get featured prompts based on engagement metrics, sorted by rating (5-star first)"""
         prompts = await PromptRepository.get_featured_prompts(session, limit, category_id, tag_id)
+        
+        # Calculate rating and sort by rating descending
+        prompts_with_rating = []
+        for prompt in prompts:
+            # Calculate simple rating (1-5 stars based on like ratio)
+            like_count = prompt.like_count or 0
+            dislike_count = prompt.dislike_count or 0
+            total_votes = like_count + dislike_count
+            
+            if total_votes > 0:
+                like_ratio = like_count / total_votes
+                simple_rating = 1 + (like_ratio * 4)  # Convert [0,1] to [1,5]
+            else:
+                simple_rating = 0  # No votes = lowest priority
+            
+            prompts_with_rating.append({
+                "prompt": prompt,
+                "simple_rating": simple_rating,
+                "engagement_rating": round((prompt.like_count * 2 + prompt.view_count * 0.1) / max(1, prompt.like_count + prompt.dislike_count + 1), 1)
+            })
+        
+        # Sort by simple_rating descending (5.0, 4.9, 4.8, ...), then by engagement as tiebreaker
+        prompts_with_rating.sort(key=lambda x: (x["simple_rating"], x["engagement_rating"]), reverse=True)
         
         return [
             {
-                "id": prompt.id,
-                "title": prompt.title,
-                "slug": prompt.slug,
-                "description": prompt.description,
-                "content": prompt.content,
-                "notes": prompt.notes,
-                "images": prompt.images,
-                "status": prompt.status,
-                "category_id": prompt.category_id,
-                "user_id": str(prompt.user_id),
-                "view_count": prompt.view_count,
-                "like_count": prompt.like_count,
-                "dislike_count": prompt.dislike_count,
-                "created_at": prompt.created_at,
-                "updated_at": prompt.updated_at,
+                "id": item["prompt"].id,
+                "title": item["prompt"].title,
+                "slug": item["prompt"].slug,
+                "description": item["prompt"].description,
+                "content": item["prompt"].content,
+                "notes": item["prompt"].notes,
+                "images": item["prompt"].images,
+                "status": item["prompt"].status,
+                "category_id": item["prompt"].category_id,
+                "user_id": str(item["prompt"].user_id),
+                "view_count": item["prompt"].view_count,
+                "like_count": item["prompt"].like_count,
+                "dislike_count": item["prompt"].dislike_count,
+                "created_at": item["prompt"].created_at,
+                "updated_at": item["prompt"].updated_at,
                 "user": {
-                    "id": str(prompt.user.id),
-                    "full_name": prompt.user.full_name,
-                    "email": prompt.user.email,
-                    "avatar_url": prompt.user.avatar_url
-                } if prompt.user else None,
+                    "id": str(item["prompt"].user.id),
+                    "full_name": item["prompt"].user.full_name,
+                    "email": item["prompt"].user.email,
+                    "avatar_url": item["prompt"].user.avatar_url
+                } if item["prompt"].user else None,
                 "category": {
-                    "id": prompt.category.id,
-                    "name": prompt.category.name,
-                    "slug": prompt.category.slug
-                } if prompt.category else None,
+                    "id": item["prompt"].category.id,
+                    "name": item["prompt"].category.name,
+                    "slug": item["prompt"].category.slug
+                } if item["prompt"].category else None,
                 "tags": [
                     {"id": tag.id, "name": tag.name} 
-                    for tag in prompt.tags
+                    for tag in item["prompt"].tags
                 ],
-                "rating": round((prompt.like_count * 2 + prompt.view_count * 0.1) / max(1, prompt.like_count + prompt.dislike_count + 1), 1),
-                "author": prompt.user.full_name if prompt.user else "Unknown"
+                "rating": item["engagement_rating"],  # Keep original engagement rating for compatibility
+                "simple_rating": round(item["simple_rating"], 1),  # Add simple rating for client
+                "author": item["prompt"].user.full_name if item["prompt"].user else "Unknown"
             }
-            for prompt in prompts
+            for item in prompts_with_rating
         ]
 
     @staticmethod
