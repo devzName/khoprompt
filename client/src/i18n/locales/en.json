@@ -273,7 +273,8 @@
     "noResultsDesc": "No prompts match the keyword \"{{query}}\". Try searching with different keywords.",
     "loadingPage": "Loading page {{page}}...",
     "searchResults": "Search results for \"{{query}}\"",
-    "tagResults": "Prompts with tag \"#{{query}}\""
+    "tagResults": "Prompts with tag \"#{{query}}\"",
+    "categoryResults": "Prompts in category \"{{query}}\""
   },
   "tags": {
     "title": "Explore by Tags",

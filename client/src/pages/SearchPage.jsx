@@ -12,7 +12,9 @@ const SearchPage = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const isTagSearch = searchParams.get('type') === 'tag';
+  const searchType = searchParams.get('type');
+  const isTagSearch = searchType === 'tag';
+  const isCategorySearch = searchType === 'category';
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
@@ -36,8 +38,9 @@ const SearchPage = () => {
           setLoading(true);
         }
         const response = await searchService.searchPrompts({ 
-          q: isTagSearch ? undefined : query,
+          q: (isTagSearch || isCategorySearch) ? undefined : query,
           tag: isTagSearch ? query : undefined,
+          category: isCategorySearch ? query : undefined,
           page: currentPage, 
           limit: PAGINATION.PAGE_SIZE 
         });
@@ -116,7 +119,11 @@ const SearchPage = () => {
             )}
             <div className={loading ? 'opacity-50 pointer-events-none transition-opacity duration-200' : 'transition-opacity duration-200'}>
               <LatestPrompts 
-                title={isTagSearch ? t('search.tagResults', { query }) : t('search.searchResults', { query })}
+                title={
+                  isTagSearch ? t('search.tagResults', { query }) : 
+                  isCategorySearch ? t('search.categoryResults', { query }) :
+                  t('search.searchResults', { query })
+                }
                 prompts={prompts}
                 pageSize={12}
                 columns={3}

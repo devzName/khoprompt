@@ -320,7 +320,8 @@
     "noResultsDesc": "Không có prompt nào phù hợp với từ khóa \"{{query}}\". Thử tìm kiếm với từ khóa khác.",
     "loadingPage": "Đang tải trang {{page}}...",
     "searchResults": "Kết quả tìm kiếm cho \"{{query}}\"",
-    "tagResults": "Prompts với tag \"#{{query}}\""
+    "tagResults": "Prompts với tag \"#{{query}}\"",
+    "categoryResults": "Prompts trong danh mục \"{{query}}\""
   },
   "tags": {
     "title": "Khám phá theo Tags",
