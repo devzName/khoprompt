@@ -68,4 +68,6 @@ poetry run python -m app.scripts.seed_tags
 ```bash
 (docker compose exec api poetry run alembic upgrade head)
 (docker compose exec api poetry run python -m app.scripts.create_admin)
+
+docker compose build --no-cache api
 ```
