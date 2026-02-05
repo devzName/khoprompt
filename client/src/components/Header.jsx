@@ -29,6 +29,7 @@ const Header = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [user, setUser] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   
   useEffect(() => {
     const queryFromUrl = searchParams.get('q') || '';
@@ -67,13 +68,13 @@ const Header = () => {
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
     
     // Update suggestions if currently showing history
-    if (!searchValue || searchValue.length < 2) {
+    if ((!searchValue || searchValue.length < 2) && isSearchFocused) {
       setSuggestions(newHistory.map((query, index) => ({
         value: query,
         label: (
           <div className="flex items-center justify-between group">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <ClockCircleOutlined className="text-gray-400 text-sm flex-shrink-0" />
+              <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />
               <span className="truncate" title={query}>{query}</span>
             </div>
             <button
@@ -101,7 +102,7 @@ const Header = () => {
       label: (
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <ClockCircleOutlined className="text-gray-400 text-sm flex-shrink-0" />
+            <ClockCircleOutlined className="text-gray-400 text-sm shrink-0" />
             <span className="truncate" title={query}>{query}</span>
           </div>
           <button
@@ -119,11 +120,30 @@ const Header = () => {
       type: 'history'
     }));
   };
+
+  // Handle search input focus
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+    // Show history when focused and no search value
+    if (!searchValue || searchValue.length < 2) {
+      setSuggestions(getHistoryOptions());
+    }
+  };
+
+  // Handle search input blur
+  const handleSearchBlur = () => {
+    // Delay to allow selection to work
+    setTimeout(() => {
+      setIsSearchFocused(false);
+    }, 200);
+  };
   const fetchSuggestions = useCallback(
     debounce(async (query) => {
       if (!query || query.length < 2) {
-        // Show search history when no query
-        setSuggestions(getHistoryOptions());
+        // Show search history when no query and focused
+        if (isSearchFocused) {
+          setSuggestions(getHistoryOptions());
+        }
         setHasSearched(false);
         return;
       }
@@ -199,7 +219,7 @@ const Header = () => {
         setLoading(false);
       }
     }, 300),
-    [searchHistory]
+    [searchHistory, isSearchFocused]
   );
 
   const handleSearch = (value, option = null) => {
@@ -231,10 +251,10 @@ const Header = () => {
 
   // Initialize suggestions with history when component mounts
   useEffect(() => {
-    if (!searchValue) {
+    if ((!searchValue || searchValue.length < 2) && isSearchFocused) {
       setSuggestions(getHistoryOptions());
     }
-  }, [searchHistory, searchValue]);
+  }, [searchHistory, searchValue, isSearchFocused]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -312,6 +332,8 @@ const Header = () => {
                 options={suggestions}
                 onSelect={handleSelect}
                 onChange={handleSearchInputChange}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
                 allowClear
                 style={{ width: '500px' }}
                 getPopupContainer={() => document.getElementById('search-container-desktop')}
@@ -362,6 +384,8 @@ const Header = () => {
             options={suggestions}
             onSelect={handleSelect}
             onChange={handleSearchInputChange}
+            onFocus={handleSearchFocus}
+            onBlur={handleSearchBlur}
             allowClear
             style={{ width: '100%' }}
             getPopupContainer={() => document.getElementById('search-container-mobile')}
