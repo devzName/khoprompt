@@ -297,58 +297,7 @@ const Header = () => {
   const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, handleLogout, true, user);
   
   return (
-    <>
-      <style jsx>{`
-        .search-autocomplete {
-          border-radius: 8px;
-        }
-        .search-autocomplete .ant-select-selector {
-          border-radius: 8px !important;
-          border: 1px solid #d1d5db !important;
-          height: 42px !important;
-          padding: 0 12px 0 48px !important;
-        }
-        .search-autocomplete .ant-select-selection-placeholder {
-          padding-left: 0 !important;
-          margin-left: 0 !important;
-          color: #9ca3af !important;
-        }
-        .search-autocomplete .ant-select-selection-search {
-          padding-left: 0 !important;
-          margin-left: 0 !important;
-        }
-        .search-autocomplete .ant-select-selection-search-input {
-          padding-left: 0 !important;
-          margin-left: 0 !important;
-        }
-        .search-autocomplete .ant-select-selector:hover {
-          border-color: #3b82f6 !important;
-        }
-        .search-autocomplete .ant-select-focused .ant-select-selector {
-          border-color: #3b82f6 !important;
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
-        }
-        .search-autocomplete .ant-select-selection-search-input {
-          height: 40px !important;
-          font-size: 14px !important;
-        }
-        .ant-select-dropdown {
-          border-radius: 8px !important;
-          border: 1px solid #d1d5db !important;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-          margin-top: 4px !important;
-        }
-        .ant-select-item {
-          padding: 8px 12px !important;
-        }
-        .ant-select-item:hover {
-          background-color: #f3f4f6 !important;
-        }
-        .ant-select-item .truncate {
-          max-width: 400px;
-        }
-      `}</style>
-      <header className="border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-white/95">
+    <header className="border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
           <div className="flex items-center shrink-0">
@@ -442,7 +391,6 @@ const Header = () => {
         </div>
       </div>
     </header>
-    </>
   );
 };
 export default Header;
