@@ -33,12 +33,17 @@ class PromptService:
                 {"status": PromptStatus.APPROVED}
             )
             
-            # Index in Elasticsearch if approved
-            try:
-                from app.services.search_service import SearchService
-                await SearchService.index_prompt(prompt)
-            except Exception as e:
-                print(f"Failed to index prompt {prompt.id} in Elasticsearch: {e}")
+        # Index in Elasticsearch if approved
+        try:
+            from app.services.search_service import SearchService
+            import asyncio
+            # Reload prompt with relationships to avoid greenlet issues
+            fresh_prompt = await PromptRepository.get_by_id(session, prompt.id)
+            if fresh_prompt:
+                # Use create_task to ensure proper async context
+                asyncio.create_task(SearchService.index_prompt(fresh_prompt))
+        except Exception as e:
+            print(f"Failed to index prompt {prompt.id} in Elasticsearch: {e}")
         
         return {
             "id": prompt.id,
@@ -524,12 +529,16 @@ class PromptService:
         # Sync with Elasticsearch based on status
         try:
             from app.services.search_service import SearchService
+            import asyncio
             if updated_prompt.status == PromptStatus.APPROVED:
-                # Index or update in Elasticsearch if approved
-                await SearchService.index_prompt(updated_prompt)
+                # Reload prompt with relationships to avoid greenlet issues
+                fresh_prompt = await PromptRepository.get_by_id(session, updated_prompt.id)
+                if fresh_prompt:
+                    # Use create_task to ensure proper async context
+                    asyncio.create_task(SearchService.index_prompt(fresh_prompt))
             else:
                 # Remove from Elasticsearch if no longer approved
-                await SearchService.delete_prompt_from_index(updated_prompt.id)
+                asyncio.create_task(SearchService.delete_prompt_from_index(updated_prompt.id))
         except Exception as e:
             print(f"Failed to sync prompt {updated_prompt.id} with Elasticsearch: {e}")
         
@@ -595,7 +604,9 @@ class PromptService:
         if prompt.status == PromptStatus.APPROVED:
             try:
                 from app.services.search_service import SearchService
-                await SearchService.delete_prompt_from_index(prompt_id)
+                import asyncio
+                # Use create_task to ensure proper async context
+                asyncio.create_task(SearchService.delete_prompt_from_index(prompt_id))
             except Exception as e:
                 print(f"Failed to delete prompt {prompt_id} from Elasticsearch: {e}")
             
@@ -621,7 +632,12 @@ class PromptService:
         # Index in Elasticsearch when approved
         try:
             from app.services.search_service import SearchService
-            await SearchService.index_prompt(updated_prompt)
+            import asyncio
+            # Reload prompt with relationships to avoid greenlet issues
+            fresh_prompt = await PromptRepository.get_by_id(session, updated_prompt.id)
+            if fresh_prompt:
+                # Use create_task to ensure proper async context
+                asyncio.create_task(SearchService.index_prompt(fresh_prompt))
         except Exception as e:
             print(f"Failed to index approved prompt {updated_prompt.id} in Elasticsearch: {e}")
         
@@ -661,7 +677,9 @@ class PromptService:
         # Remove from Elasticsearch if it was previously approved
         try:
             from app.services.search_service import SearchService
-            await SearchService.delete_prompt_from_index(updated_prompt.id)
+            import asyncio
+            # Use create_task to ensure proper async context
+            asyncio.create_task(SearchService.delete_prompt_from_index(updated_prompt.id))
         except Exception as e:
             print(f"Failed to remove rejected prompt {updated_prompt.id} from Elasticsearch: {e}")
         
