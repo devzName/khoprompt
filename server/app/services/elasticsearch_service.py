@@ -78,7 +78,8 @@ class ElasticsearchService:
                         "properties": {
                             "id": {"type": "keyword"},
                             "full_name": {"type": "text"},
-                            "avatar_url": {"type": "keyword"}
+                            "avatar_url": {"type": "keyword"},
+                            "email": {"type": "keyword"}
                         }
                     },
                     "status": {"type": "keyword"},
@@ -220,7 +221,8 @@ class ElasticsearchService:
                 "user": {
                     "id": str(prompt.user.id),
                     "full_name": prompt.user.full_name,
-                    "avatar_url": prompt.user.avatar_url
+                    "avatar_url": prompt.user.avatar_url,
+                    "email": prompt.user.email
                 } if prompt.user else None,
                 "status": prompt.status,
                 "view_count": prompt.view_count or 0,
@@ -681,7 +683,8 @@ class ElasticsearchService:
                     "user": {
                         "id": str(prompt.user.id),
                         "full_name": prompt.user.full_name,
-                        "avatar_url": prompt.user.avatar_url
+                        "avatar_url": prompt.user.avatar_url,
+                        "email": prompt.user.email
                     } if prompt.user else None,
                     "status": prompt.status,
                     "view_count": prompt.view_count or 0,
