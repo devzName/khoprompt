@@ -334,7 +334,9 @@
     "creative": "Sáng tạo",
     "writing": "Viết lách",
     "shortStory": "Truyện ngắn",
-    "noTagsAvailable": "Không có tags nào khả dụng"
+    "noTagsAvailable": "Không có tags nào khả dụng",
+    "showMore": "Xem thêm",
+    "showLess": "Ẩn bớt"
   },
   "drawer": {
     "categoryTags": "Danh mục & Tags",

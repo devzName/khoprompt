@@ -287,7 +287,9 @@
     "creative": "Creative",
     "writing": "Writing",
     "shortStory": "Short Story",
-    "noTagsAvailable": "No tags available"
+    "noTagsAvailable": "No tags available",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "drawer": {
     "categoryTags": "Category & Tags",
