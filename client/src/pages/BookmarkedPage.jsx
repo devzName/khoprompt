@@ -65,14 +65,16 @@ const BookmarkedPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="text-center">
-            <BookOutlined className="text-6xl text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {t('bookmarked.loginRequired', 'Please login to view bookmarked prompts')}
-            </h3>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="flex-grow">
+          <Header />
+          <div className="flex items-center justify-center h-[60vh]">
+            <div className="text-center">
+              <BookOutlined className="text-6xl text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t('bookmarked.loginRequired', 'Please login to view bookmarked prompts')}
+              </h3>
+            </div>
           </div>
         </div>
         <Footer />
@@ -81,37 +83,39 @@ const BookmarkedPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <Spin size="large" />
-          </div>
-        ) : prompts.length === 0 ? (
-          <div className="flex justify-center items-center min-h-[60vh] bg-white rounded-lg">
-            <div className="text-center p-8">
-              <BookOutlined className="text-6xl text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {t('bookmarked.empty', 'No bookmarked prompts yet')}
-              </h3>
-              <p className="text-gray-500 text-sm">
-                {t('bookmarked.emptyDescription', 'Start bookmarking prompts to see them here')}
-              </p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-grow">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spin size="large" />
             </div>
-          </div>
-        ) : (
-          <LatestPrompts 
-            title={t('bookmarked.title', 'Bookmarked Prompts')}
-            description={t('bookmarked.description', 'Your saved prompts for quick access')}
-            prompts={prompts}
-            pageSize={12}
-            columns={3}
-            loading={false}
-            showPagination={true}
-            pagination={pagination}
-          />
-        )}
+          ) : prompts.length === 0 ? (
+            <div className="flex justify-center items-center min-h-[60vh] bg-white rounded-lg">
+              <div className="text-center p-8">
+                <BookOutlined className="text-6xl text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {t('bookmarked.empty', 'No bookmarked prompts yet')}
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  {t('bookmarked.emptyDescription', 'Start bookmarking prompts to see them here')}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <LatestPrompts 
+              title={t('bookmarked.title', 'Bookmarked Prompts')}
+              description={t('bookmarked.description', 'Your saved prompts for quick access')}
+              prompts={prompts}
+              pageSize={12}
+              columns={3}
+              loading={false}
+              showPagination={true}
+              pagination={pagination}
+            />
+          )}
+        </div>
       </div>
       <Footer />
     </div>

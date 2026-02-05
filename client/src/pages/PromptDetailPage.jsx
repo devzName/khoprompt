@@ -314,10 +314,12 @@ const PromptDetailPage = () => {
   };
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <Spin size="large" />
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="flex-grow">
+          <Header />
+          <div className="flex items-center justify-center h-[60vh]">
+            <Spin size="large" />
+          </div>
         </div>
         <Footer />
       </div>
@@ -344,9 +346,10 @@ const PromptDetailPage = () => {
     { title: prompt.title }
   ];
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-grow">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full">
           <Breadcrumb items={breadcrumbItems} className="mb-6" />
           <div className="mt-2 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 mb-8 overflow-hidden relative">
@@ -529,6 +532,7 @@ const PromptDetailPage = () => {
             </div>
 
           </div>
+        </div>
         </div>
       </div>
       <Footer />

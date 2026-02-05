@@ -81,29 +81,31 @@ const HomePage = () => {
     setCurrentPage(page);
   };
   return (
-    <div className="min-h-screen">
-      <Header />
-      <Hero />
-      <Categories 
-        selectedCategory={selectedCategory}
-        onCategorySelect={handleCategorySelect}
-      />
-      <FeaturedPrompts prompts={featuredPrompts} loading={loadingFeatured} />
-      <LatestPrompts
-        prompts={latestPrompts}
-        maxItems={null}
-        columns={4}
-        loading={initialLoading}
-        pagination={{
-          current: currentPage,
-          total: totalPrompts,
-          pageSize: 12,
-          onChange: handlePageChange,
-          showSizeChanger: false,
-          showQuickJumper: false,
-        }}
-      />
-      <TagsSection />
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-grow">
+        <Header />
+        <Hero />
+        <Categories 
+          selectedCategory={selectedCategory}
+          onCategorySelect={handleCategorySelect}
+        />
+        <FeaturedPrompts prompts={featuredPrompts} loading={loadingFeatured} />
+        <LatestPrompts
+          prompts={latestPrompts}
+          maxItems={null}
+          columns={4}
+          loading={initialLoading}
+          pagination={{
+            current: currentPage,
+            total: totalPrompts,
+            pageSize: 12,
+            onChange: handlePageChange,
+            showSizeChanger: false,
+            showQuickJumper: false,
+          }}
+        />
+        <TagsSection />
+      </div>
       <Footer />
     </div>
   );
