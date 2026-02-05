@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func
 from uuid import UUID
 import math
 
@@ -32,6 +32,13 @@ class PromptService:
                 prompt,
                 {"status": PromptStatus.APPROVED}
             )
+            
+            # Index in Elasticsearch if approved
+            try:
+                from app.services.search_service import SearchService
+                await SearchService.index_prompt(prompt)
+            except Exception as e:
+                print(f"Failed to index prompt {prompt.id} in Elasticsearch: {e}")
         
         return {
             "id": prompt.id,
@@ -514,6 +521,18 @@ class PromptService:
             update_data
         )
         
+        # Sync with Elasticsearch based on status
+        try:
+            from app.services.search_service import SearchService
+            if updated_prompt.status == PromptStatus.APPROVED:
+                # Index or update in Elasticsearch if approved
+                await SearchService.index_prompt(updated_prompt)
+            else:
+                # Remove from Elasticsearch if no longer approved
+                await SearchService.delete_prompt_from_index(updated_prompt.id)
+        except Exception as e:
+            print(f"Failed to sync prompt {updated_prompt.id} with Elasticsearch: {e}")
+        
         return {
             "id": updated_prompt.id,
             "title": updated_prompt.title,
@@ -571,6 +590,14 @@ class PromptService:
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt or prompt.user_id != user_id:
             return False
+        
+        # Remove from Elasticsearch if it was approved
+        if prompt.status == PromptStatus.APPROVED:
+            try:
+                from app.services.search_service import SearchService
+                await SearchService.delete_prompt_from_index(prompt_id)
+            except Exception as e:
+                print(f"Failed to delete prompt {prompt_id} from Elasticsearch: {e}")
             
         await PromptRepository.delete(session, prompt)
         return True
@@ -590,6 +617,13 @@ class PromptService:
             prompt, 
             {"status": PromptStatus.APPROVED}
         )
+        
+        # Index in Elasticsearch when approved
+        try:
+            from app.services.search_service import SearchService
+            await SearchService.index_prompt(updated_prompt)
+        except Exception as e:
+            print(f"Failed to index approved prompt {updated_prompt.id} in Elasticsearch: {e}")
         
         return {
             "id": updated_prompt.id,
@@ -623,6 +657,13 @@ class PromptService:
             prompt, 
             {"status": PromptStatus.REJECTED}
         )
+        
+        # Remove from Elasticsearch if it was previously approved
+        try:
+            from app.services.search_service import SearchService
+            await SearchService.delete_prompt_from_index(updated_prompt.id)
+        except Exception as e:
+            print(f"Failed to remove rejected prompt {updated_prompt.id} from Elasticsearch: {e}")
         
         return {
             "id": updated_prompt.id,

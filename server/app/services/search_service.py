@@ -264,7 +264,13 @@ class SearchService:
     async def index_prompt(prompt: Prompt):
         """
         Index a prompt in Elasticsearch
+        Only indexes prompts with APPROVED status
         """
+        # Only index approved prompts
+        if prompt.status != PromptStatus.APPROVED:
+            logger.warning(f"Skipping indexing prompt {prompt.id} - status is {prompt.status}, not APPROVED")
+            return
+            
         if elasticsearch_service.client:
             try:
                 await elasticsearch_service.index_prompt(prompt)
