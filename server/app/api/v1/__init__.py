@@ -9,6 +9,7 @@ from app.api.v1.bookmarks import router as bookmark_router
 from app.api.v1.statistics import router as statistics_router
 from app.api.v1.ai import router as ai_router
 from app.api.v1.search import router as search_router
+from app.api.v1.login_sessions import router as login_sessions_router
 
 router = APIRouter()
 
@@ -21,3 +22,4 @@ router.include_router(bookmark_router, prefix="/bookmarks", tags=["bookmarks"])
 router.include_router(statistics_router, prefix="/statistics", tags=["statistics"])
 router.include_router(ai_router, prefix="/ai", tags=["ai"])
 router.include_router(search_router, prefix="/search", tags=["search"])
+router.include_router(login_sessions_router, prefix="/login-sessions", tags=["login-sessions"])

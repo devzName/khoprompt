@@ -33,4 +33,8 @@ export const API_ENDPOINTS = {
     TREE: '/prompt-categories/tree',
   },
   TAGS: '/prompt-tags',
+  LOGIN_SESSIONS: {
+    LIST: '/login-sessions',
+    TOGGLE_STATUS: (userId) => `/login-sessions/${userId}/toggle-status`,
+  },
 };

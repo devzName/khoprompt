@@ -23,6 +23,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
       (itemKey === 'my-prompts' && activeTab === 'list') ||
       (itemKey === 'create-prompt' && activeTab === 'create') ||
       (itemKey === 'manage' && activeTab === 'manage') ||
+      (itemKey === 'login-management' && activeTab === 'login-management') ||
       (itemKey === 'review-prompts' && activeTab === 'review');
     return isActive
       ? 'bg-blue-50 text-blue-600 font-medium'

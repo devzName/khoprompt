@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Drawer, Form, notification } from 'antd';
-import { FileTextOutlined, PlusOutlined, DashboardOutlined, TagsOutlined } from '@ant-design/icons';
+import { FileTextOutlined, PlusOutlined, DashboardOutlined, TagsOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -13,6 +13,7 @@ import DashboardOverview from '../components/DashboardOverview';
 import PromptsList from '../components/prompts/PromptsList';
 import PromptDrawer from '../components/PromptDrawer';
 import ManageCategoriesTags from '../components/ManageCategoriesTags';
+import LoginManagement from '../components/LoginManagement';
 const MyPromptsPage = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
@@ -47,6 +48,8 @@ const MyPromptsPage = () => {
       setActiveTab('dashboard');
     } else if (tabFromUrl === 'manage' && user?.user_type === 'admin') {
       setActiveTab('manage');
+    } else if (tabFromUrl === 'login-management' && user?.user_type === 'admin') {
+      setActiveTab('login-management');
     } else {
       setActiveTab('list');
     }
@@ -366,6 +369,15 @@ const MyPromptsPage = () => {
         setActiveTab('manage');
         navigate(`${ROUTES.MY_PROMPTS}?tab=manage`);
       }
+    }, {
+      key: 'login-management', 
+      icon: <UserSwitchOutlined />, 
+      label: t('sidebar.loginManagement', 'Quản lý đăng nhập'), 
+      disabled: activeTab === 'login-management',
+      action: activeTab === 'login-management' ? null : () => {
+        setActiveTab('login-management');
+        navigate(`${ROUTES.MY_PROMPTS}?tab=login-management`);
+      }
     }] : [])
   ];
   return (
@@ -395,6 +407,8 @@ const MyPromptsPage = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {activeTab === 'manage' && user?.user_type === 'admin' ? (
           <ManageCategoriesTags onMenuClick={() => setMobileMenuOpen(true)} />
+        ) : activeTab === 'login-management' && user?.user_type === 'admin' ? (
+          <LoginManagement onMenuClick={() => setMobileMenuOpen(true)} />
         ) : activeTab === 'dashboard' && user?.user_type === 'admin' ? (
           <DashboardOverview
             prompts={allPrompts}

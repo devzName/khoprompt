@@ -9,7 +9,13 @@
     "locale": "vi-VN",
     "save": "Lưu",
     "cancel": "Hủy",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "search": "Tìm kiếm",
+    "reset": "Đặt lại",
+    "confirm": "Xác nhận",
+    "actions": "Thao tác",
+    "note": "Lưu ý",
+    "totalItems": "Tổng {{total}} phiên"
   },
   "header": {
     "title": "Prompt Library",
@@ -54,7 +60,9 @@
     "language": "Ngôn ngữ",
     "reviewPrompts": "Duyệt Prompt",
     "vietnamese": "Tiếng Việt",
-    "english": "English"
+    "english": "English",
+    "dashboard": "Dashboard",
+    "loginManagement": "Quản lý đăng nhập"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -416,5 +424,35 @@
       "submit": "Gửi",
       "delete": "Xóa"
     }
+  },
+  "loginManagement": {
+    "description": "Quản lý phiên đăng nhập và quyền truy cập của người dùng",
+    "userName": "Tên người dùng",
+    "email": "Email",
+    "loginTime": "Thời gian đăng nhập",
+    "lastActivity": "Hoạt động cuối",
+    "ipAddress": "Địa chỉ IP",
+    "device": "Thiết bị",
+    "status": "Trạng thái",
+    "active": "Hoạt động",
+    "inactive": "Đã khóa",
+    "logout": "Đăng xuất",
+    "confirmLogout": "Xác nhận đăng xuất",
+    "confirmLogoutDesc": "Bạn có chắc muốn đăng xuất phiên này?",
+    "logoutSuccess": "Đã đăng xuất phiên thành công",
+    "logoutError": "Không thể đăng xuất phiên",
+    "noSessions": "Không có phiên đăng nhập",
+    "noSessionsDescription": "Chưa có phiên đăng nhập nào được ghi nhận",
+    "searchPlaceholder": "Tìm kiếm theo tên, email, IP...",
+    "fetchError": "Không thể tải danh sách phiên đăng nhập",
+    "lockAccount": "Khóa tài khoản",
+    "unlockAccount": "Mở khóa tài khoản",
+    "confirmLock": "Xác nhận khóa tài khoản",
+    "confirmUnlock": "Xác nhận mở khóa tài khoản",
+    "confirmLockDesc": "Bạn có chắc muốn khóa tài khoản của {{userName}}?",
+    "confirmUnlockDesc": "Bạn có chắc muốn mở khóa tài khoản của {{userName}}?",
+    "lockSuccess": "Đã khóa tài khoản thành công",
+    "unlockSuccess": "Đã mở khóa tài khoản thành công",
+    "toggleError": "Không thể thay đổi trạng thái tài khoản"
   }
 }

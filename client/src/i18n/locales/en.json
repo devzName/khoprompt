@@ -9,7 +9,13 @@
     "locale": "en-US",
     "save": "Save",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "search": "Search",
+    "reset": "Reset",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "note": "Note",
+    "totalItems": "Total {{total}} sessions"
   },
   "header": {
     "title": "Prompt Library",
@@ -54,7 +60,9 @@
     "language": "Language",
     "reviewPrompts": "Review Prompts",
     "vietnamese": "Tiếng Việt",
-    "english": "English"
+    "english": "English",
+    "dashboard": "Dashboard",
+    "loginManagement": "Login Management"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -416,5 +424,35 @@
     "tagDeleted": "Tag deleted successfully",
     "expandAll": "Expand All",
     "collapseAll": "Collapse All"
+  },
+  "loginManagement": {
+    "description": "Manage user login sessions and access permissions",
+    "userName": "User Name",
+    "email": "Email",
+    "loginTime": "Login Time",
+    "lastActivity": "Last Activity",
+    "ipAddress": "IP Address",
+    "device": "Device",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Locked",
+    "logout": "Logout",
+    "confirmLogout": "Confirm Logout",
+    "confirmLogoutDesc": "Are you sure you want to logout this session?",
+    "logoutSuccess": "Session logged out successfully",
+    "logoutError": "Unable to logout session",
+    "noSessions": "No login sessions",
+    "noSessionsDescription": "No login sessions have been recorded yet",
+    "searchPlaceholder": "Search by name, email, IP...",
+    "fetchError": "Unable to load login sessions list",
+    "lockAccount": "Lock Account",
+    "unlockAccount": "Unlock Account",
+    "confirmLock": "Confirm Lock Account",
+    "confirmUnlock": "Confirm Unlock Account",
+    "confirmLockDesc": "Are you sure you want to lock {{userName}}'s account?",
+    "confirmUnlockDesc": "Are you sure you want to unlock {{userName}}'s account?",
+    "lockSuccess": "Account locked successfully",
+    "unlockSuccess": "Account unlocked successfully",
+    "toggleError": "Unable to change account status"
   }
 }
