@@ -272,10 +272,7 @@ const MyPromptsPage = () => {
       setLoading(false);
     }
   };
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchMyPrompts(page, searchValue, filters, sorter);
-  };
+
   const handleTableChange = (tableFilters) => {
     const newPage = tableFilters.page || 1;
     const newFilters = {
@@ -291,10 +288,7 @@ const MyPromptsPage = () => {
     setSorter(newSorter);
     fetchMyPrompts(newPage, searchValue, newFilters, newSorter);
   };
-  const handleDashboardPageChange = (page) => {
-    setDashboardCurrentPage(page);
-    fetchAllPrompts(page, searchValue, dashboardFilters, dashboardSorter);
-  };
+
   const handleDashboardTableChange = (tableFilters) => {
     const newPage = tableFilters.page || 1;
     const newFilters = {
