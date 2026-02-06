@@ -8,6 +8,7 @@ import MyPromptsPage from './pages/MyPromptsPage';
 import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import PromptChatbot from './components/PromptChatbot';
 import { ROUTES } from './constants/routes';
 import { Spin } from 'antd';
 
@@ -70,28 +71,31 @@ function AppContent() {
   }
 
   return (
-    <Routes>
-      <Route path={ROUTES.HOME} element={<HomePage />} />
-      <Route path={ROUTES.SEARCH} element={<SearchPage />} />
-      <Route path={ROUTES.PROMPT_DETAIL} element={<PromptDetailPage />} />
-      <Route 
-        path={ROUTES.MY_PROMPTS} 
-        element={
-          <ProtectedRoute>
-            <MyPromptsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path={ROUTES.BOOKMARKED} 
-        element={
-          <ProtectedRoute>
-            <BookmarkedPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.SEARCH} element={<SearchPage />} />
+        <Route path={ROUTES.PROMPT_DETAIL} element={<PromptDetailPage />} />
+        <Route 
+          path={ROUTES.MY_PROMPTS} 
+          element={
+            <ProtectedRoute>
+              <MyPromptsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path={ROUTES.BOOKMARKED} 
+          element={
+            <ProtectedRoute>
+              <BookmarkedPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <PromptChatbot />
+    </>
   );
 }
 

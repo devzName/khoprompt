@@ -37,4 +37,8 @@ export const API_ENDPOINTS = {
     LIST: '/login-sessions',
     TOGGLE_STATUS: (userId) => `/login-sessions/${userId}/toggle-status`,
   },
+  RECOMMENDATIONS: {
+    RECOMMENDED: '/ai/recommended',
+    CHATBOT: '/ai/chatbot',
+  },
 };
