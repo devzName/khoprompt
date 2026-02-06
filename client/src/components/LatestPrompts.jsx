@@ -11,6 +11,7 @@ import { ROUTES } from '../constants/routes';
 const LatestPrompts = ({
   title = null,
   description = null,
+  icon = null,
   prompts = [],
   currentPrompt = null,
   filterByCategory = false,
@@ -115,7 +116,7 @@ const LatestPrompts = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <FireOutlined className="text-2xl text-orange-500" />
+              {icon || <FireOutlined className="text-2xl text-orange-500" />}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">
                   {title || t('latest.title')}
@@ -156,8 +157,19 @@ const LatestPrompts = ({
                 >
                   {prompt.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2 grow overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{prompt.description}</p>
-                <TagsDisplay tags={prompt.tags} className="mb-3" />
+                <p 
+                  className={`text-gray-600 text-sm mb-3 overflow-hidden ${prompt.tags && prompt.tags.length > 0 ? 'line-clamp-2' : 'line-clamp-3'}`} 
+                  style={{ 
+                    display: '-webkit-box', 
+                    WebkitLineClamp: prompt.tags && prompt.tags.length > 0 ? 2 : 4, 
+                    WebkitBoxOrient: 'vertical' 
+                  }}
+                >
+                  {prompt.description}
+                </p>
+                {prompt.tags && prompt.tags.length > 0 && (
+                  <TagsDisplay tags={prompt.tags} className="mb-3" />
+                )}
                 <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-2">
                     <Avatar 

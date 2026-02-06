@@ -129,6 +129,7 @@ const SearchPage = () => {
                   isCategorySearch ? t('search.categoryResultsDesc', { query }) :
                   t('search.searchResultsDesc', { query })
                 }
+                icon={<SearchOutlined className="text-2xl text-blue-500" />}
                 prompts={prompts}
                 pageSize={12}
                 columns={3}

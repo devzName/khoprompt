@@ -107,6 +107,7 @@ const BookmarkedPage = () => {
             <LatestPrompts 
               title={t('bookmarked.title', 'Bookmarked Prompts')}
               description={t('bookmarked.description', 'Your saved prompts for quick access')}
+              icon={<BookOutlined className="text-2xl text-blue-500" />}
               prompts={prompts}
               pageSize={12}
               columns={3}
