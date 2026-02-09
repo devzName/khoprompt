@@ -15,7 +15,7 @@ from app.schemas.bookmark import (
 router = APIRouter()
 
 
-@router.get("/", response_model=Dict[str, Any])
+@router.get("", response_model=Dict[str, Any])
 async def get_bookmarked_prompts(
     session: DbSession,
     current_user: CurrentUser,

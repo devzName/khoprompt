@@ -9,7 +9,7 @@ from app.services.login_session_service import LoginSessionService
 router = APIRouter()
 
 
-@router.get("/", response_model=Dict[str, Any])
+@router.get("", response_model=Dict[str, Any])
 async def get_login_sessions(
     session: DbSession,
     current_user: CurrentUser,

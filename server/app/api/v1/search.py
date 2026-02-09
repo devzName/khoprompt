@@ -19,7 +19,7 @@ async def get_search_suggestions(
     """
     return await SearchService.get_suggestions(session, q, limit)
 
-@router.get("/")
+@router.get("")
 async def search_prompts(
     session: DbSession,
     q: Optional[str] = Query(None, description="Search query"),
