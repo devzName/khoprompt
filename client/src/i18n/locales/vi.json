@@ -454,5 +454,21 @@
     "lockSuccess": "Đã khóa tài khoản thành công",
     "unlockSuccess": "Đã mở khóa tài khoản thành công",
     "toggleError": "Không thể thay đổi trạng thái tài khoản"
+  },
+  "chatbot": {
+    "title": "AI Prompt Library",
+    "subtitle": "Tìm prompt phù hợp",
+    "welcomeMessage": "Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!",
+    "tooltipMessage": "Xin chào! Mình có thể hỗ trợ bạn tìm prompt phù hợp 👋",
+    "tooltipButton": "Bắt đầu chat ngay →",
+    "inputPlaceholder": "Nhập câu hỏi của bạn...",
+    "quickQuestions": "Gợi ý câu hỏi:",
+    "quickQuestion1": "Tìm prompt về viết content",
+    "quickQuestion2": "Prompt lập trình Python",
+    "quickQuestion3": "Gợi ý prompt marketing",
+    "quickQuestion4": "Prompt phân tích dữ liệu",
+    "errorMessage": "Xin lỗi, có lỗi xảy ra. Bạn thử lại nhé! 😅",
+    "resetTooltip": "Làm mới cuộc trò chuyện",
+    "closeTooltip": "Đóng chatbot"
   }
 }

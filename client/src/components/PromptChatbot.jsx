@@ -29,22 +29,16 @@ const PromptChatbot = () => {
     return () => document.head.removeChild(style);
   }, []);
 
-  // Show welcome message with typing effect when chatbot opens
+  // Show welcome message immediately when chatbot opens
   useEffect(() => {
     if (isOpen && !hasShownWelcome) {
-      setIsTyping(true);
       setShowTooltip(false);
-      const timer = setTimeout(() => {
-        setIsTyping(false);
-        setMessages([{
-          type: 'bot',
-          text: 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!',
-          prompts: []
-        }]);
-        setHasShownWelcome(true);
-      }, 2000); // 2 giây hiển thị typing
-      
-      return () => clearTimeout(timer);
+      setMessages([{
+        type: 'bot',
+        text: 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!',
+        prompts: []
+      }]);
+      setHasShownWelcome(true);
     }
   }, [isOpen, hasShownWelcome]);
 

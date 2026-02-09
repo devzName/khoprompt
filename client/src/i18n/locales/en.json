@@ -454,5 +454,21 @@
     "lockSuccess": "Account locked successfully",
     "unlockSuccess": "Account unlocked successfully",
     "toggleError": "Unable to change account status"
+  },
+  "chatbot": {
+    "title": "AI Prompt Library",
+    "subtitle": "Find suitable prompts",
+    "welcomeMessage": "Hello! 👋 I'm AI Prompt Library. I can help you find prompts that suit your needs. Let me know what you're looking for!",
+    "tooltipMessage": "Hello! I can help you find suitable prompts 👋",
+    "tooltipButton": "Start chatting now →",
+    "inputPlaceholder": "Enter your question...",
+    "quickQuestions": "Quick questions:",
+    "quickQuestion1": "Find prompts about content writing",
+    "quickQuestion2": "Python programming prompts",
+    "quickQuestion3": "Marketing prompt suggestions",
+    "quickQuestion4": "Data analysis prompts",
+    "errorMessage": "Sorry, an error occurred. Please try again! 😅",
+    "resetTooltip": "Reset conversation",
+    "closeTooltip": "Close chatbot"
   }
 }
