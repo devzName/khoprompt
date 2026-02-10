@@ -41,7 +41,7 @@ poetry run python -m app.scripts.seed_mock_prompts
 cd server
 
 # Bước 1: Stop & xoá volume
-docker compose down -v
+docker compose down
 
 # Bước 2: Start lại
 docker compose up -d
