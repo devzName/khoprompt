@@ -279,9 +279,27 @@ const PromptChatbot = () => {
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] ${msg.type === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-2xl p-3 shadow-sm`}>
-                  <p className="text-sm">
-                    {typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}
-                  </p>
+                  <div className="text-sm whitespace-pre-wrap">
+                    {typeof msg.text === 'string' 
+                      ? msg.text.split('\n').map((line, i) => {
+                          if (line.match(/^\d+\.\s\*\*/)) {
+                            const parts = line.split('**');
+                            return (
+                              <div key={i} className="mb-2">
+                                <span className="font-semibold">{parts[0]}</span>
+                                <span className="font-semibold text-blue-600">{parts[1]}</span>
+                                <span>{parts[2]}</span>
+                              </div>
+                            );
+                          }
+                          if (line.startsWith('**') && line.endsWith('**')) {
+                            return <div key={i} className="font-semibold mb-1">{line.replace(/\*\*/g, '')}</div>;
+                          }
+                          return line ? <div key={i} className="mb-1">{line}</div> : <div key={i} className="h-2" />;
+                        })
+                      : JSON.stringify(msg.text)
+                    }
+                  </div>
                   
                   {/* Display prompts if available */}
                   {msg.prompts && msg.prompts.length > 0 && (
