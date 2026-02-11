@@ -9,6 +9,42 @@ const PromptChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}`);
+
+  // Load messages from sessionStorage on mount
+  useEffect(() => {
+    const savedMessages = sessionStorage.getItem('chatbot_messages');
+    const savedWelcome = sessionStorage.getItem('chatbot_welcome');
+    
+    if (savedMessages) {
+      try {
+        const parsed = JSON.parse(savedMessages);
+        // Validate messages structure
+        const validMessages = parsed.filter(msg => 
+          msg && 
+          typeof msg === 'object' && 
+          typeof msg.text === 'string' &&
+          (msg.type === 'user' || msg.type === 'bot')
+        );
+        
+        if (validMessages.length > 0) {
+          setMessages(validMessages);
+          setHasShownWelcome(savedWelcome === 'true');
+        }
+      } catch (e) {
+        sessionStorage.removeItem('chatbot_messages');
+        sessionStorage.removeItem('chatbot_welcome');
+      }
+    }
+  }, []);
+
+  // Save messages to sessionStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem('chatbot_messages', JSON.stringify(messages));
+      sessionStorage.setItem('chatbot_welcome', hasShownWelcome.toString());
+    }
+  }, [messages, hasShownWelcome]);
 
   // Add CSS animation
   useEffect(() => {
@@ -56,6 +92,10 @@ const PromptChatbot = () => {
   };
 
   const handleResetChat = () => {
+    // Clear sessionStorage
+    sessionStorage.removeItem('chatbot_messages');
+    sessionStorage.removeItem('chatbot_welcome');
+    
     setMessages([]);
     setQuery('');
     setIsTyping(true);
@@ -79,21 +119,34 @@ const PromptChatbot = () => {
 
     setQuery('');
     
-    // Add user message
-    setMessages(prev => [...prev, { type: 'user', text: textToSend }]);
+    const userMessage = { type: 'user', text: textToSend };
+    setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
     try {
-      const result = await recommendationService.chatbotSuggest(textToSend);
+      const welcomeMessage = 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!';
       
-      // Simulate typing delay
+      const chatHistory = messages
+        .filter(msg => msg.text !== welcomeMessage)
+        .map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        }));
+      
+      const result = await recommendationService.chatbotSuggest(textToSend, sessionId, chatHistory);
+      
       setTimeout(() => {
         setIsTyping(false);
-        // Add bot response
+        const botMessage = typeof result === 'string'
+          ? result
+          : typeof result?.message === 'string' 
+            ? result.message 
+            : 'Đây là kết quả tìm kiếm của bạn:';
+          
         setMessages(prev => [...prev, {
           type: 'bot',
-          text: result.message,
-          prompts: result.prompts || []
+          text: botMessage,
+          prompts: Array.isArray(result?.prompts) ? result.prompts : []
         }]);
       }, 800);
     } catch (error) {
@@ -101,7 +154,8 @@ const PromptChatbot = () => {
         setIsTyping(false);
         setMessages(prev => [...prev, {
           type: 'bot',
-          text: 'Xin lỗi, có lỗi xảy ra. Bạn thử lại nhé! 😅'
+          text: 'Xin lỗi, có lỗi xảy ra. Bạn thử lại nhé! 😅',
+          prompts: []
         }]);
       }, 800);
     } finally {
@@ -220,7 +274,9 @@ const PromptChatbot = () => {
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] ${msg.type === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-2xl p-3 shadow-sm`}>
-                  <p className="text-sm">{msg.text}</p>
+                  <p className="text-sm">
+                    {typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}
+                  </p>
                   
                   {/* Display prompts if available */}
                   {msg.prompts && msg.prompts.length > 0 && (
@@ -228,7 +284,7 @@ const PromptChatbot = () => {
                       {msg.prompts.map((prompt) => (
                         <a
                           key={prompt.id}
-                          href={`/prompts/${prompt.slug}`}
+                          href={`/prompt/${prompt.slug}`}
                           className="block bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors"
                           onClick={() => setIsOpen(false)}
                         >
@@ -295,7 +351,7 @@ const PromptChatbot = () => {
                 disabled={loading || isTyping}
               />
               <button
-                onClick={handleSend}
+                onClick={() => handleSend()}
                 disabled={!query.trim() || loading || isTyping}
                 className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >

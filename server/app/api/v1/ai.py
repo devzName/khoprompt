@@ -10,6 +10,8 @@ from app.core.prompts import (
     IMPROVE_PROMPT_CONTENT
 )
 import openai
+import httpx
+import os
 
 
 router = APIRouter()
@@ -69,7 +71,6 @@ async def generate_text(
         return TextResponse(formattedText=generated_text)
         
     except Exception as e:
-        print("Error generating text:", e)
         generated_text = _simple_generate_text(request.title, request.type)
         return TextResponse(formattedText=generated_text)
 
@@ -114,7 +115,6 @@ async def improve_text(
         return TextResponse(formattedText=improved_text)
         
     except Exception as e:
-        print("Error improving text:", e)
         improved_text = _simple_improve_text(request.text, request.value, request.type)
         return TextResponse(formattedText=improved_text)
 
@@ -139,195 +139,87 @@ def _simple_improve_text(text: str, value: str, text_type: str) -> str:
 
 
 # ============================================
-# RECOMMENDATION & CHATBOT ENDPOINTS
+# CHATBOT ENDPOINT
 # ============================================
 
-@router.get("/recommended")
-async def get_recommended_prompts(
-    limit: int = Query(12, ge=1, le=50)
-):
-    """
-    Mock API - Trả về prompts gợi ý để test UI
-    """
-    mock_prompts = [
-        {
-            "id": 1,
-            "title": "Prompt viết content marketing chuyên nghiệp",
-            "description": "Giúp bạn tạo nội dung marketing hấp dẫn, thu hút khách hàng và tăng conversion rate",
-            "slug": "prompt-viet-content-marketing",
-            "rating": 4.8,
-            "view_count": 1250,
-            "category_id": 1,
-            "status": "approved"
-        },
-        {
-            "id": 2,
-            "title": "Code Review Assistant - Python",
-            "description": "AI assistant giúp review code Python, tìm bugs và suggest improvements",
-            "slug": "code-review-python",
-            "rating": 4.6,
-            "view_count": 890,
-            "category_id": 2,
-            "status": "approved"
-        },
-        {
-            "id": 3,
-            "title": "SEO Content Optimizer",
-            "description": "Tối ưu hóa nội dung cho SEO, tăng ranking trên Google",
-            "slug": "seo-content-optimizer",
-            "rating": 4.9,
-            "view_count": 2100,
-            "category_id": 1,
-            "status": "approved"
-        },
-        {
-            "id": 4,
-            "title": "Data Analysis với Python Pandas",
-            "description": "Phân tích dữ liệu nhanh chóng với Pandas, visualization và insights",
-            "slug": "data-analysis-pandas",
-            "rating": 4.7,
-            "view_count": 1560,
-            "category_id": 3,
-            "status": "approved"
-        },
-        {
-            "id": 5,
-            "title": "UI/UX Design Feedback",
-            "description": "Nhận feedback chuyên nghiệp về thiết kế UI/UX của bạn",
-            "slug": "uiux-design-feedback",
-            "rating": 4.5,
-            "view_count": 780,
-            "category_id": 4,
-            "status": "approved"
-        },
-        {
-            "id": 6,
-            "title": "Email Marketing Template Generator",
-            "description": "Tạo email marketing template chuyên nghiệp, tăng open rate",
-            "slug": "email-marketing-template",
-            "rating": 4.4,
-            "view_count": 650,
-            "category_id": 1,
-            "status": "approved"
-        },
-        {
-            "id": 7,
-            "title": "React Component Generator",
-            "description": "Tự động generate React components với best practices",
-            "slug": "react-component-generator",
-            "rating": 4.8,
-            "view_count": 1890,
-            "category_id": 2,
-            "status": "approved"
-        },
-        {
-            "id": 8,
-            "title": "Social Media Caption Writer",
-            "description": "Viết caption hấp dẫn cho Facebook, Instagram, TikTok",
-            "slug": "social-media-caption",
-            "rating": 4.6,
-            "view_count": 1120,
-            "category_id": 1,
-            "status": "approved"
-        }
-    ]
-    
-    return mock_prompts[:limit]
+class ChatHistoryItem(BaseModel):
+    role: str
+    content: str
 
+class ChatbotRequest(BaseModel):
+    message: str
+    session_id: str = "default_session"
+    chat_history: list[ChatHistoryItem] = []
 
 @router.post("/chatbot")
 async def chatbot_suggest(
-    query: str = Query(..., min_length=1),
+    request: ChatbotRequest = None,
+    query: str = Query(None),
     limit: int = Query(5, ge=1, le=20)
 ):
     """
-    Mock Chatbot - Trả về response giả để test UI
+    Call n8n webhook để xử lý chatbot với AI
+    Hỗ trợ cả request body và query params
     """
-    query_lower = query.lower()
-    
-    # Mock responses dựa trên keywords
-    if any(word in query_lower for word in ['viết', 'content', 'marketing']):
-        message = "Mình tìm thấy 3 prompts về viết content và marketing phù hợp với bạn! 📝"
-        prompts = [
-            {
-                "id": 1,
-                "title": "Prompt viết content marketing chuyên nghiệp",
-                "description": "Giúp bạn tạo nội dung marketing hấp dẫn, thu hút khách hàng",
-                "slug": "prompt-viet-content-marketing",
-                "rating": 4.8,
-                "view_count": 1250
-            },
-            {
-                "id": 3,
-                "title": "SEO Content Optimizer",
-                "description": "Tối ưu hóa nội dung cho SEO, tăng ranking trên Google",
-                "slug": "seo-content-optimizer",
-                "rating": 4.9,
-                "view_count": 2100
-            },
-            {
-                "id": 8,
-                "title": "Social Media Caption Writer",
-                "description": "Viết caption hấp dẫn cho Facebook, Instagram, TikTok",
-                "slug": "social-media-caption",
-                "rating": 4.6,
-                "view_count": 1120
-            }
-        ]
-    elif any(word in query_lower for word in ['code', 'lập trình', 'python', 'react']):
-        message = "Có 2 prompts về lập trình rất hay cho bạn! 💻"
-        prompts = [
-            {
-                "id": 2,
-                "title": "Code Review Assistant - Python",
-                "description": "AI assistant giúp review code Python, tìm bugs",
-                "slug": "code-review-python",
-                "rating": 4.6,
-                "view_count": 890
-            },
-            {
-                "id": 7,
-                "title": "React Component Generator",
-                "description": "Tự động generate React components với best practices",
-                "slug": "react-component-generator",
-                "rating": 4.8,
-                "view_count": 1890
-            }
-        ]
-    elif any(word in query_lower for word in ['data', 'phân tích', 'analysis']):
-        message = "Mình có 1 prompt về phân tích dữ liệu rất tốt! 📊"
-        prompts = [
-            {
-                "id": 4,
-                "title": "Data Analysis với Python Pandas",
-                "description": "Phân tích dữ liệu nhanh chóng với Pandas",
-                "slug": "data-analysis-pandas",
-                "rating": 4.7,
-                "view_count": 1560
-            }
-        ]
-    else:
-        message = "Đây là một số prompts phổ biến bạn có thể quan tâm! ✨"
-        prompts = [
-            {
-                "id": 1,
-                "title": "Prompt viết content marketing chuyên nghiệp",
-                "description": "Giúp bạn tạo nội dung marketing hấp dẫn",
-                "slug": "prompt-viet-content-marketing",
-                "rating": 4.8,
-                "view_count": 1250
-            },
-            {
-                "id": 2,
-                "title": "Code Review Assistant - Python",
-                "description": "AI assistant giúp review code Python",
-                "slug": "code-review-python",
-                "rating": 4.6,
-                "view_count": 890
-            }
-        ]
-    
-    return {
-        'message': message,
-        'prompts': prompts[:limit]
-    }
+    try:
+        # Lấy message từ body hoặc query param
+        message = request.message if request else query
+        session_id = request.session_id if request else "default_session"
+        chat_history = request.chat_history if request else []
+        
+        if not message:
+            raise HTTPException(
+                status_code=400,
+                detail="Message is required"
+            )
+        
+        n8n_webhook_url = settings.n8n_webhook_url
+        
+        payload = {
+            "message": message,
+            "session_id": session_id,
+            "chat_history": [{"role": item.role, "content": item.content} for item in chat_history]
+        }
+
+        print('payload', payload)
+        
+        # Call n8n webhook
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                n8n_webhook_url,
+                json=payload,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            # Test webhook trả về array, lấy item đầu tiên
+            if response.status_code == 200:
+                result = response.json()
+                
+                # N8n test webhook trả về array of items
+                if isinstance(result, list) and len(result) > 0:
+                    return result[0]
+                
+                return result
+            else:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"N8N error: {response.text}"
+                )
+            
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="N8N webhook timeout"
+        )
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Cannot connect to N8N: {str(e)}"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Chatbot error: {str(e)}"
+        )

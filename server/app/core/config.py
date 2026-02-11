@@ -33,6 +33,12 @@ class Settings(BaseSettings):
 
     # AI Services Configuration
     openai_api_key: str | None = Field(default=None, validation_alias="OPENAI_API_KEY")
+    
+    # N8N Webhook Configuration
+    n8n_webhook_url: str = Field(
+        default="http://n8n:5678/webhook-test/chatbot",
+        validation_alias="N8N_WEBHOOK_URL"
+    )
 
     # Elasticsearch Configuration
     elasticsearch_url: str = Field(
