@@ -180,8 +180,6 @@ async def chatbot_suggest(
             "session_id": session_id,
             "chat_history": [{"role": item.role, "content": item.content} for item in chat_history]
         }
-
-        print('payload', payload)
         
         # Call n8n webhook
         async with httpx.AsyncClient(timeout=30.0) as client:
