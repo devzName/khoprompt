@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { recommendationService } from '../services/recommendationService';
 
 const PromptChatbot = () => {
@@ -9,7 +9,22 @@ const PromptChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}`);
+  const [sessionId, setSessionId] = useState(() => `session_${Date.now()}`);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  useEffect(() => {
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [isOpen]);
 
   // Load messages from sessionStorage on mount
   useEffect(() => {
@@ -92,7 +107,6 @@ const PromptChatbot = () => {
   };
 
   const handleResetChat = () => {
-    // Clear sessionStorage
     sessionStorage.removeItem('chatbot_messages');
     sessionStorage.removeItem('chatbot_welcome');
     
@@ -100,8 +114,8 @@ const PromptChatbot = () => {
     setQuery('');
     setIsTyping(true);
     setHasShownWelcome(false);
+    setSessionId(`session_${Date.now()}`);
     
-    // Show welcome message again
     setTimeout(() => {
       setIsTyping(false);
       setMessages([{
@@ -124,16 +138,7 @@ const PromptChatbot = () => {
     setIsTyping(true);
 
     try {
-      const welcomeMessage = 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!';
-      
-      const chatHistory = messages
-        .filter(msg => msg.text !== welcomeMessage)
-        .map(msg => ({
-          role: msg.type === 'user' ? 'user' : 'assistant',
-          content: msg.text
-        }));
-      
-      const result = await recommendationService.chatbotSuggest(textToSend, sessionId, chatHistory);
+      const result = await recommendationService.chatbotSuggest(textToSend, sessionId);
       
       setTimeout(() => {
         setIsTyping(false);
@@ -318,6 +323,8 @@ const PromptChatbot = () => {
                 </div>
               </div>
             )}
+            
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Quick Questions */}

@@ -142,14 +142,9 @@ def _simple_improve_text(text: str, value: str, text_type: str) -> str:
 # CHATBOT ENDPOINT
 # ============================================
 
-class ChatHistoryItem(BaseModel):
-    role: str
-    content: str
-
 class ChatbotRequest(BaseModel):
     message: str
     session_id: str = "default_session"
-    chat_history: list[ChatHistoryItem] = []
 
 @router.post("/chatbot")
 async def chatbot_suggest(
@@ -165,7 +160,6 @@ async def chatbot_suggest(
         # Lấy message từ body hoặc query param
         message = request.message if request else query
         session_id = request.session_id if request else "default_session"
-        chat_history = request.chat_history if request else []
         
         if not message:
             raise HTTPException(
@@ -177,25 +171,28 @@ async def chatbot_suggest(
         
         payload = {
             "message": message,
-            "session_id": session_id,
-            "chat_history": [{"role": item.role, "content": item.content} for item in chat_history]
+            "session_id": session_id
         }
         
-        # Call n8n webhook
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        timeout = httpx.Timeout(300.0, connect=10.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
                 n8n_webhook_url,
                 json=payload,
                 headers={"Content-Type": "application/json"}
             )
             
-            # Test webhook trả về array, lấy item đầu tiên
             if response.status_code == 200:
                 result = response.json()
                 
-                # N8n test webhook trả về array of items
                 if isinstance(result, list) and len(result) > 0:
-                    return result[0]
+                    result = result[0]
+                
+                if isinstance(result, dict) and 'output' in result:
+                    return {
+                        "message": result.get('output', ''),
+                        "prompts": result.get('prompts', [])
+                    }
                 
                 return result
             else:
@@ -204,10 +201,20 @@ async def chatbot_suggest(
                     detail=f"N8N error: {response.text}"
                 )
             
-    except httpx.TimeoutException:
+    except httpx.TimeoutException as e:
         raise HTTPException(
             status_code=504,
-            detail="N8N webhook timeout"
+            detail="Request timeout - AI đang xử lý quá lâu, vui lòng thử lại"
+        )
+    except httpx.ConnectTimeout:
+        raise HTTPException(
+            status_code=504,
+            detail="Cannot connect to N8N - Connection timeout"
+        )
+    except httpx.ReadTimeout:
+        raise HTTPException(
+            status_code=504,
+            detail="N8N response timeout - AI đang xử lý, vui lòng đợi hoặc thử lại"
         )
     except httpx.RequestError as e:
         raise HTTPException(
