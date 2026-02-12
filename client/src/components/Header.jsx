@@ -109,7 +109,7 @@ const Header = () => {
           ),
           key: `history-${index}`,
           type: type || 'history',
-          historyType: type
+          'data-history-type': type
         };
       }));
     }
@@ -149,7 +149,7 @@ const Header = () => {
         ),
         key: `history-${index}`,
         type: type || 'history',
-        historyType: type
+        'data-history-type': type
       };
     });
   };
@@ -261,9 +261,9 @@ const Header = () => {
     } else if (option?.type === 'tag' || searchQuery.startsWith('#')) {
       searchType = 'tag';
       navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery.replace('#', ''))}&type=tag`);
-    } else if (option?.historyType) {
-      searchType = option.historyType;
-      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}&type=${option.historyType}`);
+    } else if (option?.['data-history-type']) {
+      searchType = option['data-history-type'];
+      navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}&type=${option['data-history-type']}`);
     } else {
       navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery)}`);
     }
