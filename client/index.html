@@ -12,5 +12,26 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <script>
+      // Only apply protection in production
+      if (import.meta.env.PROD) {
+        // Disable text selection
+        document.addEventListener('selectstart', function(e) {
+          e.preventDefault();
+        });
+        
+        // Disable copy
+        document.addEventListener('copy', function(e) {
+          e.preventDefault();
+        });
+        
+        // Apply user-select none
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+        document.body.style.mozUserSelect = 'none';
+        document.body.style.msUserSelect = 'none';
+      }
+    </script>
   </body>
 </html>
