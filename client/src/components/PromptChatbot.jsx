@@ -10,7 +10,27 @@ const PromptChatbot = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
   const [sessionId, setSessionId] = useState(() => `session_${Date.now()}`);
+  const [user, setUser] = useState(null);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Failed to parse user data');
+      }
+    }
+  }, []);
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,7 +107,8 @@ const PromptChatbot = () => {
       setMessages([{
         type: 'bot',
         text: 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!',
-        prompts: []
+        prompts: [],
+        timestamp: new Date().toISOString()
       }]);
       setHasShownWelcome(true);
     }
@@ -121,7 +142,8 @@ const PromptChatbot = () => {
       setMessages([{
         type: 'bot',
         text: 'Xin chào! 👋 Mình là AI Prompt Library. Mình có thể giúp bạn tìm prompt phù hợp với nhu cầu của bạn. Hãy cho mình biết bạn đang tìm kiếm gì nhé!',
-        prompts: []
+        prompts: [],
+        timestamp: new Date().toISOString()
       }]);
       setHasShownWelcome(true);
     }, 1000);
@@ -133,7 +155,11 @@ const PromptChatbot = () => {
 
     setQuery('');
     
-    const userMessage = { type: 'user', text: textToSend };
+    const userMessage = { 
+      type: 'user', 
+      text: textToSend,
+      timestamp: new Date().toISOString()
+    };
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
@@ -151,7 +177,8 @@ const PromptChatbot = () => {
         setMessages(prev => [...prev, {
           type: 'bot',
           text: botMessage,
-          prompts: Array.isArray(result?.prompts) ? result.prompts : []
+          prompts: Array.isArray(result?.prompts) ? result.prompts : [],
+          timestamp: new Date().toISOString()
         }]);
       }, 800);
     } catch (error) {
@@ -160,7 +187,8 @@ const PromptChatbot = () => {
         setMessages(prev => [...prev, {
           type: 'bot',
           text: 'Xin lỗi, có lỗi xảy ra. Bạn thử lại nhé! 😅',
-          prompts: []
+          prompts: [],
+          timestamp: new Date().toISOString()
         }]);
       }, 800);
     } finally {
@@ -258,7 +286,13 @@ const PromptChatbot = () => {
               </div>
               <div>
                 <h3 className="font-semibold">AI Prompt Library</h3>
-                <p className="text-xs text-blue-100">Tìm prompt phù hợp</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-blue-100">Tìm prompt phù hợp</p>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-200">Online</span>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -277,7 +311,12 @@ const PromptChatbot = () => {
           {/* Messages */}
           <div className="grow overflow-y-auto p-4 space-y-4 bg-gray-50">
             {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div key={idx} className={`flex gap-2 ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {msg.type === 'bot' && (
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-white text-sm">🤖</span>
+                  </div>
+                )}
                 <div className={`max-w-[80%] ${msg.type === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-2xl p-3 shadow-sm`}>
                   <div className="text-sm whitespace-pre-wrap">
                     {typeof msg.text === 'string' 
@@ -300,6 +339,12 @@ const PromptChatbot = () => {
                       : JSON.stringify(msg.text)
                     }
                   </div>
+                  
+                  {msg.timestamp && (
+                    <div className={`text-xs mt-1 text-right ${msg.type === 'user' ? 'text-blue-100' : 'text-gray-400'}`}>
+                      {formatTime(msg.timestamp)}
+                    </div>
+                  )}
                   
                   {/* Display prompts if available */}
                   {msg.prompts && msg.prompts.length > 0 && (
@@ -326,6 +371,15 @@ const PromptChatbot = () => {
                     </div>
                   )}
                 </div>
+                {msg.type === 'user' && (
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden bg-gray-300">
+                    {user?.picture ? (
+                      <img src={user.picture} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-gray-600 text-sm">👤</span>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             
