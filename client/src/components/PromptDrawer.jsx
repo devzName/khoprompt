@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../constants/routes';
 import ImageGallery from './ImageGallery';
+import VariablePlaceholderForm from './prompts/variable-placeholder-form';
+import { extractVariables } from '../utils/variable-parser';
 
 // Get server URL for images
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
@@ -153,19 +155,23 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
             <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
-              <div 
+              <div
                 className="text-gray-800 leading-relaxed text-sm"
                 dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
               />
-              <Button
-                icon={<CopyOutlined />}
-                className="absolute top-2 right-2 bg-white border-gray-300 text-gray-600 hover:bg-gray-100"
-                size="small"
-                onClick={handleCopy}
-              >
-                {t('reviewPromptDrawer.copy', 'Copy')}
-              </Button>
+              {/* Hide raw copy button when variable form is present */}
+              {extractVariables(prompt.content || '').length === 0 && (
+                <Button
+                  icon={<CopyOutlined />}
+                  className="absolute top-2 right-2 bg-white border-gray-300 text-gray-600 hover:bg-gray-100"
+                  size="small"
+                  onClick={handleCopy}
+                >
+                  {t('reviewPromptDrawer.copy', 'Copy')}
+                </Button>
+              )}
             </div>
+            <VariablePlaceholderForm content={prompt.content} size="small" />
           </div>
 
           {/* Notes if exists */}

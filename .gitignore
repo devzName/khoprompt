@@ -14,3 +14,7 @@ server/logs/
 client/.env
 deploy.txt
 New Microsoft Excel Worksheet.xlsx
+plans
+.claude
+localbackup.sql
+client/dist

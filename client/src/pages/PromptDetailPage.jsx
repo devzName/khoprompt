@@ -22,6 +22,8 @@ import { voteService } from '../services/voteService';
 import { bookmarkService } from '../services/bookmarkService';
 import { useViewTracking } from '../hooks/useViewTracking';
 import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
+import VariablePlaceholderForm from '../components/prompts/variable-placeholder-form';
+import { extractVariables } from '../utils/variable-parser';
 import dayjs from 'dayjs';
 
 // Get server URL for images
@@ -475,19 +477,23 @@ const PromptDetailPage = () => {
                 {t('promptDetail.promptContent')}
               </h2>
               <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
-                <div 
+                <div
                   className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
                 />
-                <Button
-                  icon={<CopyOutlined />}
-                  className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
-                  size="small"
-                  onClick={handleCopyPrompt}
-                >
-                  {copied ? t('promptDetail.copied') : t('reviewPromptDrawer.copy')}
-                </Button>
+                {/* Hide raw copy button when variable form is present — form provides its own copy actions */}
+                {extractVariables(prompt.content || '').length === 0 && (
+                  <Button
+                    icon={<CopyOutlined />}
+                    className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
+                    size="small"
+                    onClick={handleCopyPrompt}
+                  >
+                    {copied ? t('promptDetail.copied') : t('reviewPromptDrawer.copy')}
+                  </Button>
+                )}
               </div>
+              <VariablePlaceholderForm content={prompt.content} />
             </div>
             
             {prompt.notes && (

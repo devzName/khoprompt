@@ -191,12 +191,12 @@ class PromptService:
         ]
 
     @staticmethod
-    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9) -> PaginatedResponse:
+    async def get_approved_prompts_paginated(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9, ai_model: str | None = None) -> PaginatedResponse:
         # Get total count
-        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search, tag, tag_id)
-        
+        total_count = await PromptRepository.get_approved_prompts_count(session, category_id, search, tag, tag_id, ai_model)
+
         # Get paginated data
-        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, tag, tag_id, page, limit)
+        prompts = await PromptRepository.get_approved_prompts(session, category_id, search, tag, tag_id, page, limit, ai_model)
         
         # Calculate pagination metadata
         total_pages = math.ceil(total_count / limit) if total_count > 0 else 1
@@ -610,36 +610,22 @@ class PromptService:
 
     @staticmethod
     async def submit_prompt_for_review(session: AsyncSession, prompt_id: int, user_id: UUID) -> dict | None:
-        """Submit a draft prompt for review (change status from DRAFT to PENDING)"""
+        """Submit a draft prompt for review (change status from DRAFT to PENDING).
+        Rejected prompts should use resubmit_prompt instead."""
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt or prompt.user_id != user_id:
             return None
-            
+
         if prompt.status != PromptStatus.DRAFT:
             return None
-            
+
         updated_prompt = await PromptRepository.update(
-            session, 
-            prompt, 
+            session,
+            prompt,
             {"status": PromptStatus.PENDING}
         )
-        
-        return {
-            "id": updated_prompt.id,
-            "title": updated_prompt.title,
-            "slug": updated_prompt.slug,
-            "description": updated_prompt.description,
-            "content": updated_prompt.content,
-            "notes": updated_prompt.notes,
-            "status": updated_prompt.status,
-            "category_id": updated_prompt.category_id,
-            "user_id": str(updated_prompt.user_id),
-            "view_count": updated_prompt.view_count,
-            "like_count": updated_prompt.like_count,
-            "dislike_count": updated_prompt.dislike_count,
-            "created_at": updated_prompt.created_at,
-            "updated_at": updated_prompt.updated_at
-        }
+
+        return PromptService._format_prompt(updated_prompt)
 
     @staticmethod
     async def delete_prompt(session: AsyncSession, prompt_id: int, user_id: UUID) -> bool:
@@ -684,69 +670,131 @@ class PromptService:
             # Reload prompt with relationships to avoid greenlet issues
             fresh_prompt = await PromptRepository.get_by_id(session, updated_prompt.id)
             if fresh_prompt:
-                # Use create_task to ensure proper async context
                 asyncio.create_task(SearchService.index_prompt(fresh_prompt))
         except Exception as e:
             print(f"Failed to index approved prompt {updated_prompt.id} in Elasticsearch: {e}")
-        
-        return {
-            "id": updated_prompt.id,
-            "title": updated_prompt.title,
-            "slug": updated_prompt.slug,
-            "description": updated_prompt.description,
-            "content": updated_prompt.content,
-            "notes": updated_prompt.notes,
-            "status": updated_prompt.status,
-            "category_id": updated_prompt.category_id,
-            "user_id": str(updated_prompt.user_id),
-            "view_count": updated_prompt.view_count,
-            "like_count": updated_prompt.like_count,
-            "dislike_count": updated_prompt.dislike_count,
-            "created_at": updated_prompt.created_at,
-            "updated_at": updated_prompt.updated_at
-        }
+
+        return PromptService._format_prompt(updated_prompt)
 
     @staticmethod
-    async def reject_prompt(session: AsyncSession, prompt_id: int, admin_user_id: UUID) -> dict | None:
-        """Reject a prompt (admin only)"""
+    async def reject_prompt(session: AsyncSession, prompt_id: int, admin_user_id: UUID, rejection_reason: str = "") -> dict | None:
+        """Reject a prompt (admin only). rejection_reason is required."""
         prompt = await PromptRepository.get_by_id(session, prompt_id)
         if not prompt:
             return None
-            
+
         if prompt.status != PromptStatus.PENDING:
             return None
-            
-        updated_prompt = await PromptRepository.update(
-            session, 
-            prompt, 
-            {"status": PromptStatus.REJECTED}
+
+        updated_prompt = await PromptRepository.reject_with_reason(
+            session,
+            prompt,
+            rejection_reason=rejection_reason,
+            rejected_by=admin_user_id,
         )
-        
+
         # Remove from Elasticsearch if it was previously approved
         try:
             from app.services.search_service import SearchService
             import asyncio
-            # Use create_task to ensure proper async context
             asyncio.create_task(SearchService.delete_prompt_from_index(updated_prompt.id))
         except Exception as e:
             print(f"Failed to remove rejected prompt {updated_prompt.id} from Elasticsearch: {e}")
-        
+
+        return PromptService._format_prompt(updated_prompt)
+
+    @staticmethod
+    async def resubmit_prompt(session: AsyncSession, prompt_id: int, user_id: UUID) -> dict | None:
+        """Re-submit a rejected prompt for review, clearing rejection fields.
+
+        Respects the require_approval site setting:
+        - If require_approval=true  → status becomes 'pending'
+        - If require_approval=false → status becomes 'approved' directly
+        """
+        from app.services.settings_service import require_approval as get_require_approval
+
+        prompt = await PromptRepository.get_by_id(session, prompt_id)
+        if not prompt or prompt.user_id != user_id:
+            return None
+
+        if prompt.status != PromptStatus.REJECTED:
+            return None
+
+        needs_approval = await get_require_approval(session)
+        target_status = PromptStatus.PENDING if needs_approval else PromptStatus.APPROVED
+
+        updated_prompt = await PromptRepository.clear_rejection_and_submit(session, prompt, target_status)
+
+        # If directly approved, index in Elasticsearch
+        if target_status == PromptStatus.APPROVED:
+            try:
+                from app.services.search_service import SearchService
+                import asyncio
+                fresh = await PromptRepository.get_by_id(session, updated_prompt.id)
+                if fresh:
+                    asyncio.create_task(SearchService.index_prompt(fresh))
+            except Exception as e:
+                print(f"Failed to index resubmitted prompt {updated_prompt.id}: {e}")
+
+        return PromptService._format_prompt(updated_prompt)
+
+    @staticmethod
+    async def get_trending_prompts(session: AsyncSession, days: int = 7, limit: int = 10) -> list[dict]:
+        """Return trending approved prompts scored by recent views + likes."""
+        prompts = await PromptRepository.get_trending_prompts(session, days=days, limit=limit)
+        return [PromptService._format_prompt_with_details(p) for p in prompts]
+
+    # ------------------------------------------------------------------
+    # Internal helpers — build uniform response dicts
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _format_prompt(prompt) -> dict:
+        """Minimal dict for action responses (approve/reject/submit)."""
         return {
-            "id": updated_prompt.id,
-            "title": updated_prompt.title,
-            "slug": updated_prompt.slug,
-            "description": updated_prompt.description,
-            "content": updated_prompt.content,
-            "notes": updated_prompt.notes,
-            "status": updated_prompt.status,
-            "category_id": updated_prompt.category_id,
-            "user_id": str(updated_prompt.user_id),
-            "view_count": updated_prompt.view_count,
-            "like_count": updated_prompt.like_count,
-            "dislike_count": updated_prompt.dislike_count,
-            "created_at": updated_prompt.created_at,
-            "updated_at": updated_prompt.updated_at
+            "id": prompt.id,
+            "title": prompt.title,
+            "slug": prompt.slug,
+            "description": prompt.description,
+            "content": prompt.content,
+            "notes": prompt.notes,
+            "images": getattr(prompt, "images", None),
+            "status": prompt.status,
+            "ai_model": prompt.ai_model,
+            "category_id": prompt.category_id,
+            "user_id": str(prompt.user_id),
+            "view_count": prompt.view_count,
+            "like_count": prompt.like_count,
+            "dislike_count": prompt.dislike_count,
+            "rejection_reason": prompt.rejection_reason,
+            "rejected_at": prompt.rejected_at,
+            "rejected_by": prompt.rejected_by,
+            "created_at": prompt.created_at,
+            "updated_at": prompt.updated_at,
         }
+
+    @staticmethod
+    def _format_prompt_with_details(prompt) -> dict:
+        """Full dict including user/category/tags for list responses."""
+        base = PromptService._format_prompt(prompt)
+        base.update({
+            "user": {
+                "id": str(prompt.user.id),
+                "full_name": prompt.user.full_name,
+                "email": prompt.user.email,
+                "avatar_url": prompt.user.avatar_url,
+            } if prompt.user else None,
+            "category": {
+                "id": prompt.category.id,
+                "name": prompt.category.name,
+                "slug": prompt.category.slug,
+            } if prompt.category else None,
+            "tags": [{"id": tag.id, "name": tag.name} for tag in prompt.tags],
+            "rating": PromptService._calculate_engagement_rating(prompt),
+            "simple_rating": PromptService._calculate_simple_rating(prompt),
+            "author": prompt.user.full_name if prompt.user else "Unknown",
+        })
+        return base
     @staticmethod
     async def track_view(session: AsyncSession, prompt_id: int, user_id: UUID | None = None, ip_address: str | None = None, user_agent: str | None = None) -> bool:
         prompt = await PromptRepository.get_by_id(session, prompt_id)

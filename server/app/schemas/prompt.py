@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from uuid import UUID
 from datetime import datetime
+import re
 
 
 class PromptBase(BaseModel):
@@ -12,6 +13,7 @@ class PromptBase(BaseModel):
     notes: str | None = None
     images: list[str] | None = None
     category_id: int | None = None
+    ai_model: str | None = None
 
 
 class PromptCreate(PromptBase):
@@ -28,6 +30,20 @@ class PromptUpdate(BaseModel):
     images: list[str] | None = None
     category_id: int | None = None
     tags: list[int] | None = None
+    ai_model: str | None = None
+
+
+class RejectRequest(BaseModel):
+    """Body for the POST /prompts/{id}/reject endpoint."""
+    rejection_reason: str = Field(min_length=10, max_length=1000)
+
+    @field_validator("rejection_reason")
+    @classmethod
+    def strip_html(cls, v: str) -> str:
+        # Strip leading/trailing whitespace and simple HTML tags
+        v = v.strip()
+        v = re.sub(r"<[^>]+>", "", v)
+        return v.strip()
 
 
 class PromptOut(PromptBase):
@@ -42,6 +58,10 @@ class PromptOut(PromptBase):
     dislike_count: int
     created_at: datetime
     updated_at: datetime
+    # Rejection fields (None when not rejected)
+    rejection_reason: str | None = None
+    rejected_at: datetime | None = None
+    rejected_by: UUID | None = None
 
 
 class PromptWithDetails(PromptOut):

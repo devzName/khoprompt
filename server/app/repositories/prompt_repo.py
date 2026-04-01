@@ -2,10 +2,12 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from uuid import UUID
+from datetime import datetime, timezone
 
 from app.models.prompt import Prompt
 from app.models.prompt_tag import PromptTag
 from app.models.prompt_category import PromptCategory
+from app.models.prompt_view import PromptView
 from app.constants.prompt_status import PromptStatus
 from app.utils.slug import create_slug, ensure_unique_slug
 
@@ -74,31 +76,34 @@ class PromptRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None) -> int:
+    async def get_approved_prompts_count(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, ai_model: str | None = None) -> int:
         stmt = (
             select(func.count(Prompt.id))
             .where(Prompt.status == PromptStatus.APPROVED)
         )
-        
+
         if category_id is not None:
             stmt = stmt.where(Prompt.category_id == category_id)
-            
+
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
-            
+
         if tag is not None:
             # Join with prompt_tags_association and PromptTag to filter by tag name
             stmt = stmt.join(Prompt.tags).where(PromptTag.name.ilike(f"%{tag}%"))
-        
+
         if tag_id is not None:
             # Join with prompt_tags_association and PromptTag to filter by tag id
             stmt = stmt.join(Prompt.tags).where(PromptTag.id == tag_id)
-            
+
+        if ai_model is not None:
+            stmt = stmt.where(Prompt.ai_model == ai_model)
+
         result = await session.execute(stmt)
         return result.scalar() or 0
 
     @staticmethod
-    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9) -> list[Prompt]:
+    async def get_approved_prompts(session: AsyncSession, category_id: int | None = None, search: str | None = None, tag: str | None = None, tag_id: int | None = None, page: int = 1, limit: int = 9, ai_model: str | None = None) -> list[Prompt]:
         offset = (page - 1) * limit
         
         stmt = (
@@ -124,7 +129,10 @@ class PromptRepository:
         if tag_id is not None:
             # Join with prompt_tags_association and PromptTag to filter by tag id
             stmt = stmt.join(Prompt.tags).where(PromptTag.id == tag_id)
-            
+
+        if ai_model is not None:
+            stmt = stmt.where(Prompt.ai_model == ai_model)
+
         stmt = stmt.order_by(Prompt.created_at.desc()).offset(offset).limit(limit)
         result = await session.execute(stmt)
         return result.scalars().all()
@@ -367,7 +375,7 @@ class PromptRepository:
         sort_order: str = "desc"
     ) -> list[Prompt]:
         offset = (page - 1) * limit
-        
+
         stmt = (
             select(Prompt)
             .options(
@@ -376,19 +384,19 @@ class PromptRepository:
                 selectinload(Prompt.tags)
             )
         )
-        
+
         # Search filter
         if search is not None:
             stmt = stmt.where(Prompt.title.ilike(f"%{search}%"))
-        
+
         # Category filter
         if category is not None:
             stmt = stmt.join(Prompt.category).where(PromptCategory.name == category)
-        
+
         # Status filter
         if status is not None:
             stmt = stmt.where(Prompt.status == status)
-        
+
         # Sorting
         if sort_by == "title":
             order_col = Prompt.title
@@ -398,12 +406,99 @@ class PromptRepository:
             order_col = Prompt.created_at
         else:
             order_col = Prompt.created_at  # default
-        
+
         if sort_order == "asc":
             stmt = stmt.order_by(order_col.asc())
         else:
             stmt = stmt.order_by(order_col.desc())
-            
+
         stmt = stmt.offset(offset).limit(limit)
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+    # ------------------------------------------------------------------
+    # Reject / re-submit helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def reject_with_reason(
+        session: AsyncSession,
+        prompt: Prompt,
+        rejection_reason: str,
+        rejected_by: UUID,
+    ) -> Prompt:
+        """Set status=rejected and persist rejection metadata."""
+        prompt.status = PromptStatus.REJECTED
+        prompt.rejection_reason = rejection_reason
+        prompt.rejected_at = datetime.now(timezone.utc)
+        prompt.rejected_by = rejected_by
+        await session.commit()
+        await session.refresh(prompt)
+        return prompt
+
+    @staticmethod
+    async def clear_rejection_and_submit(
+        session: AsyncSession,
+        prompt: Prompt,
+        target_status: str,
+    ) -> Prompt:
+        """Clear rejection fields and move prompt to target_status (pending or approved)."""
+        prompt.status = target_status
+        prompt.rejection_reason = None
+        prompt.rejected_at = None
+        prompt.rejected_by = None
+        await session.commit()
+        await session.refresh(prompt)
+        return prompt
+
+    # ------------------------------------------------------------------
+    # Trending
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def get_trending_prompts(
+        session: AsyncSession,
+        days: int = 7,
+        limit: int = 10,
+    ) -> list[Prompt]:
+        """Return approved prompts ordered by trending score.
+
+        score = (period_views * 0.3) + (like_count * 0.7)
+        period_views = views in the last [days] days from prompt_views table.
+        Falls back gracefully to view_count ordering when view table is sparse.
+        """
+        from sqlalchemy import literal
+        from datetime import timedelta
+
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+
+        # Sub-query: count views per prompt within the period
+        period_views_subq = (
+            select(
+                PromptView.prompt_id,
+                func.count(PromptView.id).label("period_views"),
+            )
+            .where(PromptView.viewed_at >= cutoff)
+            .group_by(PromptView.prompt_id)
+            .subquery()
+        )
+
+        # Trending score — coalesce to 0 when no recent views recorded
+        period_views_col = func.coalesce(period_views_subq.c.period_views, literal(0))
+        score_expr = (period_views_col * 0.3 + Prompt.like_count * 0.7).label("score")
+
+        stmt = (
+            select(Prompt)
+            .options(
+                selectinload(Prompt.user),
+                selectinload(Prompt.category),
+                selectinload(Prompt.tags),
+            )
+            .outerjoin(period_views_subq, Prompt.id == period_views_subq.c.prompt_id)
+            .where(Prompt.status == PromptStatus.APPROVED)
+            .order_by(score_expr.desc(), Prompt.view_count.desc())
+            .limit(limit)
+        )
+
         result = await session.execute(stmt)
         return result.scalars().all()

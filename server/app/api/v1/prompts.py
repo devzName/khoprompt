@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Depends, Request, Form, File, UploadFile
+from fastapi import APIRouter, HTTPException, Depends, Query, Request, Form, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional, Union
 import os
@@ -11,7 +11,7 @@ from pathlib import Path
 from app.api.deps import DbSession
 from app.api.auth_deps import get_current_user, get_current_user_optional
 from app.services.prompt_service import PromptService
-from app.schemas.prompt import PromptCreate, PromptUpdate, PromptOut, PromptWithDetails
+from app.schemas.prompt import PromptCreate, PromptUpdate, PromptOut, PromptWithDetails, RejectRequest
 from app.schemas.pagination import PaginatedResponse
 from app.models.user import User
 
@@ -170,6 +170,15 @@ async def get_featured_prompts(
     prompts = await PromptService.get_featured_prompts(session, limit, category_id, tag_id)
     return prompts
 
+@router.get("/trending", response_model=list[PromptWithDetails])
+async def get_trending_prompts(
+    session: DbSession,
+    days: int = Query(7, ge=1, le=90, description="Window in days"),
+    limit: int = Query(10, ge=1, le=50, description="Max results"),
+):
+    """Get trending approved prompts scored by recent views + likes (public access)."""
+    return await PromptService.get_trending_prompts(session, days=days, limit=limit)
+
 @router.get("/{prompt_id}", response_model=PromptWithDetails)
 async def get_prompt(prompt_id: int, session: DbSession):
     """Get a prompt by ID"""
@@ -195,11 +204,12 @@ async def get_approved_prompts(
     search: str | None = None,
     tag: str | None = None,
     tag_id: int | None = None,
+    ai_model: Optional[str] = Query(None, description="Filter by AI model (e.g. gpt-4o)"),
     page: int = 1,
     limit: int = 9
 ):
     """Get approved prompts (public access)"""
-    result = await PromptService.get_approved_prompts_paginated(session, category_id, search, tag, tag_id, page, limit)
+    result = await PromptService.get_approved_prompts_paginated(session, category_id, search, tag, tag_id, page, limit, ai_model)
     return result
 
 @router.patch("/{prompt_id}", response_model=PromptOut)
@@ -385,14 +395,32 @@ async def approve_prompt(
 @router.post("/{prompt_id}/reject", response_model=PromptOut)
 async def reject_prompt(
     prompt_id: int,
+    body: RejectRequest,
     session: DbSession,
     current_user: User = Depends(get_current_user)
 ):
-    """Reject a prompt (admin only)"""
+    """Reject a pending prompt with a mandatory reason (admin only)."""
     if current_user.user_type != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
-    
-    result = await PromptService.reject_prompt(session, prompt_id, current_user.id)
+
+    result = await PromptService.reject_prompt(session, prompt_id, current_user.id, body.rejection_reason)
     if not result:
         raise HTTPException(status_code=404, detail="Prompt not found or cannot be rejected")
+    return result
+
+
+@router.post("/{prompt_id}/resubmit", response_model=PromptOut)
+async def resubmit_prompt(
+    prompt_id: int,
+    session: DbSession,
+    current_user: User = Depends(get_current_user)
+):
+    """Re-submit a rejected prompt for review (owner only).
+
+    Clears rejection fields. Status becomes 'pending' or 'approved' based
+    on the require_approval site setting.
+    """
+    result = await PromptService.resubmit_prompt(session, prompt_id, current_user.id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Prompt not found, access denied, or prompt is not rejected")
     return result

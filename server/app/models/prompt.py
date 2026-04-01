@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from sqlalchemy import Integer, String, Text, Boolean, ForeignKey, Table, Column
+from datetime import datetime
+
+from sqlalchemy import DateTime, Integer, String, Text, Boolean, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID as PGUUID, ARRAY
 from uuid import UUID
@@ -36,7 +38,7 @@ class Prompt(AuditMixin, Base):
     
     # User relationship
     user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
-    user: Mapped['User'] = relationship('User', back_populates='prompts')
+    user: Mapped['User'] = relationship('User', back_populates='prompts', foreign_keys='Prompt.user_id')
     
     # Tags relationship (many-to-many)
     tags: Mapped[list['PromptTag']] = relationship(
@@ -53,7 +55,18 @@ class Prompt(AuditMixin, Base):
     
     # Bookmarks relationship
     bookmarks: Mapped[list['Bookmark']] = relationship('Bookmark', back_populates='prompt')
+
+    # Comments relationship
+    comments: Mapped[list['PromptComment']] = relationship('PromptComment', back_populates='prompt')
     
+    # Rejection info (populated when status = 'rejected')
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rejected_by: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey('users.id'), nullable=True)
+
+    # AI model tag — e.g. "gpt-4o", "claude-3-5-sonnet", "gemini-2.0-flash"
+    ai_model: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
+
     # Stats
     view_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     like_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

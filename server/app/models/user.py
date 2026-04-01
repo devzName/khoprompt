@@ -25,7 +25,8 @@ class User(AuditMixin, Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     
     # Relationships
-    prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='user')
+    prompts: Mapped[list['Prompt']] = relationship('Prompt', back_populates='user', foreign_keys='Prompt.user_id')
     prompt_votes: Mapped[list['PromptVote']] = relationship('PromptVote', back_populates='user')
     prompt_views: Mapped[list['PromptView']] = relationship('PromptView', back_populates='user')
     bookmarks: Mapped[list['Bookmark']] = relationship('Bookmark', back_populates='user')
+    comments: Mapped[list['PromptComment']] = relationship('PromptComment', back_populates='user')

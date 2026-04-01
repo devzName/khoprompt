@@ -11,7 +11,27 @@
       "Bash(poetry --version:*)",
       "Bash(poetry install:*)",
       "Bash(poetry run python:*)",
-      "Bash(poetry run uvicorn:*)"
+      "Bash(poetry run uvicorn:*)",
+      "Bash(find D:Sourcekhopromptclientsrc -type f \\\\\\(-name *admin* -o -name *manage* -o -name *review* \\\\\\) \\\\\\(-name *.tsx -o -name *.jsx -o -name *.ts -o -name *.js \\\\\\))",
+      "Bash(grep -r \"dashboard\\\\|admin\\\\|review\" D:Sourcekhopromptclientsrcpages --include=*.jsx --include=*.tsx)",
+      "Bash(grep -E \"\\\\.\\(js|jsx|ts|tsx\\)$\")",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(find /d/Source/khoprompt/server/app -name constants* -type f)",
+      "Bash(cd /d/Source/khoprompt/server && alembic current 2>&1)",
+      "Bash(cd /d/Source/khoprompt/server && python -m alembic current 2>&1 | head -20)",
+      "Bash(where python:*)",
+      "Bash(ALEMBIC=\"/c/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11/Scripts/alembic.exe\" && cd /d/Source/khoprompt/server && \"$ALEMBIC\" current 2>&1)",
+      "Bash(ALEMBIC=\"/c/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11/Scripts/alembic.exe\" && cd /d/Source/khoprompt/server && \"$ALEMBIC\" revision --autogenerate -m \"add_rejection_reason_and_ai_model_to_prompts\" 2>&1)",
+      "Bash(ALEMBIC=\"/c/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11/Scripts/alembic.exe\" && cd /d/Source/khoprompt/server && \"$ALEMBIC\" upgrade head 2>&1)",
+      "Bash(cd \"D:/Source/khoprompt/server\" && python -c \"from app.main import app; print\\('OK'\\)\" 2>&1)",
+      "Bash(ls \"D:/Source/khoprompt/server/\" && find \"D:/Source/khoprompt/server\" -name \"*.cfg\" -o -name \"pyproject.toml\" -o -name \"requirements*.txt\" 2>/dev/null | head -10)",
+      "Bash(cd /d/Source/khoprompt/server && alembic upgrade head 2>&1)",
+      "Bash(ls /d/Source/khoprompt/server/ | grep -i venv; ls /c/Users/huybt/AppData/Local/pypoetry/ 2>/dev/null | head -10; poetry env info --path 2>/dev/null || echo \"poetry not in PATH\")",
+      "Bash(VENV=\"/c/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11\")",
+      "Read(//d/Source/khoprompt/$VENV/**)",
+      "Bash(VENV=\"C:/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11\")",
+      "Bash(PYTHON=\"/c/Users/huybt/AppData/Local/pypoetry/Cache/virtualenvs/khoprompt-server-JPi4eZQ_-py3.11/Scripts/python.exe\" && cd /d/Source/khoprompt/server && \"$PYTHON\" -c \"from app.main import app; print\\('OK'\\)\" 2>&1)",
+      "Bash(cd D:/Source/khoprompt/client && npx vite build --mode development 2>&1 | tail -30)"
     ]
   }
 }

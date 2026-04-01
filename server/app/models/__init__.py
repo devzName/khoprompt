@@ -5,3 +5,6 @@ from app.models.prompt_vote import PromptVote
 from app.models.prompt_view import PromptView
 from app.models.bookmark import Bookmark
 from app.models.user import User
+from app.models.comment import PromptComment
+from app.models.site_settings import SiteSettings
+from app.models.user_event import UserEvent
