@@ -3,12 +3,12 @@ const UserProfile = ({ user, menuItems, placement = 'topRight', size = 40 }) => 
   if (!user) return null;
   return (
     <Dropdown menu={{ items: menuItems }} placement={placement} trigger={['click']}>
-      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#1f1f1f] cursor-pointer">
         <Avatar size={size} src={user?.picture} className="shrink-0">
           {user?.name?.[0] || 'U'}
         </Avatar>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-gray-900 truncate">
+          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
             {user?.name || 'User'}
           </div>
         </div>

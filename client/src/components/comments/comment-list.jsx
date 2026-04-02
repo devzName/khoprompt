@@ -116,12 +116,12 @@ const CommentList = ({ promptId, currentUser }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
+    <div className="bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
       {/* Header */}
-      <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         Bình luận
         {totalCount > 0 && (
-          <span className="text-sm font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+          <span className="text-sm font-normal text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-[#1f1f1f] px-2 py-0.5 rounded-full">
             {totalCount}
           </span>
         )}
@@ -184,7 +184,7 @@ const CommentList = ({ promptId, currentUser }) => {
       )}
 
       {/* Add comment form */}
-      <div className="mt-6 pt-6 border-t border-gray-100">
+      <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
         {currentUser ? (
           <div className="flex gap-3">
             <TextArea

@@ -37,7 +37,6 @@ cd server
 poetry run python -m app.scripts.seed_mock_prompts
 ```
 
-
 ## Run API
 
 ```bash

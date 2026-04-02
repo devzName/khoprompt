@@ -15,10 +15,10 @@ const Logo = ({ size = 'medium', onClick, className = '' }) => {
         className={`${currentSize.img} object-contain`}
       />
       <div>
-        <span className={`${currentSize.title} font-bold text-gray-900 block leading-tight`}>
+        <span className={`${currentSize.title} font-bold text-gray-900 dark:text-white block leading-tight`}>
           {t('header.title')}
         </span>
-        <span className={`${currentSize.subtitle} text-gray-500 block leading-tight`}>
+        <span className={`${currentSize.subtitle} text-gray-500 dark:text-gray-400 block leading-tight`}>
           {t('header.subtitle')}
         </span>
       </div>

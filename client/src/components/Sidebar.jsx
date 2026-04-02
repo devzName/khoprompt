@@ -26,20 +26,20 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
       (itemKey === 'login-management' && activeTab === 'login-management') ||
       (itemKey === 'review-prompts' && activeTab === 'review');
     return isActive
-      ? 'bg-blue-50 text-blue-600 font-medium'
-      : 'text-gray-700 hover:bg-gray-50';
+      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1f1f1f]';
   };
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full bg-white">
-        <div className="p-4 border-b border-gray-100">
+      <div className="flex flex-col h-full bg-white dark:bg-[#141414]">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <Logo size="medium" onClick={() => navigate(ROUTES.HOME)} />
             <Button
               type="text"
               icon={<CloseOutlined />}
               onClick={onClose}
-              className="text-gray-600 hover:text-gray-900"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               size="small"
             />
           </div>
@@ -59,7 +59,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
           </div>
         </nav>
         {user && (
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-100 dark:border-gray-700">
             <UserProfile user={user} menuItems={userMenuItems} placement="top" size={40} />
           </div>
         )}
@@ -67,8 +67,8 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
     );
   }
   return (
-    <div className="w-64 bg-white border-r h-screen flex flex-col">
-      <div className="p-4 border-b">
+    <div className="w-64 bg-white dark:bg-[#141414] border-r dark:border-gray-700 h-screen flex flex-col">
+      <div className="p-4 border-b dark:border-gray-700">
         <Logo size="medium" onClick={() => navigate(ROUTES.HOME)} />
       </div>
       <nav className="flex-1 px-3 py-2 overflow-y-auto">
@@ -85,7 +85,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
           ))}
         </div>
       </nav>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t dark:border-gray-700">
         <UserProfile user={user} menuItems={userMenuItems} placement="topRight" size={40} />
       </div>
     </div>

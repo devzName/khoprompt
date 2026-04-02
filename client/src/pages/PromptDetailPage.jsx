@@ -55,7 +55,7 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative bg-gray-50 rounded-lg overflow-hidden aspect-[4/3] border border-gray-200">
+      <div className="relative bg-gray-50 dark:bg-[#1f1f1f] rounded-lg overflow-hidden aspect-[4/3] border border-gray-200 dark:border-gray-700">
         <img
           src={`${serverUrl}/${images[currentIndex]}`}
           alt={`${title} - Hình ${currentIndex + 1}`}
@@ -97,10 +97,10 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
           {images.map((image, index) => (
             <div
               key={index}
-              className={`relative bg-gray-50 rounded-lg overflow-hidden aspect-[4/3] border-2 cursor-pointer transition-all ${
+              className={`relative bg-gray-50 dark:bg-[#1f1f1f] rounded-lg overflow-hidden aspect-[4/3] border-2 cursor-pointer transition-all ${
                 index === currentIndex 
-                  ? 'border-blue-500 ring-2 ring-blue-200' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
               onClick={() => handleImageClick(index)}
             >
@@ -355,7 +355,7 @@ const PromptDetailPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full">
           <Breadcrumb items={breadcrumbItems} className="mb-6" />
-          <div className="mt-2 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 mb-8 overflow-hidden relative">
+          <div className="mt-2 bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700 mb-8 overflow-hidden relative">
             <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
               <Avatar 
                 size={64} 
@@ -365,37 +365,37 @@ const PromptDetailPage = () => {
               />
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{prompt.title}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">{prompt.title}</h1>
                 </div>
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">{prompt.description}</p>
-                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
+                <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{prompt.description}</p>
+                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
                   {formatRating(currentRating) && (
-                    <div className={`flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 ${getRatingContainerColor(currentRating)}`}>
+                    <div className={`flex items-center gap-2 bg-gray-50 dark:bg-[#1f1f1f] px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700 ${getRatingContainerColor(currentRating)}`}>
                       <StarOutlined />
                       <span className="font-semibold">
                         {formatRating(currentRating)}
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1f1f1f] px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700">
                     <EyeOutlined className="text-blue-500" />
-                    <span className="font-semibold text-gray-700">{prompt.view_count || 0}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">{prompt.view_count || 0}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1f1f1f] px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700">
                     <LikeOutlined className="text-green-500" />
-                    <span className="font-semibold text-gray-700">{voteStats.helpful_count || 0}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">{voteStats.helpful_count || 0}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1f1f1f] px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700">
                     <DislikeOutlined className="text-red-500" />
-                    <span className="font-semibold text-gray-700">{voteStats.not_helpful_count || 0}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">{voteStats.not_helpful_count || 0}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1f1f1f] px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700">
                     <CalendarOutlined className="text-purple-500" />
-                    <span className="font-semibold text-gray-700">{dayjs(prompt.created_at).format('HH:mm DD/MM/YYYY')}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">{dayjs(prompt.created_at).format('HH:mm DD/MM/YYYY')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400">{t('featured.by')}</span>
-                    <span className="font-bold text-gray-800">{prompt.user?.full_name || 'Unknown'}</span>
+                    <span className="text-gray-400 dark:text-gray-500">{t('featured.by')}</span>
+                    <span className="font-bold text-gray-800 dark:text-gray-200">{prompt.user?.full_name || 'Unknown'}</span>
                   </div>
                 </div>
                 
@@ -425,7 +425,7 @@ const PromptDetailPage = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-gray-100 dark:border-gray-700">
               <div className="flex gap-4 flex-1">
                 {(!user || user.id !== prompt.user_id) && (
                   <>
@@ -473,8 +473,8 @@ const PromptDetailPage = () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-3 space-y-8">
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 {t('promptDetail.promptContent')}
               </h2>
               <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
@@ -498,11 +498,11 @@ const PromptDetailPage = () => {
             </div>
             
             {prompt.notes && (
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
+              <div className="bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
                   {t('reviewPromptDrawer.notes', 'Ghi chú')}
                 </h2>
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                <div className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
                   {prompt.notes}
                 </div>
               </div>
@@ -515,8 +515,8 @@ const PromptDetailPage = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Images Section */}
             {prompt.images && prompt.images.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="bg-white dark:bg-[#141414] rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   {t('promptDetail.images', 'Hình ảnh')}
                 </h3>
                 <ImageGalleryDetail 
@@ -527,15 +527,15 @@ const PromptDetailPage = () => {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">{t('promptDetail.instructions')}</h2>
+            <div className="bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t('promptDetail.instructions')}</h2>
               <ol className="space-y-4">
                 {instructions.map((instruction, index) => (
                   <li key={index} className="flex gap-4 group">
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
                       {index + 1}
                     </div>
-                    <span className="text-gray-700 py-1 leading-relaxed">{instruction}</span>
+                    <span className="text-gray-700 dark:text-gray-300 py-1 leading-relaxed">{instruction}</span>
                   </li>
                 ))}
               </ol>

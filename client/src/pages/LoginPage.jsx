@@ -174,7 +174,7 @@ const LoginPage = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="absolute top-4 right-4">
         <Dropdown
           menu={{
@@ -185,20 +185,20 @@ const LoginPage = ({ onLoginSuccess }) => {
           trigger={['click']}
         >
           <span
-            className="text-white rounded-full px-4 py-2 flex items-center gap-2 cursor-pointer hover:bg-white/20 transition-colors"
+            className="text-white rounded-full px-4 py-2 flex items-center gap-2 cursor-pointer hover:bg-white/20 dark:hover:bg-gray-700 transition-colors"
           >
             <GlobalOutlined className="text-xl" />
             <span className="text-xs font-semibold">{getLanguageName()}</span>
           </span>
         </Dropdown>
       </div>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+      <div className="w-full max-w-md bg-white dark:bg-[#141414] rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <Logo size="large" />
-          <h1 className="text-2xl font-bold text-gray-900 mt-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">
             {t('login.welcome', 'Chào mừng')}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
             {t('login.subtitle', 'Đăng nhập để tiếp tục')}
           </p>
         </div>
@@ -224,7 +224,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             <Checkbox
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="text-sm text-gray-600"
+              className="text-sm text-gray-600 dark:text-gray-300"
             >
               {t('login.rememberMe', 'Ghi nhớ đăng nhập')}
             </Checkbox>
@@ -258,7 +258,7 @@ const LoginPage = ({ onLoginSuccess }) => {
           {t('login.microsoftSignIn', 'Đăng nhập với Microsoft')}
         </Button>
 
-        <div className="text-center text-xs text-gray-500 mt-6">
+        <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
           {t('login.footer', 'Bằng cách đăng nhập, bạn đồng ý với điều khoản sử dụng')}
         </div>
       </div>

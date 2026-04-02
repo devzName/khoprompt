@@ -18,3 +18,5 @@ plans
 .claude
 localbackup.sql
 client/dist
+.opencode
+.github/copilot-instructions.md

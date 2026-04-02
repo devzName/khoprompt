@@ -48,7 +48,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
       title={
         <div>
           <div className="text-lg font-semibold">{prompt?.title}</div>
-          <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
             {prompt?.description}
           </div>
         </div>
@@ -98,7 +98,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
         <div className="space-y-6">
           {/* Category & Tags Section */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-3">
+            <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
               {t('reviewPromptDrawer.categoryTags', 'Danh mục & Tags')}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -118,7 +118,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
                 />
               )}
               {prompt.tags?.map((tag, index) => (
-                <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
+                <span key={index} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full">
                   #{typeof tag === 'object' ? tag.name : tag}
                 </span>
               ))}
@@ -135,35 +135,35 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
           {/* Stats Section */}
           <div className="flex gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-gray-300 rounded-lg">
-              <EyeOutlined className="text-gray-600 text-xs" />
-              <span className="text-xs font-medium text-gray-900">{prompt.view_count || 0}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-[#1f1f1f] border border-gray-300 dark:border-gray-600 rounded-lg">
+              <EyeOutlined className="text-gray-600 dark:text-gray-400 text-xs" />
+              <span className="text-xs font-medium text-gray-900 dark:text-white">{prompt.view_count || 0}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-green-400 rounded-lg">
-              <LikeOutlined className="text-green-600 text-xs" />
-              <span className="text-xs font-medium text-gray-900">{prompt.like_count || 0}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-[#1f1f1f] border border-green-400 dark:border-green-700 rounded-lg">
+              <LikeOutlined className="text-green-600 dark:text-green-400 text-xs" />
+              <span className="text-xs font-medium text-gray-900 dark:text-white">{prompt.like_count || 0}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 border border-red-400 rounded-lg">
-              <DislikeOutlined className="text-red-600 text-xs" />
-              <span className="text-xs font-medium text-gray-900">{prompt.dislike_count || 0}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-[#1f1f1f] border border-red-400 dark:border-red-700 rounded-lg">
+              <DislikeOutlined className="text-red-600 dark:text-red-400 text-xs" />
+              <span className="text-xs font-medium text-gray-900 dark:text-white">{prompt.dislike_count || 0}</span>
             </div>
           </div>
 
           {/* Prompt Content */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-3">
+            <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
-            <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="rounded-lg p-4 relative border border-gray-300 dark:border-gray-600" style={{ backgroundColor: '#f5f5f5' }}>
               <div
-                className="text-gray-800 leading-relaxed text-sm"
+                className="text-gray-800 dark:text-gray-200 leading-relaxed text-sm"
                 dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
               />
               {/* Hide raw copy button when variable form is present */}
               {extractVariables(prompt.content || '').length === 0 && (
                 <Button
                   icon={<CopyOutlined />}
-                  className="absolute top-2 right-2 bg-white border-gray-300 text-gray-600 hover:bg-gray-100"
+                  className="absolute top-2 right-2 bg-white dark:bg-[#1f1f1f] border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
                   size="small"
                   onClick={handleCopy}
                 >
@@ -177,11 +177,11 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
           {/* Notes if exists */}
           {prompt.notes && (
             <div>
-              <h3 className="text-base font-medium text-gray-900 mb-3">
+              <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
                 {t('reviewPromptDrawer.notes', 'Ghi chú')}
               </h3>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+              <div className="bg-gray-50 dark:bg-[#1f1f1f] rounded-lg p-4">
+                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
                   {prompt.notes}
                 </p>
               </div>
@@ -190,10 +190,10 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
 
           {prompt.user && (
             <div>
-              <h3 className="text-base font-medium text-gray-900 mb-3">
+              <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
                 {t('reviewPromptDrawer.authorInfo', 'Thông tin tác giả')}
               </h3>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 dark:bg-[#1f1f1f] rounded-lg p-4">
                 <div className="flex items-center gap-3">
                   <Avatar 
                     size={48} 
@@ -202,10 +202,10 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
                     className="shrink-0"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900 text-sm">
+                    <div className="font-medium text-gray-900 dark:text-white text-sm">
                       {prompt.user.full_name || prompt.user.name || 'Unknown User'}
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       {prompt.user.email || 'No email'}
                     </div>
                     {prompt.user.user_type && (

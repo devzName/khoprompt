@@ -92,13 +92,13 @@ const BookmarkedPage = () => {
               <Spin size="large" />
             </div>
           ) : prompts.length === 0 ? (
-            <div className="flex justify-center items-center min-h-[60vh] bg-white rounded-lg">
+            <div className="flex justify-center items-center min-h-[60vh] bg-white dark:bg-[#141414] rounded-lg">
               <div className="text-center p-8">
                 <BookOutlined className="text-6xl text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   {t('bookmarked.empty', 'No bookmarked prompts yet')}
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
                   {t('bookmarked.emptyDescription', 'Start bookmarking prompts to see them here')}
                 </p>
               </div>

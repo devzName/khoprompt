@@ -26,6 +26,15 @@ export const adminService = {
   bulkDeletePrompts: async (ids = []) => {
     await Promise.all(ids.map((id) => apiClient.delete(`/prompts/${id}`)));
   },
+
+  // GET /admin/audit-logs with optional filters + pagination
+  getAuditLogs: (params) => apiClient.get('/admin/audit-logs', { params }),
+
+  // GET /admin/audit-logs/stats?days=30 → { daily_logins, top_users }
+  getAuditLogStats: (days = 30) => apiClient.get('/admin/audit-logs/stats', { params: { days } }),
+
+  // GET /admin/users/{userId}/activity → login history last 90 days
+  getUserActivity: (userId) => apiClient.get(`/admin/audit-logs/users/${userId}/activity`),
 };
 
 export default adminService;

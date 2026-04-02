@@ -15,7 +15,7 @@ const ImageGallery = ({ images, title, serverUrl, isDrawer = false }) => {
 
   const containerClass = isDrawer 
     ? "space-y-4" 
-    : "bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200";
+    : "bg-white dark:bg-[#141414] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-700";
 
   const getGridClass = () => {
     return "grid-cols-2";
@@ -23,7 +23,7 @@ const ImageGallery = ({ images, title, serverUrl, isDrawer = false }) => {
 
   return (
     <div className={containerClass}>
-      <h3 className="text-base font-medium text-gray-900 mb-3">
+      <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
         {t('promptDetail.images', 'Hình ảnh')}
       </h3>
       
@@ -31,7 +31,7 @@ const ImageGallery = ({ images, title, serverUrl, isDrawer = false }) => {
         {images.map((image, index) => (
           <div 
             key={index} 
-            className="relative group cursor-pointer bg-gray-50 rounded-lg overflow-hidden aspect-[2/1] border border-gray-200"
+            className="relative group cursor-pointer bg-gray-50 dark:bg-[#1f1f1f] rounded-lg overflow-hidden aspect-[2/1] border border-gray-200 dark:border-gray-700"
             onClick={() => handleViewImage(index)}
           >
             <img

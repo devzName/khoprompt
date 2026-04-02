@@ -29,16 +29,16 @@ const TagsSection = () => {
   }, [t]);
   if (loading) {
     return (
-      <section className="py-4 pb-8 bg-white">
+      <section className="py-4 pb-8 bg-white dark:bg-[#141414]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
               <TagOutlined className="text-2xl text-blue-600" />
-              <h2 className="text-3xl font-bold text-gray-900">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {t('tags.title')}
               </h2>
             </div>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t('tags.subtitle')}
             </p>
           </div>
@@ -46,7 +46,7 @@ const TagsSection = () => {
             {[...Array(24)].map((_, index) => (
               <div
                 key={index}
-                className="h-5 bg-gray-200 rounded animate-pulse"
+                className="h-5 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"
               />
             ))}
           </div>
@@ -62,11 +62,11 @@ const TagsSection = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <TagOutlined className="text-2xl text-blue-600" />
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('tags.title')}
             </h2>
           </div>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('tags.subtitle')}
           </p>
         </div>
@@ -76,14 +76,14 @@ const TagsSection = () => {
               <button
                 key={tag.id || index}
                 onClick={() => handleTagClick(typeof tag === 'object' ? tag.name : tag)}
-                className="text-left text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm py-1 cursor-pointer"
+                className="text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 text-sm py-1 cursor-pointer"
               >
                 {typeof tag === 'object' ? tag.name : tag}
               </button>
             ))
           ) : (
             <div className="col-span-full text-center py-8">
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
                 {t('tags.noTagsAvailable', 'Không có tags nào khả dụng')}
               </p>
             </div>
@@ -93,7 +93,7 @@ const TagsSection = () => {
           <div className="flex justify-end mt-6">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors duration-200"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors duration-200"
             >
               {showAll ? (
                 <>

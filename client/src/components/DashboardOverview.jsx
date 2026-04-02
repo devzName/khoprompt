@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Input, Button } from 'antd';
+import { Card, Row, Col, Statistic, Input, Button, Tooltip } from 'antd';
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   FolderOutlined,
   FormOutlined,
   AppstoreOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +14,52 @@ import { PROMPT_STATUS } from '../constants/promptStatus';
 import { ROUTES } from '../constants/routes';
 import PromptsTable from './shared/PromptsTable';
 import PageHeader from './shared/PageHeader';
+import adminService from '../services/adminService';
 const { Search } = Input;
+
+/** Simple CSS bar chart — no extra library required. */
+const LoginActivityChart = () => {
+  const [bars, setBars] = useState([]);
+
+  useEffect(() => {
+    adminService
+      .getAuditLogStats(30)
+      .then((res) => setBars(res.data?.daily_logins ?? []))
+      .catch(() => {});
+  }, []);
+
+  if (!bars.length) return null;
+
+  const max = Math.max(...bars.map((b) => b.count), 1);
+
+  return (
+    <Card
+      className="shadow-sm mb-6"
+      title="Login Activity (last 30 days)"
+      extra={
+        <Button
+          type="link"
+          size="small"
+          href={ROUTES.ADMIN_AUDIT_LOGS}
+          icon={<AuditOutlined />}
+        >
+          View audit logs
+        </Button>
+      }
+    >
+      <div className="flex items-end gap-0.5 h-20 overflow-x-auto">
+        {bars.map((b) => (
+          <Tooltip key={b.date} title={`${b.date}: ${b.count} login${b.count !== 1 ? 's' : ''}`}>
+            <div
+              className="flex-1 min-w-[6px] bg-blue-400 hover:bg-blue-600 rounded-t transition-colors cursor-default"
+              style={{ height: `${Math.round((b.count / max) * 100)}%`, minHeight: b.count ? 2 : 0 }}
+            />
+          </Tooltip>
+        ))}
+      </div>
+    </Card>
+  );
+};
 const DashboardOverview = ({ 
   prompts = [], 
   loading = false,
@@ -76,6 +122,14 @@ const DashboardOverview = ({
           >
             Quản lý Prompt
           </Button>
+          {currentUser?.user_type === 'admin' && (
+            <Button
+              icon={<AuditOutlined />}
+              onClick={() => navigate(ROUTES.ADMIN_AUDIT_LOGS)}
+            >
+              Audit Logs
+            </Button>
+          )}
         </div>
       </PageHeader>
       <div className="flex-1 overflow-y-auto bg-gray-50">
@@ -123,7 +177,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
           </Row>
-          {}
+          {currentUser?.user_type === 'admin' && <LoginActivityChart />}
           <PromptsTable
             prompts={prompts}
             loading={loading}

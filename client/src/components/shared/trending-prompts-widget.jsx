@@ -73,7 +73,7 @@ const TrendingPromptsWidget = ({ days = 7, limit = 5 }) => {
                 <div className="flex-1 min-w-0">
                   <Link
                     to={ROUTES.PROMPT_DETAIL_PATH(prompt.slug)}
-                    className="block text-sm font-medium leading-snug text-gray-800 hover:text-blue-600 transition-colors line-clamp-2"
+                    className="block text-sm font-medium leading-snug text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2"
                   >
                     {prompt.title}
                   </Link>

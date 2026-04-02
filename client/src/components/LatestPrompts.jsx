@@ -4,6 +4,7 @@ import { FireOutlined, StarOutlined, EyeOutlined, UserOutlined } from '@ant-desi
 import { Pagination, Avatar, Tooltip, Badge } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useDarkMode } from '../hooks/use-dark-mode';
 import PromptDrawer from './PromptDrawer';
 import TagsDisplay from './TagsDisplay';
 import { promptService } from '../services/promptService';
@@ -24,6 +25,7 @@ const LatestPrompts = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [isDark] = useDarkMode();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -60,10 +62,10 @@ const LatestPrompts = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse flex space-x-4">
             <div className="flex-1 space-y-4 py-1">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-5/6"></div>
               </div>
             </div>
           </div>
@@ -118,10 +120,10 @@ const LatestPrompts = ({
             <div className="flex items-center gap-3">
               {icon || <FireOutlined className="text-2xl text-orange-500" />}
               <div>
-                <h2 className="text-3xl font-bold text-gray-900">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                   {title || t('latest.title')}
                 </h2>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
                   {description || t('latest.subtitle')}
                 </p>
               </div>
@@ -131,14 +133,14 @@ const LatestPrompts = ({
             {paginatedPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 flex flex-col group"
+                className="bg-white dark:bg-[#141414] rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-600 flex flex-col group"
               >
                 <div className="flex items-start justify-between mb-3">
                   <Badge 
                     count={typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                     style={{ 
-                      backgroundColor: '#f0f0f0', 
-                      color: '#666',
+                      backgroundColor: isDark ? '#1f1f1f' : '#f0f0f0', 
+                      color: isDark ? '#a0a0a0' : '#666',
                       fontSize: '11px',
                       fontWeight: '500',
                       borderRadius: '6px',
@@ -152,13 +154,13 @@ const LatestPrompts = ({
                   )}
                 </div>
                 <h3 
-                  className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] transition-colors duration-200 h-14 leading-7"
+                  className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 cursor-pointer group-hover:text-[#3568a6] dark:group-hover:text-blue-400 transition-colors duration-200 h-14 leading-7"
                   onClick={() => handleCardClick(prompt)}
                 >
                   {prompt.title}
                 </h3>
                 <p 
-                  className={`text-gray-600 text-sm mb-3 overflow-hidden ${prompt.tags && prompt.tags.length > 0 ? 'line-clamp-2' : 'line-clamp-3'}`} 
+                  className={`text-gray-600 dark:text-gray-300 text-sm mb-3 overflow-hidden ${prompt.tags && prompt.tags.length > 0 ? 'line-clamp-2' : 'line-clamp-3'}`} 
                   style={{ 
                     display: '-webkit-box', 
                     WebkitLineClamp: prompt.tags && prompt.tags.length > 0 ? 2 : 4, 
@@ -170,7 +172,7 @@ const LatestPrompts = ({
                 {prompt.tags && prompt.tags.length > 0 && (
                   <TagsDisplay tags={prompt.tags} className="mb-3" />
                 )}
-                <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs mt-auto">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between text-xs mt-auto">
                   <div className="flex items-center gap-2">
                     <Avatar 
                       size={24} 
@@ -179,7 +181,7 @@ const LatestPrompts = ({
                       className="shrink-0"
                     />
                     <div className="flex flex-col gap-1 text-gray-500">
-                      <span className="text-xs font-medium text-gray-700">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                         {prompt.user?.full_name || prompt.author || 'Unknown'}
                       </span>
                       {prompt.user?.email && (
@@ -190,7 +192,7 @@ const LatestPrompts = ({
                   <Tooltip title={t('latest.quickView', 'Xem nhanh')}>
                     <button
                       onClick={(e) => handleQuickView(e, prompt)}
-                      className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors duration-200 cursor-pointer"
+                      className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-200 cursor-pointer"
                     >
                       <EyeOutlined className="text-sm" />
                     </button>

@@ -30,7 +30,7 @@ const KanbanCard = ({ prompt, onApprove, onReject, onDelete, isMobile = false })
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white rounded-lg border border-gray-200 shadow-sm p-3 flex flex-col gap-2"
+      className="bg-white dark:bg-[#141414] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-3 flex flex-col gap-2"
     >
       {/* Drag handle (hidden on mobile) */}
       {!isMobile && (
@@ -45,16 +45,16 @@ const KanbanCard = ({ prompt, onApprove, onReject, onDelete, isMobile = false })
       )}
 
       {/* Title */}
-      <div className="font-medium text-gray-800 text-sm leading-snug">{prompt.title}</div>
+      <div className="font-medium text-gray-800 dark:text-gray-200 text-sm leading-snug">{prompt.title}</div>
 
       {/* Author */}
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-gray-500 dark:text-gray-400">
         @{prompt.user?.username || prompt.user?.email || 'unknown'}
       </div>
 
       {/* Content preview */}
       {prompt.content && (
-        <div className="text-xs text-gray-600 leading-relaxed">
+        <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
           {truncate(prompt.content)}
         </div>
       )}
@@ -99,6 +99,7 @@ const KanbanCard = ({ prompt, onApprove, onReject, onDelete, isMobile = false })
           <Button
             size="small"
             icon={<DeleteOutlined />}
+            aria-label="Xóa prompt"
             onClick={() => onDelete(prompt.id)}
           />
         </Tooltip>

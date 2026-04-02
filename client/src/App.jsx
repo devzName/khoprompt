@@ -8,6 +8,7 @@ import MyPromptsPage from './pages/MyPromptsPage';
 import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPromptManagementPage from './pages/admin/AdminPromptManagementPage';
+import AuditLogPage from './pages/admin/AuditLogPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 import { Spin, ConfigProvider, theme } from 'antd';
@@ -106,6 +107,14 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <AdminPromptManagementPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.ADMIN_AUDIT_LOGS}
+        element={
+          <ProtectedRoute>
+            <AuditLogPage />
           </ProtectedRoute>
         }
       />

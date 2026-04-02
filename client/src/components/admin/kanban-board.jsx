@@ -141,7 +141,7 @@ const KanbanBoard = () => {
               >
                 <div className="font-semibold text-gray-700 mb-3 flex items-center justify-between">
                   <span>{col.label}</span>
-                  <span className="text-xs bg-white px-2 py-0.5 rounded-full border">
+                  <span className="text-xs bg-white dark:bg-[#1f1f1f] px-2 py-0.5 rounded-full border dark:border-gray-700">
                     {colPrompts.length}
                   </span>
                 </div>

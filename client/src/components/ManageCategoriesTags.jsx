@@ -278,18 +278,18 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
   const isAllExpanded = expandedKeys.length === allKeys.length;
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-[#141414] border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1f1f1f]"
             >
               <MenuOutlined className="text-xl" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('manageCategoriesTags.title', 'Manage Categories & Tags')}</h1>
-              <p className="text-sm text-gray-500 mt-1">{t('manageCategoriesTags.subtitle', 'Organize prompts with categories and tags')}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('manageCategoriesTags.title', 'Manage Categories & Tags')}</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('manageCategoriesTags.subtitle', 'Organize prompts with categories and tags')}</p>
             </div>
           </div>
           <Space>
@@ -318,7 +318,7 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
             <Spin size="large" />
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-200 dark:border-gray-700 p-6">
             <Tree
               treeData={treeData}
               expandedKeys={expandedKeys}

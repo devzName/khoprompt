@@ -10,5 +10,6 @@ export const ROUTES = {
   CREATE_PROMPT: '/my-prompts',
   BOOKMARKED: '/bookmarked',
   ADMIN_PROMPTS: '/admin/prompts',
+  ADMIN_AUDIT_LOGS: '/admin/audit-logs',
 };
 export default ROUTES;

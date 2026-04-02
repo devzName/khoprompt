@@ -13,12 +13,31 @@ export function useDarkMode() {
   });
 
   useEffect(() => {
+    const handleThemeChange = () => {
+      const saved = localStorage.getItem('theme') === 'dark';
+      setIsDark(prev => {
+        if (prev === saved) return prev;
+        return saved;
+      });
+    };
+
+    window.addEventListener('themeChange', handleThemeChange);
+    return () => window.removeEventListener('themeChange', handleThemeChange);
+  }, []);
+
+  useEffect(() => {
+    const currentTheme = isDark ? 'dark' : 'light';
+    const savedTheme = localStorage.getItem('theme');
+    
     if (isDark) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    }
+    
+    if (savedTheme !== currentTheme) {
+      localStorage.setItem('theme', currentTheme);
+      window.dispatchEvent(new Event('themeChange'));
     }
   }, [isDark]);
 

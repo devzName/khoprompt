@@ -8,3 +8,4 @@ from app.models.user import User
 from app.models.comment import PromptComment
 from app.models.site_settings import SiteSettings
 from app.models.user_event import UserEvent
+from app.models.audit_log import AuditLog

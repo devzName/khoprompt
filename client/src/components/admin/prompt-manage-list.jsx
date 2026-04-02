@@ -137,6 +137,7 @@ const PromptManageList = () => {
           size="small"
           danger
           icon={<DeleteOutlined />}
+          aria-label="Xóa prompt"
           onClick={() => handleDelete(r.id)}
         />
       ),

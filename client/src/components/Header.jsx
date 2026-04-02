@@ -99,7 +99,7 @@ const Header = () => {
                 <span className="truncate" title={query}>{query}</span>
               </div>
               <button
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFromHistory(query);
@@ -139,7 +139,7 @@ const Header = () => {
               <span className="truncate" title={query}>{query}</span>
             </div>
             <button
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
               onClick={(e) => {
                 e.stopPropagation();
                 removeFromHistory(query);
@@ -299,7 +299,7 @@ const Header = () => {
   const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, handleLogout, true, user);
   
   return (
-    <header className="border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-white/95">
+    <header className="border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
           <div className="flex items-center shrink-0">
@@ -362,8 +362,8 @@ const Header = () => {
               arrow={{ pointAtCenter: true }}
               trigger={['click']}
             >
-              <div className="cursor-pointer hover:bg-gray-50 rounded-xl p-2 transition-colors">
-                <Avatar size={36} src={user?.picture} className="border-2 border-gray-200" />
+              <div className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1f1f1f] rounded-xl p-2 transition-colors">
+                <Avatar size={36} src={user?.picture} className="border-2 border-gray-200 dark:border-gray-700" />
               </div>
             </Dropdown>
           </div>
