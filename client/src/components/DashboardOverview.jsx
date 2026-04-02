@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Input } from 'antd';
-import { 
-  CheckCircleOutlined, 
+import { Card, Row, Col, Statistic, Input, Button } from 'antd';
+import {
+  CheckCircleOutlined,
   ClockCircleOutlined,
   FolderOutlined,
-  FormOutlined
+  FormOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { PROMPT_STATUS } from '../constants/promptStatus';
+import { ROUTES } from '../constants/routes';
 import PromptsTable from './shared/PromptsTable';
 import PageHeader from './shared/PageHeader';
 const { Search } = Input;
@@ -28,6 +31,7 @@ const DashboardOverview = ({
   currentUser
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
     approved: 0,
@@ -53,16 +57,25 @@ const DashboardOverview = ({
         breadcrumb={t('dashboard.title', 'Dashboard')}
         onMenuClick={onMenuClick}
       >
-        <div className="relative flex-1 max-w-md">
-          <Search
-            placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompt...')}
-            value={searchValue}
-            onChange={onSearchChange}
-            onSearch={onSearchSubmit}
-            className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
-            size="large"
-            allowClear
-          />
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 max-w-md">
+            <Search
+              placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompt...')}
+              value={searchValue}
+              onChange={onSearchChange}
+              onSearch={onSearchSubmit}
+              className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
+              size="large"
+              allowClear
+            />
+          </div>
+          <Button
+            type="primary"
+            icon={<AppstoreOutlined />}
+            onClick={() => navigate(ROUTES.ADMIN_PROMPTS)}
+          >
+            Quản lý Prompt
+          </Button>
         </div>
       </PageHeader>
       <div className="flex-1 overflow-y-auto bg-gray-50">

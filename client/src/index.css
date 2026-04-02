@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
+/* CSS variables for light/dark mode */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #F4F5F7;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --border-color: #e8e8e8;
+}
+
+.dark {
+  --bg-primary: #141414;
+  --bg-secondary: #1f1f1f;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #303030;
+}
+
 /* Global background color */
 body {
-  background-color: #F4F5F7;
+  background-color: var(--bg-secondary);
 }
 
 /* Custom line-clamp utilities */

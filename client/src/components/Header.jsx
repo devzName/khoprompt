@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Avatar, Dropdown, AutoComplete, Spin, Input } from 'antd';
-import { PlusOutlined, SearchOutlined, FolderOutlined, TagOutlined, ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, FolderOutlined, TagOutlined, ClockCircleOutlined, CloseOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDarkMode } from '../hooks/use-dark-mode';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
 import { ROUTES } from '../constants/routes';
@@ -21,6 +22,7 @@ const debounce = (func, wait) => {
 };
 const Header = () => {
   const { t, getLanguageMenuItems } = useLanguage();
+  const [isDark, setIsDark] = useDarkMode();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
@@ -346,6 +348,14 @@ const Header = () => {
             >
               <span className="hidden sm:inline ml-1">{t('header.createPrompt')}</span>
             </Button>
+            <Button
+              type="text"
+              size="middle"
+              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+              onClick={() => setIsDark(!isDark)}
+              aria-label="Toggle dark mode"
+              className="rounded-xl"
+            />
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"

@@ -9,5 +9,6 @@ export const ROUTES = {
   MY_PROMPTS_CREATE: '/my-prompts?tab=create',
   CREATE_PROMPT: '/my-prompts',
   BOOKMARKED: '/bookmarked',
+  ADMIN_PROMPTS: '/admin/prompts',
 };
 export default ROUTES;

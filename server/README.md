@@ -1,4 +1,5 @@
 # khoprompt-server
+
 ## Requirements
 
 - Python 3.11+
@@ -23,12 +24,14 @@ poetry run alembic upgrade head
 ## Seed Data
 
 ### Seed Tags (after migrations)
+
 ```bash
 cd server
 poetry run python -m app.scripts.seed_tags
 ```
 
 ### Seed Mock Prompts
+
 ```bash
 cd server
 poetry run python -m app.scripts.seed_mock_prompts
@@ -63,8 +66,8 @@ poetry run alembic upgrade head
 poetry run python -m app.scripts.seed_tags
 ```
 
-
 ## Docker
+
 ```bash
 (docker compose exec api poetry run alembic upgrade head)
 (docker compose exec api poetry run python -m app.scripts.index_prompts)

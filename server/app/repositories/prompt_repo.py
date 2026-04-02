@@ -417,6 +417,31 @@ class PromptRepository:
         return result.scalars().all()
 
     # ------------------------------------------------------------------
+    # User stats
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def get_user_prompt_stats(session: AsyncSession, user_id: UUID) -> dict:
+        """Single query: count prompts per status for the given user."""
+        stmt = (
+            select(Prompt.status, func.count(Prompt.id).label("cnt"))
+            .where(Prompt.user_id == user_id)
+            .group_by(Prompt.status)
+        )
+        result = await session.execute(stmt)
+        rows = result.all()
+
+        counts = {row.status: row.cnt for row in rows}
+        total = sum(counts.values())
+        return {
+            "total": total,
+            "approved": counts.get(PromptStatus.APPROVED, 0),
+            "pending": counts.get(PromptStatus.PENDING, 0),
+            "draft": counts.get(PromptStatus.DRAFT, 0),
+            "rejected": counts.get(PromptStatus.REJECTED, 0),
+        }
+
+    # ------------------------------------------------------------------
     # Reject / re-submit helpers
     # ------------------------------------------------------------------
 

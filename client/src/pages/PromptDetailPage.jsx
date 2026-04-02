@@ -24,6 +24,7 @@ import { useViewTracking } from '../hooks/useViewTracking';
 import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import VariablePlaceholderForm from '../components/prompts/variable-placeholder-form';
 import { extractVariables } from '../utils/variable-parser';
+import CommentList from '../components/comments/comment-list';
 import dayjs from 'dayjs';
 
 // Get server URL for images
@@ -506,6 +507,9 @@ const PromptDetailPage = () => {
                 </div>
               </div>
             )}
+
+            {/* Comments section */}
+            <CommentList promptId={prompt.id} currentUser={user} />
 
           </div>
           <div className="lg:col-span-2 space-y-8">

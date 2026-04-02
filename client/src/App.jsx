@@ -7,9 +7,20 @@ import SearchPage from './pages/SearchPage';
 import MyPromptsPage from './pages/MyPromptsPage';
 import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AdminPromptManagementPage from './pages/admin/AdminPromptManagementPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
-import { Spin } from 'antd';
+import { Spin, ConfigProvider, theme } from 'antd';
+import { useDarkMode } from './hooks/use-dark-mode';
+
+function App() {
+  const [isDark] = useDarkMode();
+  return (
+    <ConfigProvider theme={{ algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+      <AppContent />
+    </ConfigProvider>
+  );
+}
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -90,9 +101,17 @@ function AppContent() {
           </ProtectedRoute>
         } 
       />
+      <Route
+        path={ROUTES.ADMIN_PROMPTS}
+        element={
+          <ProtectedRoute>
+            <AdminPromptManagementPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
 
-export default AppContent;
+export default App;

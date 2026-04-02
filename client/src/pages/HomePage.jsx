@@ -6,6 +6,7 @@ import FeaturedPrompts from '../components/FeaturedPrompts';
 import LatestPrompts from '../components/LatestPrompts';
 import TagsSection from '../components/TagsSection';
 import Footer from '../components/Footer';
+import TrendingPromptsWidget from '../components/shared/trending-prompts-widget';
 import { promptService } from '../services/promptService';
 const HomePage = () => {
   const [latestPrompts, setLatestPrompts] = useState([]);
@@ -104,6 +105,9 @@ const HomePage = () => {
             showQuickJumper: false,
           }}
         />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <TrendingPromptsWidget />
+        </div>
         <TagsSection />
       </div>
       <Footer />

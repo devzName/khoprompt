@@ -11,6 +11,7 @@ from app.api.v1.ai import router as ai_router
 from app.api.v1.search import router as search_router
 from app.api.v1.login_sessions import router as login_sessions_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.comments import router as comment_router
 
 router = APIRouter()
 
@@ -18,6 +19,7 @@ router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(category_router, prefix="/prompt-categories", tags=["prompt-categories"])
 router.include_router(tag_router, prefix="/prompt-tags", tags=["prompt-tags"])
 router.include_router(prompt_router, prefix="/prompts", tags=["prompts"])
+router.include_router(comment_router, prefix="/prompts/{prompt_id}/comments", tags=["comments"])
 router.include_router(vote_router, prefix="/votes", tags=["votes"])
 router.include_router(bookmark_router, prefix="/bookmarks", tags=["bookmarks"])
 router.include_router(statistics_router, prefix="/statistics", tags=["statistics"])

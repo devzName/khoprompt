@@ -9,6 +9,14 @@ export const promptService = {
     const response = await apiClient.get(API_ENDPOINTS.PROMPTS.MY, { params });
     return response.data;
   },
+  getMyStats: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.PROMPTS.MY_STATS);
+    return response.data;
+  },
+  resubmitPrompt: async (id) => {
+    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.RESUBMIT(id));
+    return response.data;
+  },
   getPendingPrompts: async (params = {}) => {
     const response = await apiClient.get(API_ENDPOINTS.PROMPTS.PENDING, { params });
     return response.data;
@@ -68,12 +76,18 @@ export const promptService = {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.APPROVE(id));
     return response.data;
   },
-  rejectPrompt: async (id) => {
-    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.REJECT(id));
+  rejectPrompt: async (id, rejectionReason = '') => {
+    const response = await apiClient.post(API_ENDPOINTS.PROMPTS.REJECT(id), {
+      rejection_reason: rejectionReason,
+    });
     return response.data;
   },
   registerView: async (id) => {
     const response = await apiClient.post(API_ENDPOINTS.PROMPTS.VIEW(id));
+    return response.data;
+  },
+  getTrendingPrompts: async (days = 7, limit = 5) => {
+    const response = await apiClient.get(API_ENDPOINTS.PROMPTS.TRENDING, { params: { days, limit } });
     return response.data;
   },
 };

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -53,3 +54,6 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/docs")

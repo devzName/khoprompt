@@ -133,6 +133,17 @@ async def get_all_prompts(
     )
     return result
 
+@router.get("/my/stats")
+async def get_my_prompt_stats(
+    session: DbSession,
+    current_user: User = Depends(get_current_user),
+):
+    """Get prompt counts grouped by status for the current user."""
+    from app.repositories.prompt_repo import PromptRepository
+    stats = await PromptRepository.get_user_prompt_stats(session, current_user.id)
+    return stats
+
+
 @router.get("/my", response_model=PaginatedResponse[PromptWithDetails])
 async def get_my_prompts(
     session: DbSession,
