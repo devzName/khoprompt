@@ -24,6 +24,15 @@ const PersonalStatsBar = ({ stats = {}, activeStatus = 'all', onStatusClick }) =
     return stats[key] ?? 0;
   };
 
+  // We map the colors to Tailwind classes for active states.
+  const activeColorClasses = {
+    all: 'bg-purple-600 border-purple-600 text-white',
+    approved: 'bg-green-500 border-green-500 text-white',
+    pending: 'bg-yellow-500 border-yellow-500 text-white',
+    draft: 'bg-gray-500 border-gray-500 text-white',
+    rejected: 'bg-red-500 border-red-500 text-white',
+  };
+
   return (
     <div className="flex flex-wrap gap-2 mb-4">
       {PILLS.map((pill) => {
@@ -34,20 +43,21 @@ const PersonalStatsBar = ({ stats = {}, activeStatus = 'all', onStatusClick }) =
             key={pill.key}
             aria-label={`Lọc ${pill.label}: ${count}`}
             onClick={() => onStatusClick && onStatusClick(pill.key)}
-            className="cursor-pointer select-none rounded-full px-3 py-1 text-sm font-medium transition-all"
-            style={{
-              backgroundColor: isActive ? pill.colorActive : '#f5f5f5',
-              color: isActive ? '#fff' : '#595959',
-              border: isActive ? `1px solid ${pill.colorActive}` : '1px solid #d9d9d9',
-              userSelect: 'none',
-            }}
+            className={`cursor-pointer touch-manipulation select-none rounded-full px-3 py-1 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-purple-500 focus-visible:outline-none ${
+              isActive
+                ? activeColorClasses[pill.key]
+                : 'bg-gray-100 dark:bg-[#141414] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
+            }`}
+            style={{ userSelect: 'none' }}
           >
             {pill.label}
             <span
-              className="ml-1 inline-flex items-center justify-center rounded-full text-xs font-bold"
+              className={`ml-1 inline-flex items-center justify-center rounded-full text-xs font-bold ${
+                isActive
+                  ? 'bg-white/25 text-white'
+                  : 'bg-gray-200 dark:bg-[#1f1f1f] text-gray-600 dark:text-gray-400'
+              }`}
               style={{
-                backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#e8e8e8',
-                color: isActive ? '#fff' : '#595959',
                 minWidth: 20,
                 padding: '0 5px',
               }}

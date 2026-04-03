@@ -1,5 +1,6 @@
+import { App, Spin } from 'antd';
 import { useState, useEffect, useCallback } from 'react';
-import { notification, Spin, Modal } from 'antd';
+import { useDarkMode } from '../../hooks/use-dark-mode';
 import {
   DndContext,
   closestCenter,
@@ -14,24 +15,27 @@ import KanbanCard from './kanban-card';
 import RejectReasonModal from './reject-reason-modal';
 
 const COLUMNS = [
-  { key: 'pending', label: 'Chờ duyệt', color: 'bg-orange-50 border-orange-200' },
-  { key: 'approved', label: 'Đã duyệt', color: 'bg-green-50 border-green-200' },
-  { key: 'rejected', label: 'Từ chối', color: 'bg-red-50 border-red-200' },
+  { key: 'pending', label: 'Chờ duyệt', color: 'bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800/30 text-orange-900 dark:text-orange-200' },
+  { key: 'approved', label: 'Đã duyệt', color: 'bg-green-50 dark:bg-emerald-950/20 border-green-200 dark:border-emerald-800/30 text-emerald-900 dark:text-emerald-200' },
+  { key: 'rejected', label: 'Từ chối', color: 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/30 text-red-900 dark:text-red-200' },
 ];
 
 const KanbanBoard = () => {
+  const { modal, notification } = App.useApp();
+  const [isDark] = useDarkMode();
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState(null);
   const [rejectId, setRejectId] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const fetchPrompts = useCallback(async () => {
@@ -94,7 +98,7 @@ const KanbanBoard = () => {
   };
 
   const handleDelete = (id) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Xóa prompt?',
       content: 'Hành động này không thể hoàn tác.',
       okText: 'Xóa',
@@ -130,7 +134,7 @@ const KanbanBoard = () => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 overscroll-contain">
           {COLUMNS.map((col) => {
             const colPrompts = prompts.filter((p) => p.status === col.key);
             return (
@@ -139,7 +143,7 @@ const KanbanBoard = () => {
                 id={col.key}
                 className={`flex-1 min-w-[280px] rounded-xl border-2 p-3 ${col.color}`}
               >
-                <div className="font-semibold text-gray-700 mb-3 flex items-center justify-between">
+                <div className="font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
                   <span>{col.label}</span>
                   <span className="text-xs bg-white dark:bg-[#1f1f1f] px-2 py-0.5 rounded-full border dark:border-gray-700">
                     {colPrompts.length}
@@ -160,6 +164,11 @@ const KanbanBoard = () => {
                         isMobile={isMobile}
                       />
                     ))}
+                    {colPrompts.length === 0 && (
+                      <div className="text-center text-gray-400 dark:text-gray-600 text-xs py-6">
+                        Không có prompt
+                      </div>
+                    )}
                   </div>
                 </SortableContext>
               </div>

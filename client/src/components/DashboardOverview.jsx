@@ -34,7 +34,7 @@ const LoginActivityChart = () => {
 
   return (
     <Card
-      className="shadow-sm mb-6"
+      className="shadow-sm mb-6 dark:bg-[#141414] dark:border-gray-700"
       title="Login Activity (last 30 days)"
       extra={
         <Button
@@ -132,12 +132,12 @@ const DashboardOverview = ({
           )}
         </div>
       </PageHeader>
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="w-full p-4 sm:p-6">
           {}
           <Row gutter={[16, 16]} className="mb-6">
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow">
+              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
                 <Statistic
                   title={t('dashboard.stats.total', 'Tổng số prompts')}
                   value={stats.total}
@@ -147,7 +147,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow">
+              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
                 <Statistic
                   title={t('dashboard.stats.approved', 'Đã duyệt')}
                   value={stats.approved}
@@ -157,7 +157,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow">
+              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
                 <Statistic
                   title={t('dashboard.stats.pending', 'Chờ duyệt')}
                   value={stats.pending}
@@ -167,7 +167,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow">
+              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
                 <Statistic
                   title={t('dashboard.stats.draft', 'Bản nháp')}
                   value={stats.draft}

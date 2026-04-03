@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Table, Button, Select, Input, Modal, Tag, notification, Space } from 'antd';
+import { Table, Button, Select, Input, App, Tag, Space } from 'antd';
 import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { promptService } from '../../services/promptService';
@@ -12,6 +12,7 @@ const STATUS_COLOR = { pending: 'orange', approved: 'green', rejected: 'red', dr
 
 // Simple list view for when approval mode is OFF
 const PromptManageList = () => {
+  const { modal, notification } = App.useApp();
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -41,7 +42,7 @@ const PromptManageList = () => {
   useEffect(() => { fetchPrompts(1, filters); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = (id) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Xóa prompt?',
       content: 'Hành động này không thể hoàn tác.',
       okText: 'Xóa',
@@ -62,7 +63,7 @@ const PromptManageList = () => {
 
   const handleBulkDelete = () => {
     if (!selectedRowKeys.length) return;
-    Modal.confirm({
+    modal.confirm({
       title: `Xóa ${selectedRowKeys.length} prompt đã chọn?`,
       content: 'Hành động này không thể hoàn tác.',
       okText: 'Xóa tất cả',
@@ -98,7 +99,7 @@ const PromptManageList = () => {
     {
       title: 'Tác giả',
       key: 'author',
-      render: (_, r) => <span className="text-gray-600">@{r.user?.username || r.user?.email || '—'}</span>,
+      render: (_, r) => <span className="text-gray-600 dark:text-gray-400">@{r.user?.username || r.user?.email || '—'}</span>,
       width: 140,
     },
     {
@@ -169,7 +170,7 @@ const PromptManageList = () => {
         </Select>
         {selectedRowKeys.length > 0 && (
           <Space>
-            <span className="text-sm text-gray-600">Đã chọn {selectedRowKeys.length}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Đã chọn {selectedRowKeys.length}</span>
             <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
               Xóa đã chọn
             </Button>

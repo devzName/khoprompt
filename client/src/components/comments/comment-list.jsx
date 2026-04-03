@@ -133,11 +133,11 @@ const CommentList = ({ promptId, currentUser }) => {
           <Spin />
         </div>
       ) : comments.length === 0 ? (
-        <p className="text-gray-400 text-sm text-center py-6">
+        <p className="text-gray-400 dark:text-gray-400 text-sm text-center py-6">
           Chưa có bình luận nào. Hãy là người đầu tiên!
         </p>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {comments.map((comment) => (
             <div key={comment.id} className="py-2">
               <CommentItem

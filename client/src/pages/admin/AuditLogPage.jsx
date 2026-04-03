@@ -1,15 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Select, DatePicker, Card, Space, Typography, Breadcrumb } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Drawer, Select, DatePicker, Card, Space } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useAuth } from '../../hooks/useAuth';
+import { ROUTES } from '../../constants/routes';
+import { useSidebarMenu } from '../../hooks/use-sidebar-menu.jsx';
 import adminService from '../../services/adminService';
 import AuditLogTable from './audit-log-table';
 import UserActivityDrawer from './user-activity-drawer';
-import { ROUTES } from '../../constants/routes';
+import PageHeader from '../../components/shared/PageHeader';
+import Sidebar from '../../components/Sidebar';
 
 const { RangePicker } = DatePicker;
-const { Title } = Typography;
 
 const ACTION_OPTIONS = [
   { value: '', label: 'All actions' },
@@ -27,6 +30,10 @@ const DEFAULT_LIMIT = 50;
  * Row click opens UserActivityDrawer for that user.
  */
 const AuditLogPage = () => {
+  const { user, logout } = useAuth();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +44,10 @@ const AuditLogPage = () => {
 
   // Drawer state
   const [drawerUserId, setDrawerUserId] = useState(null);
+
+  const handleLogout = () => logout(() => setMobileMenuOpen(false));
+
+  const menuItems = useSidebarMenu('audit-logs', user, navigate, null, t);
 
   const fetchLogs = useCallback(async (params = {}) => {
     setLoading(true);
@@ -97,44 +108,76 @@ const AuditLogPage = () => {
     showTotal: (total) => `${total} entries`,
   };
 
-  const breadcrumbItems = [
-    { title: <Link to={ROUTES.HOME}><HomeOutlined /></Link> },
-    { title: 'Audit Logs' },
-  ];
-
   return (
-    <div className="p-6">
-      <Breadcrumb items={breadcrumbItems} className="mb-3" />
-      <Title level={4} className="mb-4">Audit Logs</Title>
+    <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab="audit-logs" />
+      </div>
 
-      {/* Filters */}
-      <Card className="mb-4 shadow-sm">
-        <Space wrap>
-          <Select
-            value={action}
-            onChange={handleActionChange}
-            options={ACTION_OPTIONS}
-            style={{ width: 180 }}
-            placeholder="Filter by action"
-          />
-          <RangePicker
-            value={dateRange.map((d) => (d ? dayjs(d) : null))}
-            onChange={handleDateChange}
-            allowEmpty={[true, true]}
-          />
-        </Space>
-      </Card>
-
-      {/* Table */}
-      <Card className="shadow-sm">
-        <AuditLogTable
-          data={data}
-          loading={loading}
-          pagination={pagination}
-          onChange={handleTableChange}
-          onRowClick={(record) => setDrawerUserId(record.user_id)}
+      {/* Mobile sidebar drawer */}
+      <Drawer
+        title={null}
+        placement="left"
+        onClose={() => setMobileMenuOpen(false)}
+        open={mobileMenuOpen}
+        className="lg:hidden"
+        size={280}
+        styles={{ body: { padding: 0 } }}
+        closeIcon={null}
+      >
+        <Sidebar
+          user={user}
+          onLogout={handleLogout}
+          onClose={() => setMobileMenuOpen(false)}
+          menuItems={menuItems}
+          activeTab="audit-logs"
+          isMobile={true}
         />
-      </Card>
+      </Drawer>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <PageHeader
+          title="Audit Logs"
+          description="Theo dõi tất cả các hoạt động quan trọng trong hệ thống"
+          breadcrumb="Audit Logs"
+          onMenuClick={() => setMobileMenuOpen(true)}
+        />
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {/* Filters */}
+          <Card className="mb-4 shadow-sm dark:bg-[#141414] dark:border-gray-700">
+            <Space wrap>
+              <Select
+                value={action}
+                onChange={handleActionChange}
+                options={ACTION_OPTIONS}
+                style={{ width: 180 }}
+                placeholder="Filter by action"
+                aria-label="Lọc theo hành động"
+              />
+              <RangePicker
+                value={dateRange.map((d) => (d ? dayjs(d) : null))}
+                onChange={handleDateChange}
+                allowEmpty={[true, true]}
+                aria-label="Lọc theo khoảng thời gian"
+              />
+            </Space>
+          </Card>
+
+          {/* Table */}
+          <Card className="shadow-sm dark:bg-[#141414] dark:border-gray-700">
+            <AuditLogTable
+              data={data}
+              loading={loading}
+              pagination={pagination}
+              onChange={handleTableChange}
+              onRowClick={(record) => setDrawerUserId(record.user_id)}
+            />
+          </Card>
+        </div>
+      </div>
 
       {/* User activity drawer */}
       <UserActivityDrawer

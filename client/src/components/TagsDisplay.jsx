@@ -72,7 +72,7 @@ const TagsDisplay = ({ tags = [], className = "" }) => {
       className={`flex flex-wrap gap-2 min-h-[28px] ${className} ${!isCalculated ? 'opacity-50' : 'opacity-100'} transition-opacity duration-300`}
     >
       {visibleTags.map((tag, index) => (
-        <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded whitespace-nowrap">
+        <span key={index} className="px-2 py-1 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs rounded whitespace-nowrap">
           #{typeof tag === 'object' ? tag.name : tag}
         </span>
       ))}
@@ -90,7 +90,7 @@ const TagsDisplay = ({ tags = [], className = "" }) => {
           }
           placement="top"
         >
-          <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded whitespace-nowrap cursor-help">
+          <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs rounded whitespace-nowrap cursor-help">
             +{hiddenTags.length}
           </span>
         </Tooltip>

@@ -118,7 +118,7 @@ const LatestPrompts = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              {icon || <FireOutlined className="text-2xl text-orange-500" />}
+              {icon || <FireOutlined className="text-2xl" style={{ color: isDark ? '#ff7a45' : '#ff4d4f' }} />}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                   {title || t('latest.title')}
@@ -139,8 +139,8 @@ const LatestPrompts = ({
                   <Badge 
                     count={typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                     style={{ 
-                      backgroundColor: isDark ? '#1f1f1f' : '#f0f0f0', 
-                      color: isDark ? '#a0a0a0' : '#666',
+                      backgroundColor: isDark ? '#262626' : '#f0f0f0', 
+                      color: isDark ? '#d9d9d9' : '#666',
                       fontSize: '11px',
                       fontWeight: '500',
                       borderRadius: '6px',

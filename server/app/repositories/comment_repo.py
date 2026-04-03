@@ -67,7 +67,10 @@ class CommentRepository:
         result = await db.execute(
             select(PromptComment)
             .where(PromptComment.id == comment.id)
-            .options(selectinload(PromptComment.user))
+            .options(
+                selectinload(PromptComment.user),
+                selectinload(PromptComment.replies),
+            )
         )
         return result.scalar_one()
 
@@ -79,4 +82,14 @@ class CommentRepository:
         comment.deleted_at = datetime.now(timezone.utc)
         await db.commit()
         await db.refresh(comment)
-        return comment
+
+        # Reload with relationships for serialisation
+        result = await db.execute(
+            select(PromptComment)
+            .where(PromptComment.id == comment.id)
+            .options(
+                selectinload(PromptComment.user),
+                selectinload(PromptComment.replies),
+            )
+        )
+        return result.scalar_one()

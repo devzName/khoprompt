@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Drawer, Form, notification } from 'antd';
-import { FileTextOutlined, PlusOutlined, DashboardOutlined, TagsOutlined, UserSwitchOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Drawer, Form, Modal, Input, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
+import { useSidebarMenu } from '../hooks/use-sidebar-menu.jsx';
 import Sidebar from '../components/Sidebar';
 import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import DashboardOverview from '../components/DashboardOverview';
@@ -25,6 +25,11 @@ const MyPromptsPage = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState(null);
+
+  // Reject reason modal state
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectTargetId, setRejectTargetId] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   // Admin dashboard state
   const [allPrompts, setAllPrompts] = useState([]);
@@ -129,11 +134,22 @@ const MyPromptsPage = () => {
     }
   };
 
-  const handleRejectPrompt = async (id) => {
+  const handleRejectPrompt = (id) => {
+    setRejectTargetId(id);
+    setRejectReason('');
+    setRejectModalVisible(true);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectReason || rejectReason.trim().length < 10) {
+      notification.error({ message: 'Lý do từ chối phải có ít nhất 10 ký tự', placement: 'topRight' });
+      return;
+    }
     try {
       setLoading(true);
-      await promptService.rejectPrompt(id);
+      await promptService.rejectPrompt(rejectTargetId, rejectReason.trim());
       notification.success({ message: t('common.success'), description: t('reviewPrompts.rejectSuccess'), placement: 'topRight' });
+      setRejectModalVisible(false);
       fetchAllPrompts(dashboardCurrentPage, dashboardSearch);
     } catch {
       notification.error({ message: t('common.error'), description: t('reviewPrompts.rejectError'), placement: 'topRight' });
@@ -154,42 +170,15 @@ const MyPromptsPage = () => {
 
   const handleLogout = () => logout(() => setMobileMenuOpen(false));
 
-  const menuItems = [
-    ...(user?.user_type === 'admin' ? [{
-      key: 'dashboard', icon: <DashboardOutlined />, label: t('sidebar.dashboard', 'Dashboard'),
-      disabled: activeTab === 'dashboard',
-      action: activeTab === 'dashboard' ? null : () => { setActiveTab('dashboard'); navigate(ROUTES.MY_PROMPTS_DASHBOARD); },
-    }] : []),
-    {
-      key: 'my-prompts', icon: <FileTextOutlined />, label: t('sidebar.myPrompts', 'Prompts của tôi'),
-      disabled: activeTab === 'list',
-      action: activeTab === 'list' ? null : () => { setActiveTab('list'); navigate(ROUTES.MY_PROMPTS); },
-    },
-    {
-      key: 'create-prompt', icon: <PlusOutlined />, label: t('myPrompts.createPrompt.title'),
-      disabled: activeTab === 'create',
-      action: activeTab === 'create' ? null : () => { handleCreatePrompt(); navigate(ROUTES.MY_PROMPTS_CREATE); },
-    },
-    ...(user?.user_type === 'admin' ? [
-      {
-        key: 'manage', icon: <TagsOutlined />, label: t('manageCategoriesTags.title', 'Manage Categories & Tags'),
-        disabled: activeTab === 'manage',
-        action: activeTab === 'manage' ? null : () => { setActiveTab('manage'); navigate(`${ROUTES.MY_PROMPTS}?tab=manage`); },
-      },
-      {
-        key: 'login-management', icon: <UserSwitchOutlined />, label: t('sidebar.loginManagement', 'Quản lý đăng nhập'),
-        disabled: activeTab === 'login-management',
-        action: activeTab === 'login-management' ? null : () => { setActiveTab('login-management'); navigate(`${ROUTES.MY_PROMPTS}?tab=login-management`); },
-      },
-      {
-        key: 'admin-prompts', icon: <AppstoreOutlined />, label: t('sidebar.adminPrompts', 'Quản lý Prompt'),
-        action: () => navigate(ROUTES.ADMIN_PROMPTS),
-      },
-    ] : []),
-  ];
+  // Map MyPromptsPage activeTab values to sidebar item keys
+  const sidebarActiveTab = activeTab === 'list' ? 'my-prompts'
+    : activeTab === 'create' ? 'create-prompt'
+    : activeTab; // 'dashboard', 'manage', 'login-management' already match keys
+
+  const menuItems = useSidebarMenu(sidebarActiveTab, user, navigate, handleCreatePrompt, t);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
       <div className="hidden lg:block">
         <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab={activeTab} />
       </div>
@@ -237,6 +226,26 @@ const MyPromptsPage = () => {
           />
         )}
       </div>
+
+      {/* Rejection reason modal for dashboard tab */}
+      <Modal
+        title="Lý do từ chối"
+        open={rejectModalVisible}
+        onOk={confirmReject}
+        onCancel={() => setRejectModalVisible(false)}
+        okText="Từ chối"
+        cancelText="Hủy"
+        okButtonProps={{ danger: true, loading }}
+      >
+        <Input.TextArea
+          value={rejectReason}
+          onChange={(e) => setRejectReason(e.target.value)}
+          placeholder="Nhập lý do từ chối (ít nhất 10 ký tự)"
+          rows={4}
+          maxLength={500}
+          showCount
+        />
+      </Modal>
     </div>
   );
 };

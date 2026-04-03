@@ -2,6 +2,8 @@ import { EyeOutlined, LikeOutlined, DislikeOutlined, CopyOutlined, LinkOutlined,
 import { Drawer, Button, Tag, Avatar, notification, Badge } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ROUTES } from '../constants/routes';
 import ImageGallery from './ImageGallery';
 import VariablePlaceholderForm from './prompts/variable-placeholder-form';
@@ -14,10 +16,7 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
   const navigate = useNavigate();
   const handleCopy = () => {
     if (prompt?.content) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = prompt.content;
-      const plainText = tempDiv.textContent || tempDiv.innerText || '';
-      navigator.clipboard.writeText(plainText);
+      navigator.clipboard.writeText(prompt.content);
       notification.success({
         message: t('common.success', 'Success'),
         description: t('promptDetail.copied', 'Đã copy!'),
@@ -155,10 +154,18 @@ const PromptDrawer = ({ open, onClose, prompt, onApprove, onReject, currentUser 
               {t('reviewPromptDrawer.promptContent', 'Nội dung Prompt')}
             </h3>
             <div className="rounded-lg p-4 relative border border-gray-300 dark:border-gray-600" style={{ backgroundColor: '#f5f5f5' }}>
-              <div
-                className="text-gray-800 dark:text-gray-200 leading-relaxed text-sm"
-                dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
-              />
+              {prompt.content_format === 'markdown' ? (
+                <div className="markdown-content prose prose-sm max-w-none text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {prompt.content || ''}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <div
+                  className="text-gray-800 dark:text-gray-200 leading-relaxed text-sm"
+                  dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
+                />
+              )}
               {/* Hide raw copy button when variable form is present */}
               {extractVariables(prompt.content || '').length === 0 && (
                 <Button

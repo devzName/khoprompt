@@ -174,7 +174,7 @@ const MyPromptsList = ({ onCreatePrompt, onEditPrompt, onMenuClick, currentUser 
         onMenuClick={onMenuClick}
       >
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 min-w-0 max-w-md">
             <Search
               placeholder={t('myPrompts.searchPlaceholder')}
               defaultValue={searchValue}
@@ -183,6 +183,7 @@ const MyPromptsList = ({ onCreatePrompt, onEditPrompt, onMenuClick, currentUser 
               className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
               size="large"
               allowClear
+              aria-label="Tìm kiếm prompt"
             />
           </div>
           <Select
@@ -198,13 +199,13 @@ const MyPromptsList = ({ onCreatePrompt, onEditPrompt, onMenuClick, currentUser 
             icon={<PlusOutlined />}
             onClick={onCreatePrompt}
             size="large"
-            className="whitespace-nowrap rounded-xl bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="whitespace-nowrap rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {t('myPrompts.createPrompt.title')}
           </Button>
         </div>
       </PageHeader>
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="w-full p-4 sm:p-6">
           <PersonalStatsBar stats={stats} activeStatus={activeStatus} onStatusClick={handleStatusClick} />
           <PromptsTable

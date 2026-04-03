@@ -81,7 +81,7 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
       <section className="py-4 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-8">
-            <StarOutlined className="text-2xl text-yellow-500" />
+            <StarOutlined className="text-2xl" style={{ color: isDark ? '#ffca28' : '#eab308' }} />
             <div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {t('featured.title')}
@@ -101,8 +101,8 @@ const FeaturedPrompts = ({ prompts = [], loading = false }) => {
                   <Badge 
                     count={typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                     style={{ 
-                      backgroundColor: isDark ? '#002c8c' : '#e6f4ff', 
-                      color: isDark ? '#69b1ff' : '#1677ff',
+                      backgroundColor: isDark ? '#002266' : '#e6f4ff', 
+                      color: isDark ? '#80b3ff' : '#1677ff',
                       fontSize: '12px',
                       fontWeight: '500',
                       borderRadius: '6px',

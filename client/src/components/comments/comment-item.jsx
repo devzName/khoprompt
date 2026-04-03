@@ -31,16 +31,16 @@ const CommentItem = ({ comment, currentUser, onReply, onDelete, isReply = false 
       <Avatar
         size={isReply ? 32 : 40}
         icon={<UserOutlined />}
-        className="shrink-0 bg-blue-100 text-blue-600"
+        className="shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
       />
 
       <div className="flex-1 min-w-0">
         {/* Author + timestamp row */}
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-semibold text-gray-800 text-sm">
+          <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">
             {comment.author_name || 'Người dùng ẩn danh'}
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {dayjs(comment.created_at).fromNow()}
           </span>
         </div>
@@ -48,7 +48,7 @@ const CommentItem = ({ comment, currentUser, onReply, onDelete, isReply = false 
         {/* Content */}
         <p
           className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${
-            isDeleted ? 'text-gray-400 italic' : 'text-gray-700'
+            isDeleted ? 'text-gray-400 italic' : 'text-gray-700 dark:text-gray-300'
           }`}
         >
           {isDeleted ? DELETED_PLACEHOLDER : comment.content}
@@ -92,7 +92,7 @@ const CommentItem = ({ comment, currentUser, onReply, onDelete, isReply = false 
 
         {/* Replies — rendered only at depth 0 */}
         {!isReply && comment.replies && comment.replies.length > 0 && (
-          <div className="border-l-2 border-gray-100 pl-2 mt-2">
+          <div className="border-l-2 border-gray-100 dark:border-gray-700 pl-2 mt-2">
             {comment.replies.map((reply) => (
               <CommentItem
                 key={reply.id}

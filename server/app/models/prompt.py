@@ -26,6 +26,7 @@ class Prompt(AuditMixin, Base):
     slug: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    content_format: Mapped[str] = mapped_column(String(10), nullable=False, default='html')  # 'html' or 'markdown'
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     images: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
     

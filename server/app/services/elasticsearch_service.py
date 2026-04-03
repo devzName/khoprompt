@@ -212,6 +212,7 @@ class ElasticsearchService:
                 "title": prompt.title,
                 "description": prompt.description,
                 "content": prompt.content,
+                "content_format": prompt.content_format,
                 "slug": prompt.slug,
                 "category_id": prompt.category.id if prompt.category else None,
                 "category_name": prompt.category.name if prompt.category else None,

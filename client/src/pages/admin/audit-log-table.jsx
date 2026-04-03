@@ -15,7 +15,8 @@ const ACTION_LABEL = {
   password_change: 'Pwd Change',
 };
 
-const formatTs = (ts) => (ts ? new Date(ts).toLocaleString() : '—');
+const fmt = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+const formatTs = (ts) => (ts ? fmt.format(new Date(ts)) : '—');
 
 // Trim user-agent to browser/OS hint only
 const shortUa = (ua) => {
@@ -63,7 +64,7 @@ const AuditLogTable = ({ data, loading, pagination, onChange, onRowClick }) => {
       key: 'user_agent',
       render: (ua) => (
         <Tooltip title={ua || '—'}>
-          <span className="text-xs text-gray-500">{shortUa(ua)}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{shortUa(ua)}</span>
         </Tooltip>
       ),
     },
@@ -71,7 +72,7 @@ const AuditLogTable = ({ data, loading, pagination, onChange, onRowClick }) => {
       title: 'Time',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: formatTs,
+      render: (ts) => <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatTs(ts)}</span>,
     },
   ];
 
@@ -85,7 +86,11 @@ const AuditLogTable = ({ data, loading, pagination, onChange, onRowClick }) => {
       onChange={onChange}
       onRow={(record) => ({
         onClick: () => record.user_id && onRowClick?.(record),
+        onKeyDown: (e) => e.key === 'Enter' && record.user_id && onRowClick?.(record),
+        tabIndex: record.user_id ? 0 : undefined,
+        role: record.user_id ? 'button' : undefined,
         style: record.user_id ? { cursor: 'pointer' } : {},
+        'aria-label': record.user_id ? `Xem hoạt động của ${record.email || 'người dùng'}` : undefined,
       })}
       size="small"
       scroll={{ x: 700 }}

@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Switch, Modal, notification } from 'antd';
+import { Switch, App, notification } from 'antd';
 import apiClient from '../../axios/apiClient';
 
 // Props: value (bool), onChange (fn)
 const ApprovalToggle = ({ value, onChange }) => {
+  const { modal } = App.useApp();
   const [loading, setLoading] = useState(false);
 
   const handleChange = (checked) => {
     if (!checked) {
       // Confirm before turning OFF approval
-      Modal.confirm({
+      modal.confirm({
         title: 'Tắt chế độ duyệt?',
         content: 'Tắt duyệt sẽ publish tất cả prompt mới ngay lập tức mà không cần phê duyệt.',
         okText: 'Tắt duyệt',
@@ -47,7 +48,7 @@ const ApprovalToggle = ({ value, onChange }) => {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-gray-700">Chế độ duyệt prompt:</span>
+      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Chế độ duyệt prompt:</span>
       <Switch
         checked={value}
         onChange={handleChange}
@@ -55,7 +56,7 @@ const ApprovalToggle = ({ value, onChange }) => {
         checkedChildren="Bật duyệt"
         unCheckedChildren="Tắt duyệt"
       />
-      <span className="text-xs text-gray-500">
+      <span className="text-xs text-gray-500 dark:text-gray-400">
         {value ? 'Prompt mới sẽ chờ phê duyệt' : 'Prompt mới được publish ngay'}
       </span>
     </div>

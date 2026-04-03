@@ -161,8 +161,8 @@ const PromptsTable = ({
       sorter: true,
       render: (text, record) => (
         <div>
-          <div className="font-semibold text-gray-900 text-sm mb-1">{text}</div>
-          <div className="text-gray-500 text-xs line-clamp-1">{record.description}</div>
+          <div className="font-semibold text-gray-900 dark:text-white text-sm mb-1">{text}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-xs line-clamp-1">{record.description}</div>
           {/* Inline rejection display for personal mode when no expand column */}
           {mode === 'personal' && record.status === PROMPT_STATUS.REJECTED && record.rejection_reason && (
             <RejectionReasonDisplay
@@ -181,7 +181,7 @@ const PromptsTable = ({
       filters: categoryFilters,
       filterMultiple: false,
       render: (category) => (
-        <span className="text-sm text-gray-700">{category?.name || '-'}</span>
+        <span className="text-sm text-gray-700 dark:text-gray-300">{category?.name || '-'}</span>
       ),
     },
     {
@@ -206,7 +206,7 @@ const PromptsTable = ({
       align: 'center',
       sorter: true,
       render: (count) => (
-        <div className="flex items-center justify-center gap-1 text-gray-600 text-sm">
+        <div className="flex items-center justify-center gap-1 text-gray-600 dark:text-gray-400 text-sm">
           <EyeOutlined className="text-gray-400" />
           <span>{count || 0}</span>
         </div>
@@ -251,7 +251,7 @@ const PromptsTable = ({
       align: 'center',
       sorter: true,
       render: (date) => (
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-gray-600 dark:text-gray-400">
           {new Date(date).toLocaleDateString('vi-VN')}{' '}
           {new Date(date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
         </div>
@@ -321,8 +321,8 @@ const PromptsTable = ({
     <>
       {/* Bulk action toolbar — only in personal mode */}
       {mode === 'personal' && selectedRowKeys.length > 0 && (
-        <div className="flex items-center gap-3 mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <span className="text-sm text-blue-700 font-medium">Đã chọn {selectedRowKeys.length} prompt</span>
+        <div className="flex items-center gap-3 mb-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 rounded-lg">
+          <span className="text-sm text-blue-700 dark:text-blue-400 font-medium">Đã chọn {selectedRowKeys.length} prompt</span>
           <Button
             danger
             size="small"
@@ -338,7 +338,7 @@ const PromptsTable = ({
           </Button>
         </div>
       )}
-      <Card className="shadow-sm">
+      <Card className="shadow-sm dark:bg-[#141414] dark:border-gray-700">
         <Table
           columns={columns}
           dataSource={prompts}
@@ -354,16 +354,16 @@ const PromptsTable = ({
           onChange={handleTableChange}
           scroll={{ x: 1000 }}
           className="prompts-table"
-          rowClassName="hover:bg-gray-50 transition-colors"
+          rowClassName="hover:bg-gray-50 dark:hover:bg-[#1f1f1f] transition-colors"
           locale={{
             emptyText: (
               <div className="py-12">
                 <div className="flex flex-col items-center justify-center text-gray-400">
                   <FileTextOutlined style={{ fontSize: 64, marginBottom: 16 }} />
-                  <div className="text-lg font-medium text-gray-600 mb-2">
+                  <div className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
                     {searchValue ? t('myPrompts.noResults') : t('myPrompts.noPrompts')}
                   </div>
-                  <div className="text-sm text-gray-500 mb-4">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     {searchValue ? t('myPrompts.noResultsDescription') : t('myPrompts.noPromptsDescription')}
                   </div>
                   {!searchValue && showCreateButton && (

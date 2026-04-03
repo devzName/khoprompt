@@ -204,7 +204,15 @@
   },
   "hero": {
     "title": "Khám phá & Chia sẻ AI Prompts",
-    "subtitle": "Khám phá kho prompt được tuyển chọn cho mọi nhu cầu – từ lập trình, sáng tạo nội dung đến marketing."
+    "subtitle": "Khám phá kho prompt được tuyển chọn cho mọi nhu cầu – từ lập trình, sáng tạo nội dung đến marketing.",
+    "badge": "Kho prompt AI hàng đầu",
+    "searchPlaceholder": "Tìm kiếm prompts...",
+    "search": "Tìm kiếm",
+    "stats": {
+      "categories": "Danh mục",
+      "prompts": "Prompts",
+      "views": "Lượt xem"
+    }
   },
   "featured": {
     "title": "Prompts Nổi Bật",

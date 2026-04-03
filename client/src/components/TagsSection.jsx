@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useDarkMode } from '../hooks/use-dark-mode';
 import { promptTagsService } from '../services/promptTagsService';
 const TagsSection = () => {
   const { t } = useTranslation();
+  const [isDark] = useDarkMode();
   const navigate = useNavigate();
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ const TagsSection = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <TagOutlined className="text-2xl text-blue-600" />
+              <TagOutlined className="text-2xl" style={{ color: isDark ? '#40a9ff' : '#2563eb' }} />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {t('tags.title')}
               </h2>
@@ -61,7 +63,7 @@ const TagsSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <TagOutlined className="text-2xl text-blue-600" />
+            <TagOutlined className="text-2xl" style={{ color: isDark ? '#40a9ff' : '#2563eb' }} />
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('tags.title')}
             </h2>

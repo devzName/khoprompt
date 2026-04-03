@@ -63,6 +63,7 @@ const CreatePromptForm = ({
     formData.append('title', values.title);
     formData.append('description', values.description);
     formData.append('content', values.content);
+    formData.append('content_format', values.content_format || 'html');
     formData.append('category_id', values.category);
 
     if (values.notes) {
@@ -95,7 +96,7 @@ const CreatePromptForm = ({
         breadcrumb={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
         onMenuClick={onMenuClick}
       />
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="w-full p-4 sm:p-6">
           <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
             <BasicInfoSection />

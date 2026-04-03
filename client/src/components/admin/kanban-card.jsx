@@ -30,7 +30,8 @@ const KanbanCard = ({ prompt, onApprove, onReject, onDelete, isMobile = false })
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white dark:bg-[#141414] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-3 flex flex-col gap-2"
+      tabIndex={0}
+      className="bg-white dark:bg-[#141414] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-3 flex flex-col gap-2 cursor-pointer touch-manipulation focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:outline-none"
     >
       {/* Drag handle (hidden on mobile) */}
       {!isMobile && (

@@ -183,7 +183,7 @@ const LoginManagement = ({ onMenuClick }) => {
       render: (status) => {
         const isActive = status === 'active';
         return (
-          <span className={`px-2 py-1 rounded text-xs font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <span className={`px-2 py-1 rounded text-xs font-medium ${isActive ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300'}`}>
             {isActive ? t('loginManagement.active', 'Hoạt động') : t('loginManagement.inactive', 'Đã khóa')}
           </span>
         );
@@ -256,9 +256,9 @@ const LoginManagement = ({ onMenuClick }) => {
         onMenuClick={onMenuClick}
       />
 
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="w-full p-4 sm:p-6">
-          <Card className="shadow-sm">
+          <Card className="shadow-sm dark:bg-[#141414] dark:border-gray-700">
             <Table
               columns={columns}
               dataSource={sessions}
@@ -272,16 +272,16 @@ const LoginManagement = ({ onMenuClick }) => {
                 showTotal: (total) => t('common.totalItems', { total }, `Tổng ${total} phiên`)
               }}
               className="login-sessions-table"
-              rowClassName="hover:bg-gray-50 transition-colors"
+              rowClassName="hover:bg-gray-50 dark:hover:bg-[#1f1f1f] transition-colors"
               locale={{
                 emptyText: (
                   <div className="py-12">
                     <div className="flex flex-col items-center justify-center text-gray-400">
                       <UserSwitchOutlined style={{ fontSize: 64, marginBottom: 16 }} />
-                      <div className="text-lg font-medium text-gray-600 mb-2">
+                      <div className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
                         {t('loginManagement.noSessions', 'Không có phiên đăng nhập')}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {t('loginManagement.noSessionsDescription', 'Chưa có phiên đăng nhập nào được ghi nhận')}
                       </div>
                     </div>

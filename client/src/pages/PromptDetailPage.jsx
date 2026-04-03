@@ -13,6 +13,9 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useDarkMode } from '../hooks/use-dark-mode';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NotFoundPage from './NotFoundPage';
@@ -73,7 +76,7 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
           <>
             <button
               onClick={handlePrevious}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-black rounded-full p-3 transition-all backdrop-blur-sm"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 dark:bg-black/20 dark:hover:bg-black/40 text-black dark:text-white rounded-full p-3 transition-all backdrop-blur-sm shadow-md"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -81,7 +84,7 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-black rounded-full p-3 transition-all backdrop-blur-sm"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 dark:bg-black/20 dark:hover:bg-black/40 text-black dark:text-white rounded-full p-3 transition-all backdrop-blur-sm shadow-md"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -97,7 +100,7 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
           {images.map((image, index) => (
             <div
               key={index}
-              className={`relative bg-gray-50 dark:bg-[#1f1f1f] rounded-lg overflow-hidden aspect-[4/3] border-2 cursor-pointer transition-all ${
+              className={`relative bg-gray-50 dark:bg-[#1f1f1f] rounded-lg overflow-hidden aspect-4/3 border-2 cursor-pointer transition-all ${
                 index === currentIndex 
                   ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -123,6 +126,7 @@ const ImageGalleryDetail = ({ images, title, serverUrl }) => {
 const PromptDetailPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [isDark] = useDarkMode();
   const { slug } = useParams();
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -209,10 +213,7 @@ const PromptDetailPage = () => {
   }, [slug, user]);
   const handleCopyPrompt = () => {
     if (prompt) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = prompt.content;
-      const plainText = tempDiv.textContent || tempDiv.innerText || '';
-      navigator.clipboard.writeText(plainText);
+      navigator.clipboard.writeText(prompt.content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       notification.success({
@@ -349,8 +350,8 @@ const PromptDetailPage = () => {
     { title: prompt.title }
   ];
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="flex-grow">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex flex-col transition-colors duration-300">
+      <div className="grow">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full">
@@ -402,7 +403,7 @@ const PromptDetailPage = () => {
                 <div className="mt-4 pt-4">
                   <div className="flex flex-wrap gap-3 items-start">
                     <div className="flex items-center gap-2">
-                      <Tag color="blue" className="rounded-lg px-3 py-1 border-blue-200 bg-blue-50 text-blue-700 font-medium text-sm">
+                      <Tag color="blue" className="rounded-lg px-3 py-1 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium text-sm">
                         {typeof prompt.category === 'object' ? prompt.category?.name : (prompt.category || 'Uncategorized')}
                       </Tag>
                     </div>
@@ -413,7 +414,7 @@ const PromptDetailPage = () => {
                           {prompt.tags.map((tag, index) => (
                             <Tag
                               key={tag.id || index}
-                              className="bg-gray-50 border-gray-200 text-gray-600 rounded-lg px-3 py-1 font-medium text-sm hover:bg-gray-100 transition-colors"
+                              className="bg-gray-50 dark:bg-[#1f1f1f] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-lg px-3 py-1 font-medium text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             >
                               #{typeof tag === 'object' ? tag.name : tag}
                             </Tag>
@@ -477,16 +478,24 @@ const PromptDetailPage = () => {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 {t('promptDetail.promptContent')}
               </h2>
-              <div className="rounded-lg p-4 relative border border-gray-300" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
-                />
+              <div className="rounded-lg p-4 relative border border-gray-300 dark:border-gray-700" style={{ backgroundColor: isDark ? '#1f1f1f' : '#f5f5f5' }}>
+                {prompt.content_format === 'markdown' ? (
+                  <div className="markdown-content prose prose-sm max-w-none prose-gray dark:prose-invert leading-relaxed">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {prompt.content || ''}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <div
+                    className="prose prose-sm max-w-none leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: prompt.content || '' }}
+                  />
+                )}
                 {/* Hide raw copy button when variable form is present — form provides its own copy actions */}
                 {extractVariables(prompt.content || '').length === 0 && (
                   <Button
                     icon={<CopyOutlined />}
-                    className="absolute top-2 right-2 bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
+                    className="absolute top-2 right-2 bg-white/80 dark:bg-black/50 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 backdrop-blur-sm"
                     size="small"
                     onClick={handleCopyPrompt}
                   >

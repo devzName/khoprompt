@@ -10,6 +10,7 @@ class PromptBase(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = None
     content: str = Field(min_length=1)
+    content_format: str = Field(default='html')
     notes: str | None = None
     images: list[str] | None = None
     category_id: int | None = None
@@ -26,6 +27,7 @@ class PromptUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     content: str | None = Field(default=None, min_length=1)
+    content_format: str | None = None
     notes: str | None = None
     images: list[str] | None = None
     category_id: int | None = None

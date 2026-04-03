@@ -24,6 +24,7 @@ async def create_prompt(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     content: str = Form(...),
+    content_format: str = Form('html'),
     notes: Optional[str] = Form(None),
     category_id: Optional[int] = Form(None),
     tags: Optional[str] = Form(None),  # JSON string of tag IDs
@@ -72,6 +73,7 @@ async def create_prompt(
             title=title,
             description=description,
             content=content,
+            content_format=content_format,
             notes=notes,
             category_id=category_id,
             tags=tag_list
@@ -234,6 +236,7 @@ async def update_prompt(
     title: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
     content: Optional[str] = Form(None),
+    content_format: Optional[str] = Form(None),
     notes: Optional[str] = Form(None),
     category_id: Optional[int] = Form(None),
     tags: Optional[str] = Form(None),
@@ -291,6 +294,7 @@ async def update_prompt(
                 title=title,
                 description=description,
                 content=content,
+                content_format=content_format,
                 notes=notes,
                 category_id=category_id,
                 tags=tag_list  # Always pass tag_list, even if empty
