@@ -59,10 +59,13 @@
     "logout": "Logout",
     "language": "Language",
     "reviewPrompts": "Review Prompts",
-    "vietnamese": "Tiếng Việt",
+    "vietnamese": "Tiáº¿ng Viá»‡t",
     "english": "English",
     "dashboard": "Dashboard",
-    "loginManagement": "Login Management"
+    "loginManagement": "Login Management",
+    "playground": "Playground",
+    "adminPrompts": "Manage Prompts",
+    "auditLogs": "Audit Logs"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -204,7 +207,7 @@
   },
   "hero": {
     "title": "Discover & Share AI Prompts",
-    "subtitle": "Explore curated prompts for all needs – from programming, content creation to marketing."
+    "subtitle": "Explore curated prompts for all needs â€“ from programming, content creation to marketing."
   },
   "featured": {
     "title": "Featured Prompts",
@@ -220,7 +223,7 @@
   },
   "footer": {
     "description": "High-quality AI prompt library for ChatGPT, Claude, Gemini and other AI tools. Optimize your work with professional prompts.",
-    "copyright": "© 2025 Prompt Library. All rights reserved.",
+    "copyright": "Â© 2025 Prompt Library. All rights reserved.",
     "popularCategories": "Popular Categories",
     "viewAll": "View All",
     "support": "Support",
@@ -277,7 +280,8 @@
     },
     "cannotVoteOwn": "You cannot vote on your own prompt",
     "votedHelpful": "Voted as helpful!",
-    "votedNotHelpful": "Voted as not helpful!"
+    "votedNotHelpful": "Voted as not helpful!",
+    "testInPlayground": "Test in Playground"
   },
   "search": {
     "enterKeyword": "Enter search keyword",
@@ -454,5 +458,31 @@
     "lockSuccess": "Account locked successfully",
     "unlockSuccess": "Account unlocked successfully",
     "toggleError": "Unable to change account status"
+  },
+  "playground": {
+    "title": "Playground",
+    "newChat": "New Chat",
+    "searchPlaceholder": "Search...",
+    "noRooms": "No conversations yet",
+    "noResults": "No results found",
+    "emptyTitle": "No messages yet",
+    "emptySubtitle": "Start a conversation or select a suggested prompt below.",
+    "sendPlaceholder": "Type a message... (Enter to send, Shift+Enter for newline)",
+    "send": "Send",
+    "stop": "Stop",
+    "deleteConfirm": "Delete this conversation?",
+    "deleteOk": "Delete",
+    "deleteCancel": "Cancel",
+    "clickToRename": "Click to rename",
+    "openingPlayground": "Opening Playground...",
+    "fillVariablesTitle": "Fill variables before testing",
+    "fillVariablesDesc": "This prompt has variables. Fill them in to use in Playground.",
+    "openPlayground": "Open Playground",
+    "errorLoadRooms": "Could not load chat rooms",
+    "errorLoadMessages": "Could not load messages",
+    "errorCreateRoom": "Could not create chat room",
+    "errorDeleteRoom": "Could not delete chat room",
+    "errorUpdateRoom": "Could not update chat room",
+    "errorOpenPrompt": "Could not open prompt in Playground"
   }
 }

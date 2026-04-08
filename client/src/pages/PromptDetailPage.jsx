@@ -9,7 +9,8 @@ import {
   CalendarOutlined,
   UserOutlined,
   StarOutlined,
-  BookOutlined
+  BookOutlined,
+  RocketOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -28,6 +29,7 @@ import { formatRating, getRatingContainerColor } from '../utils/ratingUtils';
 import VariablePlaceholderForm from '../components/prompts/variable-placeholder-form';
 import { extractVariables } from '../utils/variable-parser';
 import CommentList from '../components/comments/comment-list';
+import TestPromptModal from '../components/playground/test-prompt-modal';
 import dayjs from 'dayjs';
 
 // Get server URL for images
@@ -137,6 +139,7 @@ const PromptDetailPage = () => {
   const [currentRating, setCurrentRating] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [playgroundModalOpen, setPlaygroundModalOpen] = useState(false);
   const refreshStats = async () => {
     if (prompt?.id) {
       try {
@@ -468,6 +471,16 @@ const PromptDetailPage = () => {
                     {isBookmarked ? t('promptDetail.bookmarked') : t('promptDetail.bookmark')}
                   </Button>
                 )}
+                {user && (
+                  <Button
+                    size="large"
+                    icon={<RocketOutlined />}
+                    onClick={() => setPlaygroundModalOpen(true)}
+                    className="flex-1 sm:flex-none h-12 rounded-xl font-semibold"
+                  >
+                    {t('promptDetail.testInPlayground', 'Test in Playground')}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -555,6 +568,13 @@ const PromptDetailPage = () => {
         </div>
       </div>
       <Footer />
+      {prompt && (
+        <TestPromptModal
+          prompt={prompt}
+          open={playgroundModalOpen}
+          onClose={() => setPlaygroundModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

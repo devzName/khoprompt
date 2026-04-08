@@ -62,7 +62,8 @@
     "vietnamese": "Tiếng Việt",
     "english": "English",
     "dashboard": "Dashboard",
-    "loginManagement": "Quản lý đăng nhập"
+    "loginManagement": "Quản lý đăng nhập",
+    "playground": "Playground"
   },
   "myPrompts": {
     "breadcrumb": "Dashboard",
@@ -332,7 +333,8 @@
     },
     "cannotVoteOwn": "Bạn không thể bình chọn cho prompt của chính mình",
     "votedHelpful": "Đã đánh giá prompt là hữu ích!",
-    "votedNotHelpful": "Đã đánh giá prompt là không hữu ích!"
+    "votedNotHelpful": "Đã đánh giá prompt là không hữu ích!",
+    "testInPlayground": "Thử trong Playground"
   },
   "search": {
     "enterKeyword": "Nhập từ khóa tìm kiếm",
@@ -347,7 +349,7 @@
     "categoryResults": "Prompts trong danh mục \"{{query}}\"",
     "categoryResultsDesc": "Duyệt tất cả prompts trong danh mục {{query}}",
     "bookmarkAdded": "Đã lưu prompt thành công",
-    "bookmarkRemoved": "Đã bỏ lưu prompt thành công", 
+    "bookmarkRemoved": "Đã bỏ lưu prompt thành công",
     "bookmark": "Lưu",
     "bookmarked": "Đã lưu"
   },
@@ -462,5 +464,24 @@
     "lockSuccess": "Đã khóa tài khoản thành công",
     "unlockSuccess": "Đã mở khóa tài khoản thành công",
     "toggleError": "Không thể thay đổi trạng thái tài khoản"
+  },
+  "playground": {
+    "title": "Playground",
+    "newChat": "Cuộc trò chuyện mới",
+    "searchPlaceholder": "Tìm kiếm...",
+    "noRooms": "Chưa có cuộc trò chuyện nào",
+    "noResults": "Không tìm thấy",
+    "emptySubtitle": "Bắt đầu hội thoại hoặc chọn một prompt gợi ý bên dưới.",
+    "sendPlaceholder": "Nhập tin nhắn... (Enter gửi, Shift+Enter xuống dòng)",
+    "send": "Gửi",
+    "stop": "Dừng",
+    "deleteConfirm": "Xoá cuộc trò chuyện này?",
+    "deleteOk": "Xoá",
+    "deleteCancel": "Huỷ",
+    "clickToRename": "Nhấp để đổi tên",
+    "openingPlayground": "Đang mở Playground...",
+    "fillVariablesTitle": "Điền biến trước khi thử",
+    "fillVariablesDesc": "Prompt này có các biến. Điền giá trị để sử dụng trong Playground.",
+    "openPlayground": "Mở Playground"
   }
 }

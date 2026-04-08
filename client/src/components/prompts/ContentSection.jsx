@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import MDEditor from '@uiw/react-md-editor';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import PromptFormSection from './PromptFormSection';
 import aiService from '../../services/aiService';
 
 const MarkdownEditor = ({ value, onChange, placeholder }) => {
@@ -65,21 +64,17 @@ const ContentSection = () => {
   const handleAIFormat = async () => {
     const title = form.getFieldValue('title');
     const description = form.getFieldValue('description');
-    
+
     if (!title || title.trim() === '') {
-      form.setFields([
-        { name: 'title', errors: [t('myPrompts.createPrompt.titleRequired')] }
-      ]);
+      form.setFields([{ name: 'title', errors: [t('myPrompts.createPrompt.titleRequired')] }]);
       return;
     }
-    
+
     if (title.trim().length < 20) {
-      form.setFields([
-        { name: 'title', errors: [t('myPrompts.createPrompt.titleMinLength')] }
-      ]);
+      form.setFields([{ name: 'title', errors: [t('myPrompts.createPrompt.titleMinLength')] }]);
       return;
     }
-    
+
     setIsFormatting(true);
     try {
       if (!content || content.trim() === '') {
@@ -97,7 +92,7 @@ const ContentSection = () => {
   };
 
   const getAIButtonLabel = () => {
-    return (!content || content.trim() === '') 
+    return (!content || content.trim() === '')
       ? t('myPrompts.createPrompt.aiWrite', 'AI viết giúp')
       : t('myPrompts.createPrompt.aiEdit', 'AI sửa giúp');
   };
@@ -106,12 +101,12 @@ const ContentSection = () => {
   const hasHTMLTags = content && /<[a-z][\s\S]*>/i.test(content);
 
   return (
-    <PromptFormSection title={t('myPrompts.createPrompt.content')}>
-      {/* Format selector */}
-      <div className="mb-4 flex items-center gap-4">
+    <div>
+      {/* Format selector + AI button row */}
+      <div className="flex items-center justify-between mb-3">
+        {/* Left: format toggle */}
         <Form.Item
           name="content_format"
-          label={t('myPrompts.createPrompt.contentFormat', 'Định dạng nội dung')}
           initialValue="html"
           className="mb-0"
         >
@@ -120,37 +115,37 @@ const ContentSection = () => {
             <Radio.Button value="markdown">Markdown</Radio.Button>
           </Radio.Group>
         </Form.Item>
-        {hasHTMLTags && isHTML && (
-          <Button
-            size="small"
-            type="link"
-            onClick={() => {
-              // Convert HTML to plain text for markdown mode
-              const div = document.createElement('div');
-              div.innerHTML = content;
-              const text = div.textContent || div.innerText || '';
-              form.setFieldsValue({ content_format: 'markdown', content: text });
-            }}
-          >
-            {t('myPrompts.createPrompt.convertToMarkdown', 'Chuyển sang Markdown (giữ text)')}
-          </Button>
-        )}
-      </div>
 
-      <Form.Item
-        label={
-          <div className="flex items-center gap-2">
-            <span>{t('myPrompts.createPrompt.contentLabel')}</span>
+        {/* Right: controls */}
+        <div className="flex items-center gap-2">
+          {hasHTMLTags && isHTML && (
             <Button
               size="small"
-              icon={<ThunderboltOutlined />}
-              loading={isFormatting}
-              onClick={handleAIFormat}
+              type="link"
+              onClick={() => {
+                const div = document.createElement('div');
+                div.innerHTML = content;
+                const text = div.textContent || div.innerText || '';
+                form.setFieldsValue({ content_format: 'markdown', content: text });
+              }}
             >
-              {getAIButtonLabel()}
+              {t('myPrompts.createPrompt.convertToMarkdown', 'Chuyển sang Markdown (giữ text)')}
             </Button>
-          </div>
-        }
+          )}
+          <button
+            type="button"
+            disabled={isFormatting}
+            onClick={handleAIFormat}
+            className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            <ThunderboltOutlined aria-hidden="true" />
+            {isFormatting ? '...' : getAIButtonLabel()}
+          </button>
+        </div>
+      </div>
+
+      {/* Content editor — no label */}
+      <Form.Item
         name="content"
         rules={[{ required: true, message: t('myPrompts.createPrompt.contentRequired') }]}
         className="mb-0"
@@ -161,7 +156,7 @@ const ContentSection = () => {
           <MarkdownEditor placeholder={t('myPrompts.createPrompt.contentPlaceholder')} />
         )}
       </Form.Item>
-    </PromptFormSection>
+    </div>
   );
 };
 

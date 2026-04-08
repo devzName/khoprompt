@@ -9,6 +9,7 @@ import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPromptManagementPage from './pages/admin/AdminPromptManagementPage';
 import AuditLogPage from './pages/admin/AuditLogPage';
+import PlaygroundPage from './pages/PlaygroundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 import { Spin, ConfigProvider, theme } from 'antd';
@@ -115,6 +116,22 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <AuditLogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.PLAYGROUND}
+        element={
+          <ProtectedRoute>
+            <PlaygroundPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/playground/:roomId"
+        element={
+          <ProtectedRoute>
+            <PlaygroundPage />
           </ProtectedRoute>
         }
       />

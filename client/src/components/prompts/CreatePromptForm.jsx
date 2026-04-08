@@ -1,15 +1,15 @@
 import { Form } from 'antd';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import PageHeader from '../shared/PageHeader';
 import BasicInfoSection from './BasicInfoSection';
 import ContentSection from './ContentSection';
 import ImageUploadSection from './ImageUploadSection';
 import CategorizationSection from './CategorizationSection';
-import NotesSection from './NotesSection';
 import FormActions from './FormActions';
+import DetailsAccordion from './details-accordion';
 import { promptCategoriesService } from '../../services/promptCategoriesService';
 import { promptTagsService } from '../../services/promptTagsService';
+
 const CreatePromptForm = ({
   form,
   loading,
@@ -23,6 +23,7 @@ const CreatePromptForm = ({
   const [categories, setCategories] = useState([]);
   const [allTags, setAllTags] = useState([]);
   const [filteredTags, setFilteredTags] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,89 +31,96 @@ const CreatePromptForm = ({
           promptCategoriesService.getCategories(),
           promptTagsService.getTags()
         ]);
-        setCategories(categoriesData.map(cat => ({ 
-          label: cat.name, 
-          value: cat.id, 
-          slug: cat.slug 
+        setCategories(categoriesData.map(cat => ({
+          label: cat.name,
+          value: cat.id,
+          slug: cat.slug
         })));
-        const mappedTags = tagsData.map(tag => ({ 
-          label: tag.name, 
+        const mappedTags = tagsData.map(tag => ({
+          label: tag.name,
           value: tag.id.toString(),
           categoryId: tag.category_id
         }));
         setAllTags(mappedTags);
         const initialCategory = form.getFieldValue('category');
         if (initialCategory) {
-          const filtered = mappedTags.filter(tag => tag.categoryId === initialCategory);
-          setFilteredTags(filtered);
+          setFilteredTags(mappedTags.filter(tag => tag.categoryId === initialCategory));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     fetchData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCategoryChange = (value) => {
-    const filtered = allTags.filter(tag => tag.categoryId === value);
-    setFilteredTags(filtered);
+    setFilteredTags(allTags.filter(tag => tag.categoryId === value));
     form.setFieldsValue({ tags: [] });
   };
+
   const handleFormSubmit = (values) => {
     const formData = new FormData();
-    
     formData.append('title', values.title);
     formData.append('description', values.description);
     formData.append('content', values.content);
     formData.append('content_format', values.content_format || 'html');
     formData.append('category_id', values.category);
-
-    if (values.notes) {
-      formData.append('notes', values.notes);
+    if (values.notes) formData.append('notes', values.notes);
+    formData.append(
+      'tags',
+      JSON.stringify(values.tags?.length ? values.tags.map(tag => parseInt(tag, 10)) : [])
+    );
+    if (values.images?.length) {
+      values.images.forEach(file => formData.append('images', file));
     }
-    
-    if (values.tags && values.tags.length > 0) {
-      formData.append('tags', JSON.stringify(values.tags.map(tag => parseInt(tag, 10))));
-    } else {
-      formData.append('tags', JSON.stringify([]));
-    }
-    
-    if (values.images && values.images.length > 0) {
-      values.images.forEach((file) => {
-        formData.append('images', file);
-      });
-    }
-    
-    if (values.existingImages && values.existingImages.length > 0) {
+    if (values.existingImages?.length) {
       formData.append('existingImages', JSON.stringify(values.existingImages));
     }
-    
     onSubmit(formData);
   };
+
+  // Watch title for sticky header display
+  const title = Form.useWatch('title', form);
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      <PageHeader
-        title={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
-        description={isEditing ? t('myPrompts.editPrompt.description', 'Update your prompt details') : t('myPrompts.createPrompt.description')}
-        breadcrumb={isEditing ? t('myPrompts.editPrompt.title', 'Edit Prompt') : t('myPrompts.createPrompt.title')}
-        onMenuClick={onMenuClick}
+      {/* Sticky top action bar */}
+      <FormActions
+        loading={loading}
+        onCancel={onCancel}
+        onSubmit={() => form.submit()}
+        isEditing={isEditing}
+        title={title}
       />
-      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
-        <div className="w-full p-4 sm:p-6">
+
+      {/* Scrollable form area */}
+      <div className="flex-1 overflow-y-auto bg-white dark:bg-[#0d0d0d]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
           <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
-            <BasicInfoSection />
-            <ContentSection />
-            <CategorizationSection 
-              categories={categories} 
+            {/* Top meta bar: Category + Tags */}
+            <CategorizationSection
+              categories={categories}
               predefinedTags={filteredTags}
               onCategoryChange={handleCategoryChange}
             />
-            <NotesSection />
-            <ImageUploadSection existingImages={initialData?.images || []} />
-            <FormActions loading={loading} onCancel={onCancel} />
+
+            <div className="border-b border-gray-100 dark:border-gray-800 my-6" />
+
+            {/* Title + Description */}
+            <BasicInfoSection />
+
+            <div className="border-b border-gray-100 dark:border-gray-800 my-6" />
+
+            {/* Content editor */}
+            <ContentSection />
+
+            {/* Collapsible Details: Notes + Images */}
+            <DetailsAccordion existingImages={initialData?.images || []} />
           </Form>
         </div>
       </div>
     </div>
   );
 };
+
 export default CreatePromptForm;

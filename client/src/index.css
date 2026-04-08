@@ -59,6 +59,9 @@ body {
   overflow: hidden;
 }
 
+/* CKEditor auto-grow override */
+.ck-editor__editable { min-height: 300px !important; }
+
 /* Markdown editor overrides */
 .w-md-editor {
   --md-editor-font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;

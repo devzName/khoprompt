@@ -180,10 +180,10 @@ const MyPromptsPage = () => {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
       <div className="hidden lg:block">
-        <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab={activeTab} />
+        <Sidebar menuItems={menuItems} activeTab={activeTab} />
       </div>
       <Drawer title={null} placement="left" onClose={() => setMobileMenuOpen(false)} open={mobileMenuOpen} className="lg:hidden" size={280} styles={{ body: { padding: 0 } }} closeIcon={null}>
-        <Sidebar user={user} onLogout={handleLogout} onClose={() => setMobileMenuOpen(false)} menuItems={menuItems} activeTab={activeTab} isMobile={true} />
+        <Sidebar onClose={() => setMobileMenuOpen(false)} menuItems={menuItems} activeTab={activeTab} isMobile={true} />
       </Drawer>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {activeTab === 'manage' && user?.user_type === 'admin' ? (

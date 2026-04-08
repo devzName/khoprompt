@@ -6,6 +6,7 @@ import {
   TagsOutlined,
   UserSwitchOutlined,
   AuditOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '../constants/routes';
 
@@ -48,6 +49,15 @@ export function useSidebarMenu(activeTab, user, navigate, onCreatePrompt, t) {
       'sidebar.myPrompts',
       'Prompts của tôi',
       () => navigate(ROUTES.MY_PROMPTS),
+    ),
+
+    // Playground
+    item(
+      'playground',
+      <ExperimentOutlined />,
+      'sidebar.playground',
+      'Playground',
+      () => navigate(ROUTES.PLAYGROUND),
     ),
 
     // Create Prompt

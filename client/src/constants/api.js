@@ -45,4 +45,11 @@ export const API_ENDPOINTS = {
     CREATE: (promptId) => `/prompts/${promptId}/comments`,
     DELETE: (promptId, commentId) => `/prompts/${promptId}/comments/${commentId}`,
   },
+  CHAT: {
+    MODELS: '/chat/models',
+    ROOMS: '/chat/rooms',
+    ROOM: (id) => `/chat/rooms/${id}`,
+    MESSAGES: (roomId) => `/chat/rooms/${roomId}/messages`,
+    SEND: (roomId) => `/chat/rooms/${roomId}/messages`,
+  },
 };

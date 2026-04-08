@@ -9,3 +9,5 @@ from app.models.comment import PromptComment
 from app.models.site_settings import SiteSettings
 from app.models.user_event import UserEvent
 from app.models.audit_log import AuditLog
+from app.models.chat_room import ChatRoom
+from app.models.chat_message import ChatMessage

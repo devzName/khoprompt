@@ -112,7 +112,7 @@ const AuditLogPage = () => {
     <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab="audit-logs" />
+        <Sidebar menuItems={menuItems} activeTab="audit-logs" />
       </div>
 
       {/* Mobile sidebar drawer */}
@@ -127,8 +127,6 @@ const AuditLogPage = () => {
         closeIcon={null}
       >
         <Sidebar
-          user={user}
-          onLogout={handleLogout}
           onClose={() => setMobileMenuOpen(false)}
           menuItems={menuItems}
           activeTab="audit-logs"

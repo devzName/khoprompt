@@ -1,10 +1,11 @@
-import { Form, Input, Button } from 'antd';
+import { Form, Input } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PromptFormSection from './PromptFormSection';
 import aiService from '../../services/aiService';
+
 const { TextArea } = Input;
+
 const BasicInfoSection = () => {
   const { t } = useTranslation();
   const [isFormatting, setIsFormatting] = useState(false);
@@ -14,27 +15,17 @@ const BasicInfoSection = () => {
   const handleAIFormat = async () => {
     const description = form.getFieldValue('description');
     const title = form.getFieldValue('title');
-    
+
     if (!title || title.trim() === '') {
-      form.setFields([
-        {
-          name: 'title',
-          errors: [t('myPrompts.createPrompt.titleRequired')]
-        }
-      ]);
+      form.setFields([{ name: 'title', errors: [t('myPrompts.createPrompt.titleRequired')] }]);
       return;
     }
-    
+
     if (title.trim().length < 20) {
-      form.setFields([
-        {
-          name: 'title',
-          errors: [t('myPrompts.createPrompt.titleMinLength')]
-        }
-      ]);
+      form.setFields([{ name: 'title', errors: [t('myPrompts.createPrompt.titleMinLength')] }]);
       return;
     }
-    
+
     setIsFormatting(true);
     try {
       if (!description || description.trim() === '') {
@@ -52,12 +43,13 @@ const BasicInfoSection = () => {
   };
 
   const getAIButtonLabel = () => {
-    return (!description || description.trim() === '') 
+    return (!description || description.trim() === '')
       ? t('myPrompts.createPrompt.aiWrite', 'AI viết giúp')
       : t('myPrompts.createPrompt.aiEdit', 'AI sửa giúp');
   };
+
   return (
-    <PromptFormSection title={t('myPrompts.createPrompt.basicInfo')}>
+    <div>
       <Form.Item
         label={t('myPrompts.createPrompt.titleLabel')}
         name="title"
@@ -67,23 +59,28 @@ const BasicInfoSection = () => {
         ]}
         className="mb-4"
       >
-        <Input 
+        <Input
           placeholder={t('myPrompts.createPrompt.titlePlaceholder')}
           size="large"
+          name="title"
+          autoComplete="off"
+          className="text-2xl font-semibold border-0 focus:ring-0 shadow-none px-0 placeholder:text-gray-300 dark:placeholder:text-gray-600"
+          style={{ fontSize: '1.5rem', fontWeight: 600 }}
         />
       </Form.Item>
       <Form.Item
         label={
           <div className="flex items-center gap-2">
             <span>{t('myPrompts.createPrompt.descriptionLabel')}</span>
-            <Button
-              size="small"
-              icon={<ThunderboltOutlined />}
-              loading={isFormatting}
+            <button
+              type="button"
+              disabled={isFormatting}
               onClick={handleAIFormat}
+              className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors disabled:opacity-50"
             >
-              {getAIButtonLabel()}
-            </Button>
+              <ThunderboltOutlined aria-hidden="true" />
+              {isFormatting ? '...' : getAIButtonLabel()}
+            </button>
           </div>
         }
         name="description"
@@ -92,11 +89,14 @@ const BasicInfoSection = () => {
       >
         <TextArea
           placeholder={t('myPrompts.createPrompt.descriptionPlaceholder')}
-          rows={3}
+          rows={2}
           size="large"
+          name="description"
+          autoComplete="off"
         />
       </Form.Item>
-    </PromptFormSection>
+    </div>
   );
 };
+
 export default BasicInfoSection;

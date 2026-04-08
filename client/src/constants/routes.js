@@ -11,5 +11,7 @@ export const ROUTES = {
   BOOKMARKED: '/bookmarked',
   ADMIN_PROMPTS: '/admin/prompts',
   ADMIN_AUDIT_LOGS: '/admin/audit-logs',
+  PLAYGROUND: '/playground',
+  PLAYGROUND_ROOM: (roomId) => `/playground/${roomId}`,
 };
 export default ROUTES;

@@ -74,7 +74,7 @@ const AdminPromptManagementPage = () => {
     <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <Sidebar user={user} onLogout={handleLogout} menuItems={menuItems} activeTab="admin-prompts" />
+        <Sidebar menuItems={menuItems} activeTab="admin-prompts" />
       </div>
 
       {/* Mobile sidebar drawer */}
@@ -89,8 +89,6 @@ const AdminPromptManagementPage = () => {
         closeIcon={null}
       >
         <Sidebar
-          user={user}
-          onLogout={handleLogout}
           onClose={() => setMobileMenuOpen(false)}
           menuItems={menuItems}
           activeTab="admin-prompts"

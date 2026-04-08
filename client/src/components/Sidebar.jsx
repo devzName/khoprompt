@@ -1,17 +1,12 @@
 import { useState } from 'react';
-import { Avatar, Button, Dropdown, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { CloseOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../hooks/useLanguage';
-import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
-import UserProfile from './shared/UserProfile';
 import { ROUTES } from '../constants/routes';
 
-const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClose = null }) => {
+const Sidebar = ({ menuItems, activeTab, isMobile = false, onClose = null }) => {
   const navigate = useNavigate();
-  const { t, getLanguageMenuItems } = useLanguage();
-  const userMenuItems = createUserMenuItems(t, getLanguageMenuItems, onLogout, false, user);
 
   // Collapse state — desktop only; persisted in localStorage
   const [collapsed, setCollapsed] = useState(() => {
@@ -63,7 +58,7 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
             />
           </div>
         </div>
-        <nav className="flex-1 px-4">
+        <nav className="flex-1 px-4 py-2">
           <div className="space-y-2">
             {menuItems.map((item) => (
               <button
@@ -77,11 +72,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
             ))}
           </div>
         </nav>
-        {user && (
-          <div className="p-4 border-t border-gray-100 dark:border-gray-700">
-            <UserProfile user={user} menuItems={userMenuItems} placement="top" size={40} />
-          </div>
-        )}
       </div>
     );
   }
@@ -124,27 +114,6 @@ const Sidebar = ({ user, onLogout, menuItems, activeTab, isMobile = false, onClo
           ))}
         </div>
       </nav>
-
-      {/* User profile */}
-      <div className={`border-t dark:border-gray-700 ${collapsed ? 'p-2 flex justify-center' : 'p-4'}`}>
-        {!collapsed ? (
-          <UserProfile user={user} menuItems={userMenuItems} placement="topRight" size={40} />
-        ) : (
-          user && (
-            <Tooltip title={user?.name || user?.email || ''} placement="right">
-              <Dropdown menu={{ items: userMenuItems }} placement="topRight" trigger={['click']}>
-                <Avatar
-                  size={32}
-                  src={user?.picture}
-                  className="cursor-pointer shrink-0 hover:opacity-80 transition-opacity"
-                >
-                  {user?.name?.[0] || 'U'}
-                </Avatar>
-              </Dropdown>
-            </Tooltip>
-          )
-        )}
-      </div>
 
       {/* Collapse toggle */}
       <div className={`border-t dark:border-gray-700 p-2 flex ${collapsed ? 'justify-center' : 'justify-end'}`}>
