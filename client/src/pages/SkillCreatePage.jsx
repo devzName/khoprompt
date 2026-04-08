@@ -11,6 +11,7 @@ import { useSidebarMenu } from '../hooks/use-sidebar-menu.jsx';
 import { skillService } from '../services/skillService';
 import { ROUTES } from '../constants/routes';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/shared/PageHeader';
 import SkillForm from '../components/skills/skill-form';
 
 const SkillCreatePage = () => {
@@ -26,7 +27,7 @@ const SkillCreatePage = () => {
   const [initialData, setInitialData] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const menuItems = useSidebarMenu('skills', user, navigate, null, t);
+  const menuItems = useSidebarMenu('my-skills', user, navigate, null, t);
 
   useEffect(() => {
     if (!isEditing) return;
@@ -81,8 +82,8 @@ const SkillCreatePage = () => {
 
   return (
     <div className="flex h-full bg-white dark:bg-[#111]">
-      <div className="hidden lg:block">
-        <Sidebar menuItems={menuItems} activeTab="skills" />
+      <div className="hidden lg:block border-r border-gray-100 dark:border-white/5">
+        <Sidebar menuItems={menuItems} activeTab="my-skills" />
       </div>
 
       <Drawer
@@ -94,25 +95,32 @@ const SkillCreatePage = () => {
         styles={{ body: { padding: 0 } }}
         closeIcon={null}
       >
-        <Sidebar menuItems={menuItems} activeTab="skills" />
+        <Sidebar menuItems={menuItems} activeTab="my-skills" isMobile onClose={() => setMobileMenuOpen(false)} />
       </Drawer>
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-2xl mx-auto flex flex-col gap-5">
-          <h1 className="text-xl font-semibold">
-            {isEditing ? t('skills.editTitle', 'Edit Skill') : t('skills.createTitle', 'Create Skill')}
-          </h1>
+      <div className="flex-1 overflow-y-auto flex flex-col min-h-0 bg-gray-50 dark:bg-[#0d0d0d]">
+        <PageHeader
+          title={isEditing ? t('skills.editTitle', 'Edit Skill') : t('skills.createTitle', 'Create Skill')}
+          description={isEditing ? t('skills.editDescription', 'Update your skill details.') : t('skills.createDescription', 'Add a new skill to your workspace.')}
+          breadcrumb={isEditing ? t('skills.editTitle') : t('skills.createTitle')}
+          onMenuClick={() => setMobileMenuOpen(true)}
+        />
 
-          {fetching ? (
-            <div className="flex justify-center py-16"><Spin size="large" /></div>
-          ) : (
-            <SkillForm
-              form={form}
-              onFinish={handleFinish}
-              loading={loading}
-              initialData={initialData}
-            />
-          )}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+          <div className="max-w-2xl mx-auto">
+            {fetching ? (
+              <div className="flex justify-center py-24"><Spin size="large" /></div>
+            ) : (
+              <div className="bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/5 p-6 shadow-sm">
+                <SkillForm
+                  form={form}
+                  onFinish={handleFinish}
+                  loading={loading}
+                  initialData={initialData}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

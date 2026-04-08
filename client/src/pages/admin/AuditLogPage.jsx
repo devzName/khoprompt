@@ -1,16 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Drawer, Select, DatePicker } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Select, DatePicker } from 'antd';
 import dayjs from 'dayjs';
-import { useAuth } from '../../hooks/useAuth';
-import { ROUTES } from '../../constants/routes';
-import { useSidebarMenu } from '../../hooks/use-sidebar-menu.jsx';
 import adminService from '../../services/adminService';
 import AuditLogTable from './audit-log-table';
 import UserActivityDrawer from './user-activity-drawer';
 import PageHeader from '../../components/shared/PageHeader';
-import Sidebar from '../../components/Sidebar';
+import AdminLayout from '../../components/layouts/AdminLayout';
 
 const { RangePicker } = DatePicker;
 
@@ -25,29 +20,13 @@ const ACTION_OPTIONS = [
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 50;
 
-/**
- * Admin page: paginated, filterable audit log viewer.
- * Row click opens UserActivityDrawer for that user.
- */
 const AuditLogPage = () => {
-  const { user, logout } = useAuth();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Filters
   const [action, setAction] = useState('');
   const [dateRange, setDateRange] = useState([null, null]);
   const [page, setPage] = useState(DEFAULT_PAGE);
-
-  // Drawer state
   const [drawerUserId, setDrawerUserId] = useState(null);
-
-  const handleLogout = () => logout(() => setMobileMenuOpen(false));
-
-  const menuItems = useSidebarMenu('audit-logs', user, navigate, null, t);
 
   const fetchLogs = useCallback(async (params = {}) => {
     setLoading(true);
@@ -60,7 +39,6 @@ const AuditLogPage = () => {
         ...(dateRange[1] ? { to_date: dateRange[1].toISOString() } : {}),
         ...params,
       };
-      // Remove empty string action
       if (!query.action) delete query.action;
       const res = await adminService.getAuditLogs(query);
       setData(res.data);
@@ -71,7 +49,6 @@ const AuditLogPage = () => {
     }
   }, [page, action, dateRange]);
 
-  // Initial load
   useEffect(() => {
     fetchLogs({ page: DEFAULT_PAGE });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,80 +86,51 @@ const AuditLogPage = () => {
   };
 
   return (
-    <div className="flex h-full bg-gray-50 dark:bg-[#0a0a0a]">
-      {/* Desktop sidebar */}
-      <div className="hidden lg:block">
-        <Sidebar menuItems={menuItems} activeTab="audit-logs" />
-      </div>
-
-      {/* Mobile sidebar drawer */}
-      <Drawer
-        title={null}
-        placement="left"
-        onClose={() => setMobileMenuOpen(false)}
-        open={mobileMenuOpen}
-        className="lg:hidden"
-        size={280}
-        styles={{ body: { padding: 0 } }}
-        closeIcon={null}
-      >
-        <Sidebar
-          onClose={() => setMobileMenuOpen(false)}
-          menuItems={menuItems}
-          activeTab="audit-logs"
-          isMobile={true}
-        />
-      </Drawer>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <PageHeader
-          title="Audit Logs"
-          description="Theo dõi tất cả các hoạt động quan trọng trong hệ thống"
-          breadcrumb="Audit Logs"
-          onMenuClick={() => setMobileMenuOpen(true)}
-        />
-
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d] p-6">
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Select
-              value={action}
-              onChange={handleActionChange}
-              options={ACTION_OPTIONS}
-              style={{ width: 180 }}
-              placeholder="Filter by action"
-              aria-label="Lọc theo hành động"
-              size="small"
-            />
-            <RangePicker
-              value={dateRange.map((d) => (d ? dayjs(d) : null))}
-              onChange={handleDateChange}
-              allowEmpty={[true, true]}
-              aria-label="Lọc theo khoảng thời gian"
-              size="small"
-            />
+    <AdminLayout activeTab="audit-logs">
+      {({ onMenuClick }) => (
+        <>
+          <PageHeader
+            title="Audit Logs"
+            description="Theo dõi tất cả các hoạt động quan trọng trong hệ thống"
+            breadcrumb="Audit Logs"
+            onMenuClick={onMenuClick}
+          />
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d] p-6">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <Select
+                value={action}
+                onChange={handleActionChange}
+                options={ACTION_OPTIONS}
+                style={{ width: 180 }}
+                placeholder="Filter by action"
+                aria-label="Lọc theo hành động"
+                size="small"
+              />
+              <RangePicker
+                value={dateRange.map((d) => (d ? dayjs(d) : null))}
+                onChange={handleDateChange}
+                allowEmpty={[true, true]}
+                aria-label="Lọc theo khoảng thời gian"
+                size="small"
+              />
+            </div>
+            <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] overflow-hidden">
+              <AuditLogTable
+                data={data}
+                loading={loading}
+                pagination={pagination}
+                onChange={handleTableChange}
+                onRowClick={(record) => setDrawerUserId(record.user_id)}
+              />
+            </div>
           </div>
-
-          {/* Table */}
-          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] overflow-hidden">
-            <AuditLogTable
-              data={data}
-              loading={loading}
-              pagination={pagination}
-              onChange={handleTableChange}
-              onRowClick={(record) => setDrawerUserId(record.user_id)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* User activity drawer */}
-      <UserActivityDrawer
-        userId={drawerUserId}
-        onClose={() => setDrawerUserId(null)}
-      />
-    </div>
+          <UserActivityDrawer
+            userId={drawerUserId}
+            onClose={() => setDrawerUserId(null)}
+          />
+        </>
+      )}
+    </AdminLayout>
   );
 };
 

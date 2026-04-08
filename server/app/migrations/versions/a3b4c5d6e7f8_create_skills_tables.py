@@ -25,6 +25,8 @@ def upgrade() -> None:
         sa.Column('spec', JSONB, nullable=False),
         sa.Column('tags', ARRAY(sa.String), nullable=False, server_default='{}'),
         sa.Column('category', sa.String(50), nullable=True),
+        # Ownership - required field for skill creator
+        sa.Column('user_id', UUID(as_uuid=True), sa.ForeignKey('users.id'), nullable=False),
         sa.Column('is_public', sa.Boolean, nullable=False, server_default=sa.text('false')),
         sa.Column('approval_status', sa.String(20), nullable=False, server_default='pending'),
         sa.Column('approved_by', UUID(as_uuid=True), sa.ForeignKey('users.id'), nullable=True),
@@ -51,6 +53,7 @@ def upgrade() -> None:
         sa.Column('output', sa.Text, nullable=False),
         sa.Column('file_path', sa.String(255), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text('now()')),
+        sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text('now()')),
         sa.UniqueConstraint('skill_id', 'agent', name='uq_skill_compilation_agent'),
     )
     op.create_index('ix_skill_compilations_skill_id', 'skill_compilations', ['skill_id'])

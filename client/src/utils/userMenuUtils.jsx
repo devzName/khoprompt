@@ -32,6 +32,11 @@ export const createUserMenuItems = (t, getLanguageMenuItems, onLogout, includeMy
         label: <Link to={ROUTES.MY_PROMPTS}>{t('header.myPrompts')}</Link>,
       },
       {
+        key: 'my-skills',
+        icon: <FileOutlined />,
+        label: <Link to={ROUTES.MY_SKILLS}>{t('skills.mySkills')}</Link>,
+      },
+      {
         type: 'divider',
       },
       {

@@ -1,34 +1,87 @@
-import { Card, Avatar } from 'antd';
-import { EyeOutlined, UserOutlined } from '@ant-design/icons';
-const PromptCard = ({ title, description, author }) => {
-  return (
-    <Card
-      hoverable
-      className="h-full border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden bg-white dark:bg-[#141414]"
-    >
-      <div className="flex flex-col h-full min-h-[150px]">
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-words">
-          {title}
-        </h3>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 flex-grow leading-relaxed break-words">
-          {description}
-        </p>
-        <div className="flex items-center justify-between gap-2 pt-3 mt-auto border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-2 min-w-0 flex-shrink">
-            <Avatar
-              size="small"
-              icon={<UserOutlined />}
-              className="bg-linear-to-br from-blue-500 to-blue-600 flex-shrink-0"
-            />
-            <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium truncate">@{author}</span>
+import { Tag, Tooltip } from 'antd';
+import { EyeOutlined, LikeOutlined, StarOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../constants/routes';
+
+const PromptCard = ({ prompt, title, description, author, listMode = false }) => {
+  const navigate = useNavigate();
+
+  const displayTitle = prompt?.title || title;
+  const displayDescription = prompt?.description || description;
+  const displayAuthor = prompt?.user?.full_name || prompt?.author || author || 'Unknown';
+  const slug = prompt?.slug;
+  const isFeatured = prompt?.featured;
+  const viewCount = prompt?.view_count ?? 0;
+  const likeCount = prompt?.like_count ?? 0;
+  const categoryName = typeof prompt?.category === 'object' ? prompt.category?.name : prompt?.category;
+
+  const handleCardClick = () => {
+    if (slug) navigate(ROUTES.PROMPT_DETAIL_PATH(slug));
+  };
+
+  if (listMode) {
+    return (
+      <div
+        onClick={handleCardClick}
+        className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-[#141414] hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer transition-colors"
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            {isFeatured && <StarOutlined className="text-yellow-500 shrink-0" />}
+            <span className="font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+            <Tag className="m-0 border-none bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-lg px-2 py-0.5 shrink-0">
+              {categoryName || 'Uncategorized'}
+            </Tag>
           </div>
-          <button className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs sm:text-sm font-medium flex items-center space-x-1 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors flex-shrink-0 whitespace-nowrap">
-            <EyeOutlined className="text-sm sm:text-base" />
-            <span>Xem nhanh</span>
-          </button>
+          <p className="text-sm text-gray-500 dark:text-neutral-400 truncate">{displayDescription}</p>
+        </div>
+        <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-neutral-500 shrink-0">
+          <span className="flex items-center gap-1"><EyeOutlined /> {viewCount}</span>
+          <span className="flex items-center gap-1"><LikeOutlined /> {likeCount}</span>
+          <span className="hidden sm:block">@{displayAuthor.split(' ')[0]}</span>
         </div>
       </div>
-    </Card>
+    );
+  }
+
+  return (
+    <div
+      onClick={handleCardClick}
+      className="group relative bg-white dark:bg-[#141414] rounded-2xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 cursor-pointer overflow-hidden"
+    >
+      {/* Decorative background gradient */}
+      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors" />
+
+      <div className="relative flex flex-col h-full gap-4">
+        <div className="flex items-start justify-between gap-2">
+          <Tag className="m-0 border-none bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-lg px-2 py-0.5">
+            {categoryName || 'Uncategorized'}
+          </Tag>
+          {isFeatured && (
+            <Tooltip title="Featured">
+              <StarOutlined className="text-yellow-500 shrink-0" />
+            </Tooltip>
+          )}
+        </div>
+
+        <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+          {displayTitle}
+        </h3>
+
+        <p className="text-sm text-gray-500 dark:text-neutral-400 line-clamp-2 leading-relaxed">
+          {displayDescription}
+        </p>
+
+        <div className="mt-auto pt-4 border-t border-gray-50 dark:border-white/5 flex items-center justify-between text-xs text-gray-400 dark:text-neutral-500">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1"><EyeOutlined className="text-blue-500/70" /> {viewCount}</span>
+            <span className="flex items-center gap-1"><LikeOutlined className="text-pink-500/70" /> {likeCount}</span>
+          </div>
+          <span className="font-medium text-gray-400/80">@{displayAuthor.split(' ')[0]}</span>
+        </div>
+      </div>
+    </div>
   );
 };
+
 export default PromptCard;

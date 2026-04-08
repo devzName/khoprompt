@@ -6,6 +6,7 @@ import {
   UserSwitchOutlined,
   AuditOutlined,
   ToolOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '../constants/routes';
 
@@ -19,8 +20,8 @@ import { ROUTES } from '../constants/routes';
  * @param {function|null} _onCreatePrompt - unused, kept for backward compat
  * @param {function} t
  */
-export function useSidebarMenu(activeTab, user, navigate, _onCreatePrompt, t) {
-  const isAdmin = user?.user_type === 'admin';
+export function useSidebarMenu(activeTab, user, navigate, _onCreatePrompt, t, showAdmin = false) {
+  const isAdmin = user?.user_type === 'admin' && showAdmin;
 
   const item = (key, icon, labelKey, labelFallback, action) => ({
     key,
@@ -32,36 +33,33 @@ export function useSidebarMenu(activeTab, user, navigate, _onCreatePrompt, t) {
 
   const section = (label) => ({ type: 'section', label });
 
+  if (isAdmin) {
+    return [
+      item('dashboard', <DashboardOutlined />, 'sidebar.dashboard', 'Dashboard',
+        () => navigate(ROUTES.ADMIN_DASHBOARD)),
+
+      item('admin-prompts', <AppstoreOutlined />, 'sidebar.adminPrompts', 'Manage Prompts',
+        () => navigate(ROUTES.ADMIN_PROMPTS)),
+
+      item('manage', <TagsOutlined />, 'manageCategoriesTags.title', 'Categories & Tags',
+        () => navigate(ROUTES.ADMIN_CATEGORIES)),
+
+      item('login-management', <UserSwitchOutlined />, 'sidebar.loginManagement', 'Login Management',
+        () => navigate(ROUTES.ADMIN_LOGIN_MANAGEMENT)),
+
+      item('audit-logs', <AuditOutlined />, 'sidebar.auditLogs', 'Audit Logs',
+        () => navigate(ROUTES.ADMIN_AUDIT_LOGS)),
+    ];
+  }
+
   return [
-    // --- My content ---
-    ...(isAdmin
-      ? [item('dashboard', <DashboardOutlined />, 'sidebar.dashboard', 'Dashboard',
-          () => navigate(ROUTES.MY_PROMPTS_DASHBOARD))]
-      : []),
+    item('prompts', <AppstoreOutlined />, 'sidebar.prompts', 'Prompts',
+      () => navigate(ROUTES.PROMPTS)),
 
     item('my-prompts', <FileTextOutlined />, 'sidebar.myPrompts', 'My Prompts',
       () => navigate(ROUTES.MY_PROMPTS)),
 
-    item('skills', <ToolOutlined />, 'skills.title', 'Skills',
-      () => navigate(ROUTES.SKILLS)),
-
-    // --- Admin section ---
-    ...(isAdmin
-      ? [
-          section('Admin'),
-
-          item('admin-prompts', <AppstoreOutlined />, 'sidebar.adminPrompts', 'Manage Prompts',
-            () => navigate(ROUTES.ADMIN_PROMPTS)),
-
-          item('manage', <TagsOutlined />, 'manageCategoriesTags.title', 'Categories & Tags',
-            () => navigate(`${ROUTES.MY_PROMPTS}?tab=manage`)),
-
-          item('login-management', <UserSwitchOutlined />, 'sidebar.loginManagement', 'Login Management',
-            () => navigate(`${ROUTES.MY_PROMPTS}?tab=login-management`)),
-
-          item('audit-logs', <AuditOutlined />, 'sidebar.auditLogs', 'Audit Logs',
-            () => navigate(ROUTES.ADMIN_AUDIT_LOGS)),
-        ]
-      : []),
+    item('my-skills', <ToolOutlined />, 'sidebar.mySkills', 'My Skills',
+      () => navigate(ROUTES.MY_SKILLS)),
   ];
 }

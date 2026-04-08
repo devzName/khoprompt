@@ -8,13 +8,19 @@ import MyPromptsPage from './pages/MyPromptsPage';
 import BookmarkedPage from './pages/BookmarkedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPromptManagementPage from './pages/admin/AdminPromptManagementPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import AdminLoginManagementPage from './pages/admin/AdminLoginManagementPage';
 import AuditLogPage from './pages/admin/AuditLogPage';
 import PlaygroundPage from './pages/PlaygroundPage';
 import CreatePromptPage from './pages/CreatePromptPage';
 import SkillListPage from './pages/SkillListPage';
+import PromptListPage from './pages/PromptListPage';
+import MySkillsPage from './pages/MySkillsPage';
 import SkillCreatePage from './pages/SkillCreatePage';
 import SkillDetailPage from './pages/SkillDetailPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
 import { ROUTES } from './constants/routes';
 import { Spin, ConfigProvider, theme } from 'antd';
@@ -105,6 +111,7 @@ function AppContent() {
       <Routes>
         <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.SEARCH} element={<SearchPage />} />
+        <Route path={ROUTES.PROMPTS} element={<PromptListPage />} />
         <Route path={ROUTES.PROMPT_DETAIL} element={<PromptDetailPage />} />
         <Route
           path={ROUTES.MY_PROMPTS}
@@ -141,17 +148,41 @@ function AppContent() {
         <Route
           path={ROUTES.ADMIN_PROMPTS}
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminPromptManagementPage />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route
           path={ROUTES.ADMIN_AUDIT_LOGS}
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AuditLogPage />
-            </ProtectedRoute>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_DASHBOARD}
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_CATEGORIES}
+          element={
+            <AdminRoute>
+              <AdminCategoriesPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_LOGIN_MANAGEMENT}
+          element={
+            <AdminRoute>
+              <AdminLoginManagementPage />
+            </AdminRoute>
           }
         />
         <Route
@@ -173,6 +204,10 @@ function AppContent() {
         <Route
           path={ROUTES.SKILLS}
           element={<ProtectedRoute><SkillListPage /></ProtectedRoute>}
+        />
+        <Route
+          path={ROUTES.MY_SKILLS}
+          element={<ProtectedRoute><MySkillsPage /></ProtectedRoute>}
         />
         <Route
           path={ROUTES.SKILL_CREATE}

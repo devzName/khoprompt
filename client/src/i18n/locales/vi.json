@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "view": "Xem",
     "edit": "Sửa",
@@ -22,6 +22,7 @@
     "subtitle": "AI Prompt Collection",
     "search": "Tìm kiếm prompt...",
     "createPrompt": "Tạo Prompt",
+    "prompts": "Prompts",
     "myPrompts": "Prompts của tôi",
     "bookmarked": "Đã lưu",
     "reviewPrompts": "Duyệt Prompt",
@@ -50,7 +51,9 @@
   "sidebar": {
     "backToHome": "Quay về trang chủ",
     "overview": "Tổng quan",
+    "prompts": "Khám phá",
     "myPrompts": "Prompts của tôi",
+    "mySkills": "Kỹ năng của tôi",
     "promptKits": "Prompt Kits",
     "orders": "Đơn hàng đã mua",
     "paymentHistory": "Lịch sử nạp tiền",
@@ -483,5 +486,12 @@
     "fillVariablesTitle": "Điền biến trước khi thử",
     "fillVariablesDesc": "Prompt này có các biến. Điền giá trị để sử dụng trong Playground.",
     "openPlayground": "Mở Playground"
+  },
+  "mySkills": {
+    "subtitle": "Quản lý và tạo các công cụ, năng lực nội bộ của riêng bạn."
+  },
+  "prompts": {
+    "explore": "Khám phá Prompts",
+    "discoverSubtitle": "Khám phá những prompt tốt nhất từ cộng đồng để tối ưu hóa quy trình làm việc của bạn."
   }
 }

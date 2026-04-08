@@ -64,12 +64,12 @@ const BookmarkedPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-full bg-gray-50 flex flex-col">
+      <div className="min-h-full bg-white dark:bg-[#0a0a0a] flex flex-col">
         <div className="flex-grow">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
-              <BookOutlined className="text-6xl text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <BookOutlined className="text-6xl text-gray-300 dark:text-gray-600 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 {t('bookmarked.loginRequired', 'Please login to view bookmarked prompts')}
               </h3>
             </div>
@@ -81,7 +81,7 @@ const BookmarkedPage = () => {
   }
 
   return (
-    <div className="min-h-full bg-gray-50 flex flex-col">
+    <div className="min-h-full bg-white dark:bg-[#0a0a0a] flex flex-col">
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {loading ? (

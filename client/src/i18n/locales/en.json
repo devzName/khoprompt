@@ -22,6 +22,7 @@
     "subtitle": "AI Prompt Collection",
     "search": "Search prompt...",
     "createPrompt": "Create Prompt",
+    "prompts": "Prompts",
     "myPrompts": "My Prompts",
     "bookmarked": "Bookmarked",
     "reviewPrompts": "Review Prompts",
@@ -50,7 +51,9 @@
   "sidebar": {
     "backToHome": "Back to home",
     "overview": "Overview",
+    "prompts": "Discover",
     "myPrompts": "My Prompts",
+    "mySkills": "My Skills",
     "promptKits": "Prompt Kits",
     "orders": "My Orders",
     "paymentHistory": "Payment History",
@@ -532,5 +535,12 @@
     "errorDeleteRoom": "Could not delete chat room",
     "errorUpdateRoom": "Could not update chat room",
     "errorOpenPrompt": "Could not open prompt in Playground"
+  },
+  "mySkills": {
+    "subtitle": "Manage and create your internal tools and capabilities."
+  },
+  "prompts": {
+    "explore": "Explore Prompts",
+    "discoverSubtitle": "Discover the best community prompts to supercharge your workflow."
   }
 }
