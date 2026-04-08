@@ -11,6 +11,9 @@ import AdminPromptManagementPage from './pages/admin/AdminPromptManagementPage';
 import AuditLogPage from './pages/admin/AuditLogPage';
 import PlaygroundPage from './pages/PlaygroundPage';
 import CreatePromptPage from './pages/CreatePromptPage';
+import SkillListPage from './pages/SkillListPage';
+import SkillCreatePage from './pages/SkillCreatePage';
+import SkillDetailPage from './pages/SkillDetailPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import { ROUTES } from './constants/routes';
@@ -166,6 +169,22 @@ function AppContent() {
               <PlaygroundPage />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path={ROUTES.SKILLS}
+          element={<ProtectedRoute><SkillListPage /></ProtectedRoute>}
+        />
+        <Route
+          path={ROUTES.SKILL_CREATE}
+          element={<ProtectedRoute><SkillCreatePage /></ProtectedRoute>}
+        />
+        <Route
+          path={ROUTES.SKILL_DETAIL}
+          element={<ProtectedRoute><SkillDetailPage /></ProtectedRoute>}
+        />
+        <Route
+          path={ROUTES.SKILL_EDIT}
+          element={<ProtectedRoute><SkillCreatePage /></ProtectedRoute>}
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

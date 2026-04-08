@@ -5,6 +5,7 @@ import {
   TagsOutlined,
   UserSwitchOutlined,
   AuditOutlined,
+  ToolOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '../constants/routes';
 
@@ -40,6 +41,9 @@ export function useSidebarMenu(activeTab, user, navigate, _onCreatePrompt, t) {
 
     item('my-prompts', <FileTextOutlined />, 'sidebar.myPrompts', 'My Prompts',
       () => navigate(ROUTES.MY_PROMPTS)),
+
+    item('skills', <ToolOutlined />, 'skills.title', 'Skills',
+      () => navigate(ROUTES.SKILLS)),
 
     // --- Admin section ---
     ...(isAdmin

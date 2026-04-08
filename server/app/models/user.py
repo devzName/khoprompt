@@ -30,3 +30,10 @@ class User(AuditMixin, Base):
     prompt_views: Mapped[list['PromptView']] = relationship('PromptView', back_populates='user')
     bookmarks: Mapped[list['Bookmark']] = relationship('Bookmark', back_populates='user')
     comments: Mapped[list['PromptComment']] = relationship('PromptComment', back_populates='user')
+
+    # Skill relationships
+    skills: Mapped[list['Skill']] = relationship('Skill', back_populates='user', foreign_keys='Skill.user_id')
+    skill_bookmarks: Mapped[list['SkillBookmark']] = relationship('SkillBookmark', back_populates='user')
+    skill_votes: Mapped[list['SkillVote']] = relationship('SkillVote', back_populates='user')
+    skill_views: Mapped[list['SkillView']] = relationship('SkillView', back_populates='user')
+    skill_comments: Mapped[list['SkillComment']] = relationship('SkillComment', back_populates='user')

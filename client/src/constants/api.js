@@ -45,6 +45,17 @@ export const API_ENDPOINTS = {
     CREATE: (promptId) => `/prompts/${promptId}/comments`,
     DELETE: (promptId, commentId) => `/prompts/${promptId}/comments/${commentId}`,
   },
+  SKILLS: {
+    BASE: '/skills',
+    MY: '/skills/my',
+    BY_ID: (id) => `/skills/${id}`,
+    COMPILE: (id, agent) => `/skills/${id}/compile/${agent}`,
+    BOOKMARK: (id) => `/skills/${id}/bookmark`,
+    VOTE: (id) => `/skills/${id}/vote`,
+    VIEW: (id) => `/skills/${id}/view`,
+    COMMENTS: (id) => `/skills/${id}/comments`,
+    COMMENT: (id, cid) => `/skills/${id}/comments/${cid}`,
+  },
   CHAT: {
     MODELS: '/chat/models',
     ROOMS: '/chat/rooms',

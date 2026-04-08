@@ -14,5 +14,11 @@ export const ROUTES = {
   ADMIN_AUDIT_LOGS: '/admin/audit-logs',
   PLAYGROUND: '/playground',
   PLAYGROUND_ROOM: (roomId) => `/playground/${roomId}`,
+  SKILLS: '/skills',
+  SKILL_CREATE: '/skills/new',
+  SKILL_DETAIL: '/skills/:id',
+  SKILL_DETAIL_PATH: (id) => `/skills/${id}`,
+  SKILL_EDIT: '/skills/:id/edit',
+  SKILL_EDIT_PATH: (id) => `/skills/${id}/edit`,
 };
 export default ROUTES;

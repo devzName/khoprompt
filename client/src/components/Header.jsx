@@ -336,6 +336,18 @@ const Header = () => {
               {t('bookmarked.title', 'Bookmarks')}
             </button>
 
+            <button
+              onClick={() => navigate(ROUTES.SKILLS)}
+              className="px-3 py-1.5 rounded-md text-sm
+                text-gray-500 dark:text-neutral-400
+                hover:text-black dark:hover:text-white
+                hover:bg-gray-100 dark:hover:bg-white/[0.06]
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-white/20
+                transition-colors duration-150"
+            >
+              {t('skills.title', 'Skills')}
+            </button>
+
             {/* Divider */}
             <span aria-hidden="true" className="w-px h-4 bg-gray-200 dark:bg-white/10 mx-1.5" />
 
