@@ -1,5 +1,9 @@
+/**
+ * My Prompts dashboard page — list, dashboard, manage, login-management tabs.
+ * Create/Edit prompt is now a separate route: /my-prompts/create and /my-prompts/:id/edit
+ */
 import { useState, useEffect } from 'react';
-import { Drawer, Form, Modal, Input, notification } from 'antd';
+import { Drawer, Modal, Input, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -7,7 +11,6 @@ import { promptService } from '../services/promptService';
 import { ROUTES } from '../constants/routes';
 import { useSidebarMenu } from '../hooks/use-sidebar-menu.jsx';
 import Sidebar from '../components/Sidebar';
-import CreatePromptForm from '../components/prompts/CreatePromptForm';
 import DashboardOverview from '../components/DashboardOverview';
 import MyPromptsList from '../components/my-prompts/my-prompts-list';
 import ManageCategoriesTags from '../components/ManageCategoriesTags';
@@ -15,18 +18,18 @@ import LoginManagement from '../components/LoginManagement';
 import { PAGINATION } from '../constants/pagination';
 
 const MyPromptsPage = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [editingPrompt, setEditingPrompt] = useState(null);
 
-  // Reject reason modal state
+  // Shared loading for approve/reject actions
+  const [loading, setLoading] = useState(false);
+
+  // Reject reason modal
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [rejectTargetId, setRejectTargetId] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -40,22 +43,14 @@ const MyPromptsPage = () => {
   const [dashboardSorter, setDashboardSorter] = useState({ sortBy: 'created_at', sortOrder: 'desc' });
   const [dashboardSearch, setDashboardSearch] = useState('');
 
+  // Sync active tab from URL query param
   useEffect(() => {
-    const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl === 'create') {
-      setActiveTab('create');
-      setEditingPrompt(null);
-      form.resetFields();
-    } else if (tabFromUrl === 'dashboard' && user?.user_type === 'admin') {
-      setActiveTab('dashboard');
-    } else if (tabFromUrl === 'manage' && user?.user_type === 'admin') {
-      setActiveTab('manage');
-    } else if (tabFromUrl === 'login-management' && user?.user_type === 'admin') {
-      setActiveTab('login-management');
-    } else {
-      setActiveTab('list');
-    }
-  }, [searchParams, form, user?.user_type]);
+    const tab = searchParams.get('tab');
+    if (tab === 'dashboard' && user?.user_type === 'admin') setActiveTab('dashboard');
+    else if (tab === 'manage' && user?.user_type === 'admin') setActiveTab('manage');
+    else if (tab === 'login-management' && user?.user_type === 'admin') setActiveTab('login-management');
+    else setActiveTab('list');
+  }, [searchParams, user?.user_type]);
 
   useEffect(() => {
     if (user?.user_type === 'admin' && activeTab === 'dashboard') {
@@ -81,45 +76,9 @@ const MyPromptsPage = () => {
     }
   };
 
-  const handleCreatePrompt = () => {
-    setEditingPrompt(null);
-    form.resetFields();
-    setActiveTab('create');
-  };
-
-  const handleEditPrompt = (prompt) => {
-    setEditingPrompt(prompt);
-    form.setFieldsValue({
-      title: prompt.title,
-      description: prompt.description,
-      content: prompt.content,
-      category: prompt.category_id,
-      tags: prompt.tags?.map((tag) => (typeof tag === 'object' ? tag.id : tag).toString()) || [],
-      notes: prompt.notes,
-    });
-    setActiveTab('create');
-  };
-
-  const handleSubmitPrompt = async (formData) => {
-    try {
-      setLoading(true);
-      if (editingPrompt) {
-        await promptService.updatePrompt(editingPrompt.id, formData);
-        notification.success({ message: t('common.success'), description: t('myPrompts.editPrompt.success'), placement: 'topRight' });
-      } else {
-        await promptService.createPrompt(formData);
-        notification.success({ message: t('common.success'), description: t('myPrompts.createPrompt.success'), placement: 'topRight' });
-      }
-      form.resetFields();
-      setEditingPrompt(null);
-      setActiveTab('list');
-      navigate(ROUTES.MY_PROMPTS);
-    } catch {
-      notification.error({ message: t('common.error'), description: t('myPrompts.createPrompt.error'), placement: 'topRight' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Navigate to the dedicated create/edit page
+  const handleCreatePrompt = () => navigate(ROUTES.MY_PROMPTS_CREATE);
+  const handleEditPrompt = (prompt) => navigate(ROUTES.MY_PROMPTS_EDIT(prompt.id));
 
   const handleApprovePrompt = async (id) => {
     try {
@@ -168,23 +127,36 @@ const MyPromptsPage = () => {
     fetchAllPrompts(newPage, dashboardSearch, newFilters, newSorter);
   };
 
-  const handleLogout = () => logout(() => setMobileMenuOpen(false));
-
-  // Map MyPromptsPage activeTab values to sidebar item keys
-  const sidebarActiveTab = activeTab === 'list' ? 'my-prompts'
-    : activeTab === 'create' ? 'create-prompt'
-    : activeTab; // 'dashboard', 'manage', 'login-management' already match keys
-
+  // Map tab value to sidebar item key
+  const sidebarActiveTab = activeTab === 'list' ? 'my-prompts' : activeTab;
   const menuItems = useSidebarMenu(sidebarActiveTab, user, navigate, handleCreatePrompt, t);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+    <div className="flex h-full bg-gray-50 dark:bg-[#0d0d0d]">
+      {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <Sidebar menuItems={menuItems} activeTab={activeTab} />
+        <Sidebar menuItems={menuItems} activeTab={sidebarActiveTab} />
       </div>
-      <Drawer title={null} placement="left" onClose={() => setMobileMenuOpen(false)} open={mobileMenuOpen} className="lg:hidden" size={280} styles={{ body: { padding: 0 } }} closeIcon={null}>
-        <Sidebar onClose={() => setMobileMenuOpen(false)} menuItems={menuItems} activeTab={activeTab} isMobile={true} />
+
+      {/* Mobile sidebar drawer */}
+      <Drawer
+        title={null}
+        placement="left"
+        onClose={() => setMobileMenuOpen(false)}
+        open={mobileMenuOpen}
+        width={208}
+        styles={{ body: { padding: 0 } }}
+        closeIcon={null}
+      >
+        <Sidebar
+          menuItems={menuItems}
+          activeTab={sidebarActiveTab}
+          isMobile
+          onClose={() => setMobileMenuOpen(false)}
+        />
       </Drawer>
+
+      {/* Content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {activeTab === 'manage' && user?.user_type === 'admin' ? (
           <ManageCategoriesTags onMenuClick={() => setMobileMenuOpen(true)} />
@@ -207,27 +179,17 @@ const MyPromptsPage = () => {
             onTableChange={handleDashboardTableChange}
             pagination={{ current: dashboardCurrentPage, total: totalAllPrompts, pageSize: PAGINATION.PAGE_SIZE }}
           />
-        ) : activeTab === 'list' ? (
+        ) : (
           <MyPromptsList
             onCreatePrompt={handleCreatePrompt}
             onEditPrompt={handleEditPrompt}
             onMenuClick={() => setMobileMenuOpen(true)}
             currentUser={user}
           />
-        ) : (
-          <CreatePromptForm
-            form={form}
-            loading={loading}
-            onSubmit={handleSubmitPrompt}
-            onCancel={() => { setActiveTab('list'); navigate(ROUTES.MY_PROMPTS); }}
-            onMenuClick={() => setMobileMenuOpen(true)}
-            isEditing={!!editingPrompt}
-            initialData={editingPrompt}
-          />
         )}
       </div>
 
-      {/* Rejection reason modal for dashboard tab */}
+      {/* Reject reason modal */}
       <Modal
         title="Lý do từ chối"
         open={rejectModalVisible}

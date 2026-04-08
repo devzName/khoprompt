@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Spin, Empty, notification } from 'antd';
 import { BookOutlined } from '@ant-design/icons';
 import { useAuth } from '../hooks/useAuth';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
 import { bookmarkService } from '../services/bookmarkService';
@@ -65,9 +64,8 @@ const BookmarkedPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-full bg-gray-50 flex flex-col">
         <div className="flex-grow">
-          <Header />
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
               <BookOutlined className="text-6xl text-gray-300 mb-4" />
@@ -83,9 +81,8 @@ const BookmarkedPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-full bg-gray-50 flex flex-col">
       <div className="flex-grow">
-        <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {loading ? (
             <div className="flex justify-center items-center h-64">

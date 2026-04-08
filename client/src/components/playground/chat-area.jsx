@@ -10,8 +10,9 @@ import ChatInput from './chat-input';
 import SuggestedPromptCards from './suggested-prompt-cards';
 
 const MobileMenuBar = ({ onOpen }) => (
-  <div className="md:hidden flex items-center border-b dark:border-gray-700 px-3 py-2 bg-white dark:bg-[#141414]">
+  <div className="md:hidden flex items-center px-3 py-1 bg-white dark:bg-[#141414] border-b dark:border-gray-700">
     <Button icon={<MenuOutlined />} type="text" onClick={onOpen} size="small" />
+    <span className="text-xs text-gray-400 ml-2">Rooms</span>
   </div>
 );
 

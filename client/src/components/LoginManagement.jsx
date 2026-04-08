@@ -1,4 +1,4 @@
-import { Table, Card, Input, Button, Space, Modal, Tooltip } from 'antd';
+import { Table, Input, Button, Space, Modal, Tooltip } from 'antd';
 import { UserSwitchOutlined, SearchOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useRef, useState, useEffect } from 'react';
@@ -256,9 +256,9 @@ const LoginManagement = ({ onMenuClick }) => {
         onMenuClick={onMenuClick}
       />
 
-      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d]">
         <div className="w-full p-4 sm:p-6">
-          <Card className="shadow-sm dark:bg-[#141414] dark:border-gray-700">
+          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] overflow-hidden">
             <Table
               columns={columns}
               dataSource={sessions}
@@ -289,7 +289,7 @@ const LoginManagement = ({ onMenuClick }) => {
                 )
               }}
             />
-          </Card>
+          </div>
         </div>
       </div>
     </div>

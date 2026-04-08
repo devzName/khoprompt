@@ -20,3 +20,5 @@ localbackup.sql
 client/dist
 .opencode
 .github/copilot-instructions.md
+docs
+.claude

@@ -278,18 +278,19 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
   const isAllExpanded = expandedKeys.length === allKeys.length;
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="bg-white dark:bg-[#141414] border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="bg-white dark:bg-[#111] border-b border-gray-100 dark:border-white/[0.06] px-6 py-4 shrink-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1f1f1f]"
+              className="lg:hidden p-1.5 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
+              aria-label="Open menu"
             >
-              <MenuOutlined className="text-xl" />
+              <MenuOutlined />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('manageCategoriesTags.title', 'Manage Categories & Tags')}</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('manageCategoriesTags.subtitle', 'Organize prompts with categories and tags')}</p>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{t('manageCategoriesTags.title', 'Categories & Tags')}</h1>
+              <p className="text-sm text-gray-400 dark:text-neutral-500 mt-0.5">{t('manageCategoriesTags.subtitle', 'Organize prompts with categories and tags')}</p>
             </div>
           </div>
           <Space>
@@ -312,13 +313,13 @@ const ManageCategoriesTags = ({ onMenuClick }) => {
           </Space>
         </div>
       </div>
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 bg-gray-50 dark:bg-[#0d0d0d]">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <Spin size="large" />
           </div>
         ) : (
-          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] p-6">
             <Tree
               treeData={treeData}
               expandedKeys={expandedKeys}

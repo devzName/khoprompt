@@ -172,40 +172,38 @@ const MyPromptsList = ({ onCreatePrompt, onEditPrompt, onMenuClick, currentUser 
         description={t('myPrompts.description')}
         breadcrumb={t('myPrompts.title')}
         onMenuClick={onMenuClick}
-      >
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative flex-1 min-w-0 max-w-md">
-            <Search
-              placeholder={t('myPrompts.searchPlaceholder')}
-              defaultValue={searchValue}
-              key={searchValue} // reset input when URL clears
-              onSearch={handleSearchSubmit}
-              className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
-              size="large"
-              allowClear
-              aria-label="Tìm kiếm prompt"
-            />
-          </div>
-          <Select
-            value={sortRaw}
-            onChange={handleSortChange}
-            options={SORT_OPTIONS}
-            size="large"
-            style={{ minWidth: 180 }}
-            aria-label="Sắp xếp prompt"
-          />
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={onCreatePrompt}
-            size="large"
-            className="whitespace-nowrap rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            {t('myPrompts.createPrompt.title')}
-          </Button>
-        </div>
-      </PageHeader>
-      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
+      />
+
+      {/* Toolbar — separate from page title */}
+      <div className="flex flex-wrap gap-2 items-center px-6 py-3 bg-white dark:bg-[#111] border-b border-gray-100 dark:border-white/[0.06] shrink-0">
+        <Search
+          placeholder={t('myPrompts.searchPlaceholder')}
+          defaultValue={searchValue}
+          key={searchValue}
+          onSearch={handleSearchSubmit}
+          style={{ maxWidth: 260 }}
+          allowClear
+          aria-label="Tìm kiếm prompt"
+        />
+        <Select
+          value={sortRaw}
+          onChange={handleSortChange}
+          options={SORT_OPTIONS}
+          style={{ minWidth: 160 }}
+          aria-label="Sắp xếp prompt"
+        />
+        <div className="flex-1" />
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={onCreatePrompt}
+          className="whitespace-nowrap"
+        >
+          {t('myPrompts.createPrompt.title')}
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d]">
         <div className="w-full p-4 sm:p-6">
           <PersonalStatsBar stats={stats} activeStatus={activeStatus} onStatusClick={handleStatusClick} />
           <PromptsTable

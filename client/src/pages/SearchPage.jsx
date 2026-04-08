@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LatestPrompts from '../components/LatestPrompts';
 import { searchService } from '../services/searchService';
@@ -82,8 +81,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
+    <div className="min-h-full bg-gray-50 flex flex-col">
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {initialLoading ? (
           <div className="flex justify-center items-center h-64">

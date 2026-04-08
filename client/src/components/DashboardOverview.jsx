@@ -34,7 +34,7 @@ const LoginActivityChart = () => {
 
   return (
     <Card
-      className="shadow-sm mb-6 dark:bg-[#141414] dark:border-gray-700"
+      className="mb-6 border border-gray-100 dark:border-white/[0.06] dark:bg-[#141414]"
       title="Login Activity (last 30 days)"
       extra={
         <Button
@@ -102,42 +102,41 @@ const DashboardOverview = ({
         description={t('dashboard.subtitle', 'Quản lý và giám sát tất cả prompts trong hệ thống')}
         breadcrumb={t('dashboard.title', 'Dashboard')}
         onMenuClick={onMenuClick}
-      >
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 max-w-md">
-            <Search
-              placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompt...')}
-              value={searchValue}
-              onChange={onSearchChange}
-              onSearch={onSearchSubmit}
-              className="rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 shadow-sm"
-              size="large"
-              allowClear
-            />
-          </div>
+      />
+
+      {/* Toolbar — separate from page title */}
+      <div className="flex flex-wrap gap-2 items-center px-6 py-3 bg-white dark:bg-[#111] border-b border-gray-100 dark:border-white/[0.06] shrink-0">
+        <Search
+          placeholder={t('dashboard.searchPlaceholder', 'Tìm kiếm prompt...')}
+          value={searchValue}
+          onChange={onSearchChange}
+          onSearch={onSearchSubmit}
+          style={{ maxWidth: 260 }}
+          allowClear
+        />
+        <div className="flex-1" />
+        <Button
+          type="primary"
+          icon={<AppstoreOutlined />}
+          onClick={() => navigate(ROUTES.ADMIN_PROMPTS)}
+        >
+          Quản lý Prompt
+        </Button>
+        {currentUser?.user_type === 'admin' && (
           <Button
-            type="primary"
-            icon={<AppstoreOutlined />}
-            onClick={() => navigate(ROUTES.ADMIN_PROMPTS)}
+            icon={<AuditOutlined />}
+            onClick={() => navigate(ROUTES.ADMIN_AUDIT_LOGS)}
           >
-            Quản lý Prompt
+            Audit Logs
           </Button>
-          {currentUser?.user_type === 'admin' && (
-            <Button
-              icon={<AuditOutlined />}
-              onClick={() => navigate(ROUTES.ADMIN_AUDIT_LOGS)}
-            >
-              Audit Logs
-            </Button>
-          )}
-        </div>
-      </PageHeader>
-      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d]">
         <div className="w-full p-4 sm:p-6">
           {}
           <Row gutter={[16, 16]} className="mb-6">
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
+              <Card className="border border-gray-100 dark:border-white/[0.06] dark:bg-[#141414]">
                 <Statistic
                   title={t('dashboard.stats.total', 'Tổng số prompts')}
                   value={stats.total}
@@ -147,7 +146,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
+              <Card className="border border-gray-100 dark:border-white/[0.06] dark:bg-[#141414]">
                 <Statistic
                   title={t('dashboard.stats.approved', 'Đã duyệt')}
                   value={stats.approved}
@@ -157,7 +156,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
+              <Card className="border border-gray-100 dark:border-white/[0.06] dark:bg-[#141414]">
                 <Statistic
                   title={t('dashboard.stats.pending', 'Chờ duyệt')}
                   value={stats.pending}
@@ -167,7 +166,7 @@ const DashboardOverview = ({
               </Card>
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <Card className="shadow-sm hover:shadow-md transition-shadow dark:bg-[#141414] dark:border-gray-700">
+              <Card className="border border-gray-100 dark:border-white/[0.06] dark:bg-[#141414]">
                 <Statistic
                   title={t('dashboard.stats.draft', 'Bản nháp')}
                   value={stats.draft}

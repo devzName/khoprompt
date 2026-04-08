@@ -55,10 +55,10 @@ const Hero = () => {
         <div className="relative px-6 sm:px-8 lg:px-16 py-10 sm:py-14 md:py-16">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6 border border-white/20 dark:border-white/10">
+            {/* <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6 border border-white/20 dark:border-white/10">
               <FireOutlined className="text-orange-400" />
               <span className="text-white/90 text-sm font-medium">{t('hero.badge', 'Kho prompt AI hàng đầu')}</span>
-            </div>
+            </div> */}
 
             {/* Title */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6 leading-tight tracking-tight">

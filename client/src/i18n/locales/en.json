@@ -59,7 +59,7 @@
     "logout": "Logout",
     "language": "Language",
     "reviewPrompts": "Review Prompts",
-    "vietnamese": "Tiáº¿ng Viá»‡t",
+    "vietnamese": "Vietnamese",
     "english": "English",
     "dashboard": "Dashboard",
     "loginManagement": "Login Management",
@@ -207,7 +207,7 @@
   },
   "hero": {
     "title": "Discover & Share AI Prompts",
-    "subtitle": "Explore curated prompts for all needs â€“ from programming, content creation to marketing."
+    "subtitle": "Explore curated prompts for all needs from programming, content creation to marketing."
   },
   "featured": {
     "title": "Featured Prompts",
@@ -223,7 +223,7 @@
   },
   "footer": {
     "description": "High-quality AI prompt library for ChatGPT, Claude, Gemini and other AI tools. Optimize your work with professional prompts.",
-    "copyright": "Â© 2025 Prompt Library. All rights reserved.",
+    "copyright": "© 2025 Prompt Library. All rights reserved.",
     "popularCategories": "Popular Categories",
     "viewAll": "View All",
     "support": "Support",

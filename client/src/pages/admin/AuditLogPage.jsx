@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Drawer, Select, DatePicker, Card, Space } from 'antd';
+import { Drawer, Select, DatePicker } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -109,7 +109,7 @@ const AuditLogPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+    <div className="flex h-full bg-gray-50 dark:bg-[#0a0a0a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar menuItems={menuItems} activeTab="audit-logs" />
@@ -143,29 +143,29 @@ const AuditLogPage = () => {
           onMenuClick={() => setMobileMenuOpen(true)}
         />
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d] p-6">
           {/* Filters */}
-          <Card className="mb-4 shadow-sm dark:bg-[#141414] dark:border-gray-700">
-            <Space wrap>
-              <Select
-                value={action}
-                onChange={handleActionChange}
-                options={ACTION_OPTIONS}
-                style={{ width: 180 }}
-                placeholder="Filter by action"
-                aria-label="Lọc theo hành động"
-              />
-              <RangePicker
-                value={dateRange.map((d) => (d ? dayjs(d) : null))}
-                onChange={handleDateChange}
-                allowEmpty={[true, true]}
-                aria-label="Lọc theo khoảng thời gian"
-              />
-            </Space>
-          </Card>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Select
+              value={action}
+              onChange={handleActionChange}
+              options={ACTION_OPTIONS}
+              style={{ width: 180 }}
+              placeholder="Filter by action"
+              aria-label="Lọc theo hành động"
+              size="small"
+            />
+            <RangePicker
+              value={dateRange.map((d) => (d ? dayjs(d) : null))}
+              onChange={handleDateChange}
+              allowEmpty={[true, true]}
+              aria-label="Lọc theo khoảng thời gian"
+              size="small"
+            />
+          </div>
 
           {/* Table */}
-          <Card className="shadow-sm dark:bg-[#141414] dark:border-gray-700">
+          <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] overflow-hidden">
             <AuditLogTable
               data={data}
               loading={loading}
@@ -173,7 +173,7 @@ const AuditLogPage = () => {
               onChange={handleTableChange}
               onRowClick={(record) => setDrawerUserId(record.user_id)}
             />
-          </Card>
+          </div>
         </div>
       </div>
 

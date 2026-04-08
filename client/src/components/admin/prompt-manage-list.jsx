@@ -148,7 +148,7 @@ const PromptManageList = () => {
   return (
     <div className="flex flex-col gap-4">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-2 items-center">
         <Search
           placeholder="Tìm kiếm prompt..."
           allowClear
@@ -179,12 +179,14 @@ const PromptManageList = () => {
       </div>
 
       {/* Table */}
+      <div className="bg-white dark:bg-[#141414] rounded-lg border border-gray-100 dark:border-white/[0.06] overflow-hidden">
       <Table
         rowKey="id"
         columns={columns}
         dataSource={prompts}
         loading={loading}
         size="small"
+        className="[&_.ant-table]:!rounded-none [&_.ant-table-container]:!rounded-none"
         rowSelection={{
           selectedRowKeys,
           onChange: setSelectedRowKeys,
@@ -199,6 +201,7 @@ const PromptManageList = () => {
         }}
         scroll={{ x: 700 }}
       />
+      </div>
     </div>
   );
 };

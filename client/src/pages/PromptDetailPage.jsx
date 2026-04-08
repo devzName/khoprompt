@@ -17,7 +17,6 @@ import { useAuth } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/use-dark-mode';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NotFoundPage from './NotFoundPage';
 import { ROUTES } from '../constants/routes';
@@ -321,9 +320,8 @@ const PromptDetailPage = () => {
   };
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-full bg-gray-50 flex flex-col">
         <div className="flex-grow">
-          <Header />
           <div className="flex items-center justify-center h-[60vh]">
             <Spin size="large" />
           </div>
@@ -353,9 +351,8 @@ const PromptDetailPage = () => {
     { title: prompt.title }
   ];
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex flex-col transition-colors duration-300">
+    <div className="min-h-full bg-gray-50 dark:bg-[#0a0a0a] flex flex-col transition-colors duration-300">
       <div className="grow">
-        <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full">
           <Breadcrumb items={breadcrumbItems} className="mb-6" />

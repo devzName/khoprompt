@@ -178,38 +178,41 @@ const PlaygroundPage = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-[#0d0d0d]">
-      {/* Desktop sidebar — hidden on mobile */}
-      <div className="hidden md:flex">
-        <ChatSidebar {...sidebarProps} />
+    <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-[#0d0d0d]">
+      {/* Chat body — sidebar + main area */}
+      <div className="flex flex-1 min-h-0">
+        {/* Desktop sidebar — hidden on mobile */}
+        <div className="hidden md:flex">
+          <ChatSidebar {...sidebarProps} />
+        </div>
+
+        {/* Mobile sidebar — Drawer */}
+        <Drawer
+          open={mobileSidebarOpen}
+          onClose={() => setMobileSidebarOpen(false)}
+          placement="left"
+          width={256}
+          styles={{ body: { padding: 0 } }}
+          title={null}
+          closable={false}
+        >
+          <ChatSidebar {...sidebarProps} />
+        </Drawer>
+
+        <ChatArea
+          room={activeRoom}
+          models={models}
+          messages={messages}
+          streamingContent={streamingContent}
+          isStreaming={isStreaming}
+          loadingMessages={loadingMessages}
+          onSendMessage={handleSendMessage}
+          onAbort={abort}
+          onUpdateRoom={handleUpdateRoom}
+          onSelectPrompt={handleSelectPrompt}
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+        />
       </div>
-
-      {/* Mobile sidebar — Drawer */}
-      <Drawer
-        open={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-        placement="left"
-        width={256}
-        styles={{ body: { padding: 0 } }}
-        title={null}
-        closable={false}
-      >
-        <ChatSidebar {...sidebarProps} />
-      </Drawer>
-
-      <ChatArea
-        room={activeRoom}
-        models={models}
-        messages={messages}
-        streamingContent={streamingContent}
-        isStreaming={isStreaming}
-        loadingMessages={loadingMessages}
-        onSendMessage={handleSendMessage}
-        onAbort={abort}
-        onUpdateRoom={handleUpdateRoom}
-        onSelectPrompt={handleSelectPrompt}
-        onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
-      />
     </div>
   );
 };

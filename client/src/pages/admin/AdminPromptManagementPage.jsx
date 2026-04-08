@@ -71,7 +71,7 @@ const AdminPromptManagementPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+    <div className="flex h-full bg-gray-50 dark:bg-[#0a0a0a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar menuItems={menuItems} activeTab="admin-prompts" />
@@ -103,15 +103,18 @@ const AdminPromptManagementPage = () => {
           description="Duyệt, từ chối và quản lý tất cả prompts trong hệ thống"
           breadcrumb="Quản lý Prompt"
           onMenuClick={() => setMobileMenuOpen(true)}
-        >
-          <ApprovalToggle value={requireApproval} onChange={setRequireApproval} />
-        </PageHeader>
+        />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]">
-          <div className="w-full p-4 sm:p-6">
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 px-6 py-3 bg-white dark:bg-[#111] border-b border-gray-100 dark:border-white/[0.06] shrink-0">
+          <ApprovalToggle value={requireApproval} onChange={setRequireApproval} />
+        </div>
+
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0d0d]">
+          <div className="p-6">
             {isMobile && requireApproval && (
-              <div className="mb-4 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg px-3 py-2">
-                Chế độ Kanban không khả dụng trên thiết bị di động. Đang hiển thị dạng danh sách.
+              <div className="mb-4 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-md px-3 py-2">
+                Kanban không khả dụng trên mobile — hiển thị dạng danh sách.
               </div>
             )}
             {showKanban ? <KanbanBoard /> : <PromptManageList />}
