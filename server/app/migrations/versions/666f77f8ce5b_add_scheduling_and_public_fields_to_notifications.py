@@ -1,6 +1,6 @@
 """add_scheduling_and_public_fields_to_notifications
 
-Revision ID: a1b2c3d4e5f6
+Revision ID: 666f77f8ce5b
 Revises: 093bc1eda71d
 Create Date: 2026-04-09 10:10:00.000000
 
@@ -9,7 +9,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = 'a1b2c3d4e5f6'
+revision = '666f77f8ce5b'
 down_revision = '093bc1eda71d'
 branch_labels = None
 depends_on = None
