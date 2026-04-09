@@ -1,6 +1,7 @@
 // src/pages/NotificationsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { getNotifications, markAsRead } from '../services/notificationService';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/dateUtils';
@@ -102,7 +103,10 @@ const NotificationsPage = () => {
                       )}
                     </div>
                     <h3 className="text-lg font-medium text-gray-900">{notification.title}</h3>
-                    <p className="mt-2 text-gray-600">{notification.content}</p>
+                    <div
+                      className="mt-2 text-gray-600 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(notification.content) }}
+                    />
                     <div className="mt-4 text-sm text-gray-500">
                       {formatDate(notification.created_at)}
                     </div>
