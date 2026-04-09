@@ -184,9 +184,9 @@ const PromptListPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col divide-y divide-gray-100 dark:divide-white/5 border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden">
-                  {prompts.map(prompt => (
-                    <PromptCard key={prompt.id} prompt={prompt} listMode />
+                <div className="flex flex-col divide-y divide-[#E2E8F0] dark:divide-white/5 border border-[#E2E8F0] dark:border-white/5 rounded-xl overflow-hidden">
+                  {prompts.map((prompt, i) => (
+                    <PromptCard key={prompt.id} prompt={prompt} listMode index={i} />
                   ))}
                 </div>
               )}
