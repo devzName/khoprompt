@@ -4,19 +4,20 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Spin, Empty, Drawer, notification, Pagination, Tag, Tooltip } from 'antd';
+import { Input, Button, Spin, Empty, Drawer, notification, Pagination, Tooltip, Avatar } from 'antd';
 import { 
   EyeOutlined,
   LikeOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth';
 import { skillService } from '../services/skillService';
 import { ROUTES } from '../constants/routes';
 import PageHeader from '../components/shared/PageHeader';
 import FilterSidebar from '../components/FilterSidebar';
+import { getCategoryColor, CategoryBadge } from '../components/PromptCard';
 
 const { Search } = Input;
 
@@ -25,74 +26,92 @@ const CATEGORIES = [
   'Architecture', 'Review', 'Debugging', 'Refactoring', 'Other',
 ];
 
-const SkillCard = ({ skill, onClick, listMode = false }) => {
+const SkillCard = ({ skill, onClick, listMode = false, index = 0 }) => {
+  const color = getCategoryColor(skill.category);
+
   if (listMode) {
+    const isEven = index % 2 === 0;
     return (
       <div
         onClick={() => onClick(skill.id)}
-        className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-[#141414] hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer transition-colors"
+        className={`flex items-center gap-0 cursor-pointer transition-colors group
+          ${isEven ? 'bg-white dark:bg-[#141414]' : 'bg-[#F8FAFC] dark:bg-[#161616]'}
+          hover:bg-[#EFF6FF] dark:hover:bg-blue-950/20`}
       >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-gray-900 dark:text-white truncate">{skill.name}</span>
-            {skill.category && (
-              <Tag className="m-0 border-none bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-lg px-2 py-0.5 shrink-0">
-                {skill.category}
-              </Tag>
-            )}
+        {/* Left color stripe */}
+        <div className={`w-1 self-stretch shrink-0 ${color.stripe} opacity-70`} />
+
+        <div className="flex items-center gap-4 px-4 py-3.5 flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="font-semibold text-[#1E293B] dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {skill.name}
+              </span>
+              {skill.category && <CategoryBadge name={skill.category} className="shrink-0" />}
+            </div>
+            <p className="text-sm text-[#64748B] dark:text-neutral-400 truncate">{skill.description || 'No description provided.'}</p>
           </div>
-          <p className="text-sm text-gray-500 dark:text-neutral-400 truncate">{skill.description || 'No description provided.'}</p>
-        </div>
-        <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-neutral-500 shrink-0">
-          <span className="flex items-center gap-1"><EyeOutlined /> {skill.view_count ?? 0}</span>
-          <span className="flex items-center gap-1"><LikeOutlined /> {skill.like_count ?? 0}</span>
-          <span className="hidden sm:block">@{skill.user?.full_name?.split(' ')[0] || 'User'}</span>
+          <div className="flex items-center gap-4 shrink-0 text-xs text-[#94A3B8] dark:text-neutral-500">
+            <span className={`flex items-center gap-1 ${(skill.view_count ?? 0) > 0 ? 'text-blue-400' : ''}`}>
+              <EyeOutlined /> {skill.view_count ?? 0}
+            </span>
+            <span className={`flex items-center gap-1 ${(skill.like_count ?? 0) > 0 ? 'text-rose-400' : ''}`}>
+              <LikeOutlined /> {skill.like_count ?? 0}
+            </span>
+            <span className="text-indigo-400 font-medium hidden sm:block">
+              @{skill.user?.full_name?.split(' ')[0] || 'User'}
+            </span>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Grid card
   return (
     <div
       onClick={() => onClick(skill.id)}
-      className="group relative bg-white dark:bg-[#141414] rounded-2xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 cursor-pointer overflow-hidden"
+      className="bg-white dark:bg-[#141414] rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-600 flex flex-col group cursor-pointer"
     >
-    {/* Decorative background gradient */}
-    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors" />
-    
-    <div className="relative flex flex-col h-full gap-4">
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-          {skill.name}
-        </h3>
-        {skill.category && (
-          <Tag className="m-0 border-none bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-lg px-2 py-0.5">
-            {skill.category}
-          </Tag>
-        )}
+      <div className="flex items-start justify-between mb-3">
+        <CategoryBadge name={skill.category} />
       </div>
 
-      <p className="text-sm text-gray-500 dark:text-neutral-400 line-clamp-2 h-10 leading-relaxed">
+      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug h-12">
+        {skill.name}
+      </h3>
+
+      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-4 grow leading-relaxed">
         {skill.description || 'No description provided.'}
       </p>
 
-      <div className="flex flex-wrap gap-1.5">
-        {skill.tags?.slice(0, 3).map(tag => (
-          <span key={tag} className="text-[11px] bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-neutral-500 px-2 py-0.5 rounded-md">
-            #{tag}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-auto pt-4 border-t border-gray-50 dark:border-white/5 flex items-center justify-between text-xs text-gray-400 dark:text-neutral-500">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1"><EyeOutlined className="text-blue-500/70" /> {skill.view_count ?? 0}</span>
-          <span className="flex items-center gap-1"><LikeOutlined className="text-pink-500/70" /> {skill.like_count ?? 0}</span>
+      {skill.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {skill.tags.slice(0, 3).map(tag => (
+            <span key={tag} className="text-[11px] bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-neutral-500 px-2 py-0.5 rounded-md">
+              #{tag}
+            </span>
+          ))}
         </div>
-        <span className="font-medium text-gray-400/80">@{skill.user?.full_name?.split(' ')[0] || 'User'}</span>
+      )}
+
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between text-xs mt-auto">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar size={22} icon={<UserOutlined />} className="shrink-0 bg-blue-100 text-blue-600" />
+          <span className="font-medium text-gray-700 dark:text-gray-200 truncate">
+            {skill.user?.full_name || 'User'}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 text-gray-400 shrink-0">
+          <span className={`flex items-center gap-1 ${(skill.view_count ?? 0) > 0 ? 'text-blue-400' : ''}`}>
+            <EyeOutlined /> {skill.view_count ?? 0}
+          </span>
+          <span className={`flex items-center gap-1 ${(skill.like_count ?? 0) > 0 ? 'text-rose-400' : ''}`}>
+            <LikeOutlined /> {skill.like_count ?? 0}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
   );
 };
 
@@ -247,9 +266,9 @@ const SkillListPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col divide-y divide-gray-100 dark:divide-white/5 border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden">
-                  {Array.isArray(skills) && skills.map(skill => (
-                    <SkillCard key={skill?.id} skill={skill} onClick={handleCardClick} listMode />
+                <div className="flex flex-col divide-y divide-[#E2E8F0] dark:divide-white/5 border border-[#E2E8F0] dark:border-white/5 rounded-xl overflow-hidden">
+                  {Array.isArray(skills) && skills.map((skill, i) => (
+                    <SkillCard key={skill?.id} skill={skill} onClick={handleCardClick} listMode index={i} />
                   ))}
                 </div>
               )}
