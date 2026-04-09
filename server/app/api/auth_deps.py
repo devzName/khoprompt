@@ -12,19 +12,22 @@ from app.core.security import verify_token
 from app.repositories.user_repo import UserRepository
 from app.models.user import User
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 optional_security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
     session: DbSession,
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
+    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)]
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    if credentials is None:
+        raise credentials_exception
     
     user_id_str = verify_token(credentials.credentials)
     if user_id_str is None:

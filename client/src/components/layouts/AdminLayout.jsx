@@ -33,7 +33,7 @@ const AdminLayout = ({ activeTab, children }) => {
         onClose={() => setMobileMenuOpen(false)}
         open={mobileMenuOpen}
         className="lg:hidden"
-        width={208}
+        size="default"
         styles={{ body: { padding: 0 } }}
         closeIcon={null}
       >
@@ -47,9 +47,13 @@ const AdminLayout = ({ activeTab, children }) => {
 
       {/* Main content — children receive onMenuClick to open mobile drawer */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {typeof children === 'function'
-          ? children({ onMenuClick: () => setMobileMenuOpen(true) })
-          : children}
+        {(() => {
+          const onMenuClick = () => setMobileMenuOpen(true);
+          const kids = Array.isArray(children) ? children : [children];
+          return kids.map((child, i) =>
+            typeof child === 'function' ? child({ onMenuClick }) : child
+          );
+        })()}
       </div>
     </div>
   );

@@ -1,24 +1,97 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Dropdown } from 'antd';
+import { Avatar, Dropdown, Popover, Empty } from 'antd';
 import {
   SunOutlined,
   MoonOutlined,
   ThunderboltOutlined,
-  PlusOutlined,
   DashboardOutlined,
+  BellOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 import { useLanguage } from '../hooks/useLanguage';
 import { useDarkMode } from '../hooks/use-dark-mode';
 import { createUserMenuItems } from '../utils/userMenuUtils.jsx';
 import Logo from './shared/Logo';
 import { ROUTES } from '../constants/routes';
+import NotificationBadge from './NotificationBadge';
+import { useNotifications } from '../hooks/useNotifications';
+
+const NotificationPanel = ({ onViewAll }) => {
+  const { notifications, unreadCount, markRead } = useNotifications();
+  const navigate = useNavigate();
+  const recent = notifications.slice(0, 5);
+
+  return (
+    <div className="w-80 bg-white dark:bg-[#1a1a1a] rounded-xl shadow-xl border border-gray-100 dark:border-white/8 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/8">
+        <span className="font-semibold text-gray-900 dark:text-white text-sm">Notifications</span>
+        {unreadCount > 0 && (
+          <span className="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">
+            {unreadCount} unread
+          </span>
+        )}
+      </div>
+
+      {/* List */}
+      <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-white/5">
+        {recent.length === 0 ? (
+          <div className="py-10 flex flex-col items-center gap-2 text-gray-400">
+            <BellOutlined className="text-2xl" />
+            <span className="text-sm">No notifications</span>
+          </div>
+        ) : (
+          recent.map(n => (
+            <div
+              key={n.id}
+              className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer
+                ${n.status === 'unread' ? 'bg-blue-50/50 dark:bg-blue-950/20' : 'hover:bg-gray-50 dark:hover:bg-white/3'}`}
+              onClick={() => n.status === 'unread' && markRead(n.id)}
+            >
+              <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${n.status === 'unread' ? 'bg-blue-500' : 'bg-transparent'}`} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {n.notification?.title || n.title}
+                </p>
+                <p
+                  className="text-xs text-gray-500 dark:text-neutral-400 line-clamp-2 mt-0.5"
+                  dangerouslySetInnerHTML={{ __html: n.notification?.content || n.content || '' }}
+                />
+              </div>
+              {n.status === 'unread' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); markRead(n.id); }}
+                  className="shrink-0 p-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-400 transition-colors"
+                  title="Mark as read"
+                >
+                  <CheckOutlined className="text-xs" />
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-gray-100 dark:border-white/8 px-4 py-2.5">
+        <button
+          onClick={() => { navigate('/notifications'); onViewAll?.(); }}
+          className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+        >
+          View all notifications
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Header = () => {
   const { t, getLanguageMenuItems } = useLanguage();
   const [isDark, setIsDark] = useDarkMode();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -154,6 +227,28 @@ const Header = () => {
               ? <SunOutlined aria-hidden="true" className="text-sm" />
               : <MoonOutlined aria-hidden="true" className="text-sm" />}
           </button>
+
+          {/* Notification Popover */}
+          <Popover
+            content={<NotificationPanel onViewAll={() => {}} />}
+            trigger="click"
+            placement="bottomRight"
+            arrow={false}
+            overlayInnerStyle={{ padding: 0, borderRadius: 12 }}
+            overlayStyle={{ paddingTop: 8 }}
+          >
+            <button
+              className="relative p-2 rounded-md
+                text-gray-400 dark:text-neutral-500
+                hover:text-black dark:hover:text-white
+                hover:bg-gray-100 dark:hover:bg-white/6
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-white/20
+                transition-colors duration-150"
+            >
+              <BellOutlined aria-hidden="true" className="text-sm" />
+              <NotificationBadge count={unreadCount} />
+            </button>
+          </Popover>
 
           {/* Avatar / user menu */}
           <Dropdown

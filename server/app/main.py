@@ -7,15 +7,22 @@ from contextlib import asynccontextmanager
 
 from app.api.v1 import router as v1_router
 from app.core.config import get_settings
+from app.core.scheduler import scheduler
 from app.services.elasticsearch_service import elasticsearch_service
+from app.services.scheduler_jobs import publish_scheduled_notifications
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     await elasticsearch_service.connect()
+    scheduler.add_job(publish_scheduled_notifications, "interval", seconds=30, id="publish_scheduled")
+    scheduler.start()
+    # Catch any missed windows from downtime
+    await publish_scheduled_notifications()
     yield
     # Shutdown
+    scheduler.shutdown(wait=False)
     await elasticsearch_service.disconnect()
 
 

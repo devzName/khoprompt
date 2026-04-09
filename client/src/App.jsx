@@ -12,6 +12,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminLoginManagementPage from './pages/admin/AdminLoginManagementPage';
 import AuditLogPage from './pages/admin/AuditLogPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import PlaygroundPage from './pages/PlaygroundPage';
 import CreatePromptPage from './pages/CreatePromptPage';
 import SkillListPage from './pages/SkillListPage';
@@ -19,17 +20,16 @@ import PromptListPage from './pages/PromptListPage';
 import MySkillsPage from './pages/MySkillsPage';
 import SkillCreatePage from './pages/SkillCreatePage';
 import SkillDetailPage from './pages/SkillDetailPage';
+import NotificationsPage from './pages/NotificationsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
 import { ROUTES } from './constants/routes';
 import { Spin, ConfigProvider, theme } from 'antd';
 import { useDarkMode } from './hooks/use-dark-mode';
+import { NotificationProvider } from './hooks/useNotifications';
+import NotificationModal from './components/NotificationModal';
 
-/**
- * Shared layout: sticky header at top; content fills remaining height.
- * Each page controls its own overflow/scroll behaviour.
- */
 const AuthLayout = ({ children }) => (
   <div className="flex flex-col h-screen">
     <Header />
@@ -43,7 +43,10 @@ function App() {
   const [isDark] = useDarkMode();
   return (
     <ConfigProvider theme={{ algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
-      <AppContent />
+      <NotificationProvider>
+        <NotificationModal />
+        <AppContent />
+      </NotificationProvider>
     </ConfigProvider>
   );
 }
@@ -186,6 +189,14 @@ function AppContent() {
           }
         />
         <Route
+          path={ROUTES.ADMIN_NOTIFICATIONS}
+          element={
+            <AdminRoute>
+              <AdminNotificationsPage />
+            </AdminRoute>
+          }
+        />
+        <Route
           path={ROUTES.PLAYGROUND}
           element={
             <ProtectedRoute>
@@ -220,6 +231,14 @@ function AppContent() {
         <Route
           path={ROUTES.SKILL_EDIT}
           element={<ProtectedRoute><SkillCreatePage /></ProtectedRoute>}
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

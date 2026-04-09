@@ -6,7 +6,7 @@ import {
   UserSwitchOutlined,
   AuditOutlined,
   ToolOutlined,
-  PlusOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '../constants/routes';
 
@@ -46,6 +46,9 @@ export function useSidebarMenu(activeTab, user, navigate, _onCreatePrompt, t, sh
 
       item('login-management', <UserSwitchOutlined />, 'sidebar.loginManagement', 'Login Management',
         () => navigate(ROUTES.ADMIN_LOGIN_MANAGEMENT)),
+
+      item('notifications', <BellOutlined />, 'sidebar.notifications', 'Notifications',
+        () => navigate(ROUTES.ADMIN_NOTIFICATIONS)),
 
       item('audit-logs', <AuditOutlined />, 'sidebar.auditLogs', 'Audit Logs',
         () => navigate(ROUTES.ADMIN_AUDIT_LOGS)),

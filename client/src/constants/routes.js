@@ -16,6 +16,7 @@ export const ROUTES = {
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_CATEGORIES: '/admin/categories',
   ADMIN_LOGIN_MANAGEMENT: '/admin/login-management',
+  ADMIN_NOTIFICATIONS: '/admin/notifications',
   PLAYGROUND: '/playground',
   PLAYGROUND_ROOM: (roomId) => `/playground/${roomId}`,
   SKILLS: '/skills',
